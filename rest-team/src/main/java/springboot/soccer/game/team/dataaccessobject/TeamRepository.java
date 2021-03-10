@@ -29,7 +29,7 @@ public interface TeamRepository extends PagingAndSortingRepository<TeamDO, Long>
 
     Optional<TeamDO> findByIdAndDeletedIsFalse(Long id);
 
-    Optional<TeamDO> findByNameAndDeletedIsFalse(String name);
+    List<TeamDO> findByNameAndDeletedIsFalse(String name);
 
     List<TeamDO> findByCountryDOCodeAndDeletedIsFalse(String countryCode, Pageable pageable);
 
