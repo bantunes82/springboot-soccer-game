@@ -16,6 +16,7 @@
 	<properties>
 		<java.version>11</java.version>
 		<pojo.tester.version>[0.7.6]</pojo.tester.version>
+		<mokito.version>[3.8.0]</mokito.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -53,6 +54,18 @@
 			<groupId>pl.pojo</groupId>
 			<artifactId>pojo-tester</artifactId>
 			<version>${pojo.tester.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>${mokito.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>${mokito.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
