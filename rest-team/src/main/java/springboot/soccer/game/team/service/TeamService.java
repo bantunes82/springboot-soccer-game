@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import springboot.soccer.game.team.dataaccessobject.CountryRepository;
 import springboot.soccer.game.team.dataaccessobject.TeamRepository;
 import springboot.soccer.game.team.domainobject.CountryDO;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Validated
 @Transactional(propagation = Propagation.SUPPORTS)
 public class TeamService {
 

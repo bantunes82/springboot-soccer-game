@@ -2,8 +2,8 @@ package springboot.soccer.game.team.resource;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -23,11 +23,13 @@ import springboot.soccer.game.team.service.TeamService;
 import springboot.soccer.game.team.util.CountryCode;
 import springboot.soccer.game.team.util.Range;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping(value = "/v1/teams", produces = "application/json")
 public class TeamResource {
@@ -57,7 +59,7 @@ public class TeamResource {
 
     @GetMapping(path = "/country/{countryCode}")
     public ResponseEntity<List<TeamDTO>> findTeamByCountryCode(@PathVariable("countryCode") @CountryCode String countryCode,
-                                                               @RequestParam("pageIndex") int pageIndex,
+                                                               @RequestParam(value = "pageIndex", defaultValue = "0") int pageIndex,
                                                                @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         List<TeamDO> teams = teamService.findByCountryCode(countryCode, pageIndex, pageSize);
 
@@ -65,7 +67,7 @@ public class TeamResource {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity createTeam(@RequestBody TeamDTO teamDTO) {
+    public ResponseEntity createTeam(@Valid @RequestBody TeamDTO teamDTO) {
         TeamDO teamDO = teamMapper.toTeamDO(teamDTO);
         TeamDO teamSaved = teamService.create(teamDO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -80,7 +82,7 @@ public class TeamResource {
 
     @PutMapping(path = "/{id}", consumes = "application/json")
     public ResponseEntity<TeamDTO> updateTeam(@PathVariable("id") Long teamId,
-                                              @RequestBody TeamDTO teamDTO) throws EntityNotFoundException {
+                                              @Valid @RequestBody TeamDTO teamDTO) throws EntityNotFoundException {
         TeamDO teamDO = teamMapper.toTeamDO(teamDTO);
         TeamDO teamUpdated = teamService.update(teamId, teamDO);
 
