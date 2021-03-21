@@ -1,6 +1,8 @@
 package springboot.soccer.game.team.handler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import springboot.soccer.game.team.exception.EntityNotFoundException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -21,12 +24,19 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ErrorHandlingControllerAdvice {
 
+    private final MessageSource messageSource;
+
+    @Autowired
+    public ErrorHandlingControllerAdvice(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
-        log.debug("Errors while finding entity: %s", ex.getMessage());
+    ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex, Locale locale) {
+        String message = messageSource.getMessage(ex.getMessage(), ex.getArgs(), locale);
+        log.debug("Errors while finding entity: %s", message);
 
-        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error; ", ex.getMessage()));
+        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error; ", message));
 
         return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
     }

@@ -1,10 +1,16 @@
 package springboot.soccer.game.team.exception;
 
+import lombok.Getter;
+
 public class EntityNotFoundException extends Exception {
 
-    public EntityNotFoundException(String message)
+    @Getter
+    private final Object[] args;
+
+    public EntityNotFoundException(String messageKey, Object... args)
     {
-        super(message);
+        super(messageKey);
+        this.args = args;
     }
 
 }

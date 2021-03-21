@@ -19,6 +19,8 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
+import static springboot.soccer.game.team.constants.Validation.TEAM_NOT_FOUND;
+
 @Service
 @Validated
 @Transactional(propagation = Propagation.SUPPORTS)
@@ -93,7 +95,7 @@ public class TeamService {
 
 
     private TeamDO findTeamChecked(Long teamId) throws EntityNotFoundException {
-        return teamRepository.findByIdAndDeletedIsFalse(teamId).orElseThrow(() -> new EntityNotFoundException("Could not find team with id: " + teamId));
+        return teamRepository.findByIdAndDeletedIsFalse(teamId).orElseThrow(() -> new EntityNotFoundException(TEAM_NOT_FOUND, teamId));
     }
 
 

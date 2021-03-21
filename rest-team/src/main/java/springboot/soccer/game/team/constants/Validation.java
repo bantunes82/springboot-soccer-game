@@ -17,4 +17,6 @@ public class Validation {
     public static final String COUNTRY_NAME_BLANK = "{constraint.country.nameNotBlank}";
     public static final String COUNTRY_NAME_SIZE =  "{constraint.country.nameSize}";
     public static final String COUNTRY_CODE_INVALID = "{constraint.country.codeInvalid}";
+
+    public static final String TEAM_NOT_FOUND = "exception.team.not.found";
 }
