@@ -27,11 +27,13 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 
 @Slf4j
 @Validated
 @RestController
-@RequestMapping(value = "/v1/teams", produces = "application/json")
+@RequestMapping(value = "/v1/teams", produces = APPLICATION_JSON_VALUE)
 public class TeamResource {
 
     private TeamService teamService;
@@ -66,7 +68,7 @@ public class TeamResource {
         return ResponseEntity.ok(teamMapper.toTeamDTOList(teams));
     }
 
-    @PostMapping(consumes = "application/json")
+    @PostMapping(consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity createTeam(@Valid @RequestBody TeamDTO teamDTO) {
         TeamDO teamDO = teamMapper.toTeamDO(teamDTO);
         TeamDO teamSaved = teamService.create(teamDO);
@@ -80,7 +82,7 @@ public class TeamResource {
         return ResponseEntity.created(location).build();
     }
 
-    @PutMapping(path = "/{id}", consumes = "application/json")
+    @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<TeamDTO> updateTeam(@PathVariable("id") Long teamId,
                                               @Valid @RequestBody TeamDTO teamDTO) throws EntityNotFoundException {
         TeamDO teamDO = teamMapper.toTeamDO(teamDTO);

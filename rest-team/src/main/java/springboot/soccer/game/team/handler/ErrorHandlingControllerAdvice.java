@@ -36,7 +36,7 @@ public class ErrorHandlingControllerAdvice {
         String message = messageSource.getMessage(ex.getMessage(), ex.getArgs(), locale);
         log.debug("Errors while finding entity: %s", message);
 
-        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error; ", message));
+        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error", message));
 
         return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
     }

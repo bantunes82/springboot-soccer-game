@@ -6,7 +6,7 @@
     <artifactId>super-parent-root</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
-    <name>Quarkus Soccer Game - R00T</name>
+    <name>SpringBoot Soccer Game - R00T</name>
 	
 	 <modules>
         <module>rest-team</module>
