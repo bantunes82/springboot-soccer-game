@@ -14,6 +14,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import springboot.soccer.game.team.container.Containers;
+import springboot.soccer.game.team.dataaccessobject.TeamRepository;
 import springboot.soccer.game.team.datatransferobject.CountryDTO;
 import springboot.soccer.game.team.datatransferobject.TeamDTO;
 
@@ -22,8 +23,7 @@ import java.util.Locale;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static springboot.soccer.game.team.constants.Validation.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -44,6 +44,8 @@ public class TeamResourceIntegrationTest extends Containers {
     private MockMvc mockMvc;
     @Autowired
     private MessageSource messageSource;
+    @Autowired
+    private TeamRepository teamRepository;
     private String bayernMunchen;
     private String invalidTeamDTO;
     private String invalidTeamDTONullValues;
@@ -56,6 +58,16 @@ public class TeamResourceIntegrationTest extends Containers {
         createInvalidTeamDTONullValues();
         createInvalidTeamDTONullCountryDTO();
 
+    }
+
+    @Test
+    void findRandomTeam_GivenThereIsNoTeam_ReturnsNotFound() throws Exception {
+        teamRepository.deleteAll();
+
+        mockMvc.perform(get(TEAM_PATH + "/random"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(content().json("{\"errors\":{\"error\":\"" + getErrorMessage(THERE_IS_NOT_ANY_TEAM, Locale.ENGLISH) + "\"}}"));
     }
 
     @Test
@@ -94,12 +106,10 @@ public class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void findTeamByCountryCode_GivenInvalidCountryCode_ReturnsBadRequest() throws Exception {
-        String errorMessage = getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH);
-
         mockMvc.perform(get(TEAM_PATH + "/country/XX"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"findTeamByCountryCode.countryCode\":\"" + errorMessage + "\"}}"));
+                .andExpect(content().json("{\"errors\":{\"findTeamByCountryCode.countryCode\":\"" + getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH) + "\"}}"));
     }
 
     @Test
@@ -226,6 +236,77 @@ public class TeamResourceIntegrationTest extends Containers {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json("{\"level\":8.4}"));
     }
+
+    @Test
+    void deleteTeam_GivenInvalidTeamId_ReturnsNotFound() throws Exception {
+        mockMvc.perform(delete(TEAM_PATH + "-1000"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(content().json("{\"errors\":{\"error\":\"" + getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, Locale.ENGLISH) + "\"}}"));
+    }
+
+    @Test
+    void deleteTeam_GivenValidTeamId_ReturnsNoContent() throws Exception {
+        mockMvc.perform(delete(TEAM_PATH + "-1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void createTeam_GivenInvalidDTOValues_ReturnsBadRequest() throws Exception {
+        mockMvc.perform(post(TEAM_PATH)
+                .contentType(APPLICATION_JSON)
+                .content(invalidTeamDTO)
+        )
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(content().json("{\"errors\":{\"countryDTO.name\":\"" + getErrorMessage(COUNTRY_NAME_SIZE, Locale.ENGLISH) + "\"}}"))
+                .andExpect(content().json("{\"errors\":{\"countryDTO.code\":\"" + getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH) + "\"}}"))
+                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_PAST, Locale.ENGLISH) + "\"}}"))
+                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH) + "\"}}"))
+                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_SIZE, Locale.ENGLISH) + "\"}}"));
+    }
+
+    @Test
+    void createTeam_GivenInvalidDTONullValues_ReturnsBadRequest() throws Exception {
+        mockMvc.perform(post(TEAM_PATH)
+                .contentType(APPLICATION_JSON)
+                .content(invalidTeamDTONullValues)
+        )
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(content().json("{\"errors\":{\"countryDTO.name\":\"" + getErrorMessage(COUNTRY_NAME_BLANK, Locale.ENGLISH) + "\"}}"))
+                .andExpect(content().json("{\"errors\":{\"countryDTO.code\":\"" + getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH) + "\"}}"))
+                .andExpect(content().json("{\"errors\":{\"picture\":\"" + getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH) + "\"}}"))
+                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH) + "\"}}"))
+                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH) + "\"}}"))
+                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH) + "\"}}"));
+    }
+
+    @Test
+    void createTeam_GivenInvalidDTONullCountryDTO_ReturnsBadRequest() throws Exception {
+        mockMvc.perform(post(TEAM_PATH)
+                .contentType(APPLICATION_JSON)
+                .content(invalidTeamDTONullCountryDTO)
+        )
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(content().json("{\"errors\":{\"countryDTO\":\"" + getErrorMessage(TEAM_COUNTRY_NULL, Locale.ENGLISH) + "\"}}"))
+                .andExpect(content().json("{\"errors\":{\"picture\":\"" + getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH) + "\"}}"))
+                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH) + "\"}}"))
+                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH) + "\"}}"))
+                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH) + "\"}}"));
+    }
+
+    @Test
+    void createTeam_GivenValidDTOAndAllowedRoleUser_ReturnsCreated() throws Exception {
+        mockMvc.perform(post(TEAM_PATH)
+                .contentType(APPLICATION_JSON)
+                .content(bayernMunchen)
+        )
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "http://localhost/v1/teams/1"));
+    }
+
 
     private String getErrorMessage(String messageKeyWithBraces, Locale locale) {
         return getErrorMessage(messageKeyWithBraces, null, locale);

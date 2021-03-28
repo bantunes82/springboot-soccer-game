@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static springboot.soccer.game.team.constants.Validation.TEAM_NOT_FOUND;
+import static springboot.soccer.game.team.constants.Validation.THERE_IS_NOT_ANY_TEAM;
 
 @Service
 @Validated
@@ -36,7 +37,7 @@ public class TeamService {
     }
 
     public TeamDO findRandom() throws EntityNotFoundException {
-        return teamRepository.findRandomAndDeletedIsFalse().orElseThrow(() -> new EntityNotFoundException("Could not find any team"));
+        return teamRepository.findRandomAndDeletedIsFalse().orElseThrow(() -> new EntityNotFoundException(THERE_IS_NOT_ANY_TEAM));
     }
 
     public List<TeamDO> findByName(String name) {

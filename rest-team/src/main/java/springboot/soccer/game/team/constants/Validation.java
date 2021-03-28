@@ -19,4 +19,5 @@ public class Validation {
     public static final String COUNTRY_CODE_INVALID = "{constraint.country.codeInvalid}";
 
     public static final String TEAM_NOT_FOUND = "exception.team.not.found";
+    public static final String THERE_IS_NOT_ANY_TEAM = "exception.there.is.not.any.team";
 }
