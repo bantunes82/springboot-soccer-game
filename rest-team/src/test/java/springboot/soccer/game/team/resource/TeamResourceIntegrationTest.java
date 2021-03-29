@@ -41,7 +41,7 @@ class TeamResourceIntegrationTest extends Containers {
     private static final Locale SPAIN_LOCALE = Locale.forLanguageTag(ES);
     private static final String TEAMS_JSON = "[{\"name\":\"Sport Club Corinthians Paulista\",\"nickName\":\"Timao\",\"founded\":\"1910-09-01\",\"level\":8.0,\"picture\":\"https://conteudo.imguol.com.br//c/esporte/futebol/times/desktop/corinthians.jpg\",\"countryDTO\":{\"name\":\"Brazil\",\"code\":\"BR\"}}]";
     private static final String CORINTHIANS_TEAM_JSON = "{\"name\":\"Sport Club Corinthians Paulista\",\"nickName\":\"Timao\",\"founded\":\"1910-09-01\",\"level\":8.0,\"picture\":\"https://conteudo.imguol.com.br//c/esporte/futebol/times/desktop/corinthians.jpg\",\"countryDTO\":{\"name\":\"Brazil\",\"code\":\"BR\"}}";
-    private static final String BAYERN_JSON = "{\"name\":\"FC Bayern de Munchen\",\"nickName\":\"Bayer\",\"founded\":\"1900-02-27\",\"level\":8.55,\"picture\":\"https://storage.googleapis.com/www-paredro-com/uploads/2019/02/%E2%96%B7-Esta-es-la-historia-del-logo-del-Bayern-Mu%CC%81nich-el-gigante-de-Baviera.jpg\",\"countryDTO\":{\"name\":\"Germany\",\"code\":\"DE\"}}";
+    private static final String BAYERN_TEAM_JSON = "{\"name\":\"FC Bayern de Munchen\",\"nickName\":\"Bayer\",\"founded\":\"1900-02-27\",\"level\":8.55,\"picture\":\"https://storage.googleapis.com/www-paredro-com/uploads/2019/02/%E2%96%B7-Esta-es-la-historia-del-logo-del-Bayern-Mu%CC%81nich-el-gigante-de-Baviera.jpg\",\"countryDTO\":{\"name\":\"Germany\",\"code\":\"DE\"}}";
     private static String TEAM_PATH = "/v1/teams/";
     @Autowired
     private MockMvc mockMvc;
@@ -277,7 +277,7 @@ class TeamResourceIntegrationTest extends Containers {
         )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json(BAYERN_JSON));
+                .andExpect(content().json(BAYERN_TEAM_JSON));
     }
 
 
