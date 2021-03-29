@@ -463,7 +463,7 @@ class TeamResourceIntegrationTest extends Containers {
     }
 
     @Test
-    void createTeam_GivenValidDTOAndAllowedRoleUser_ReturnsCreated() throws Exception {
+    void createTeam_GivenValidDTO_ReturnsCreated() throws Exception {
         mockMvc.perform(post(TEAM_PATH)
                 .contentType(APPLICATION_JSON)
                 .content(bayernMunchen)
