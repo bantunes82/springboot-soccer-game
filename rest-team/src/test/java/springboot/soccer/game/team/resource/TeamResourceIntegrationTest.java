@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import springboot.soccer.game.team.container.Containers;
 import springboot.soccer.game.team.dataaccessobject.TeamRepository;
 import springboot.soccer.game.team.datatransferobject.CountryDTO;
@@ -30,7 +30,7 @@ import static springboot.soccer.game.team.constants.Validation.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Transactional
 class TeamResourceIntegrationTest extends Containers {
 
     private static final ObjectMapper MAPPER = new ObjectMapper()
