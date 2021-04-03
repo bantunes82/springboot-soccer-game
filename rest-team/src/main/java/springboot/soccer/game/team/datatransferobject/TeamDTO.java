@@ -1,6 +1,7 @@
 package springboot.soccer.game.team.datatransferobject;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +16,7 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
+@Schema(description="Team Soccer", required = true)
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -26,6 +28,10 @@ public class TeamDTO {
 
     private final String nickName;
 
+    @Schema(example = "1910-07-01", type = "string",
+            implementation = LocalDate.class,
+            pattern = "yyyy-MM-dd",
+            description = "Team founded date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Past(message = Validation.TEAM_FOUNDED_PAST)
     @NotNull(message = Validation.TEAM_FOUNDED_BLANK)

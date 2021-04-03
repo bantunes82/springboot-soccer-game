@@ -1,5 +1,14 @@
 package springboot.soccer.game.team.resource;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import springboot.soccer.game.team.datatransferobject.ErrorDTO;
 import springboot.soccer.game.team.datatransferobject.TeamDTO;
 import springboot.soccer.game.team.domainobject.TeamDO;
 import springboot.soccer.game.team.exception.EntityNotFoundException;
@@ -27,9 +37,10 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
+import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-
+@Tag(name = "soccer team", description = "Anybody interested in soccer team")
 @Slf4j
 @Validated
 @RestController
@@ -45,6 +56,11 @@ public class TeamResource {
         this.teamMapper = teamMapper;
     }
 
+    @Operation(summary = "Returns a random soccer team")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "When there is at least one soccer team available", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class, required = true))),
+            @ApiResponse(responseCode = "404", description = "When there is no soccer team available", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true, example = "{\"timestamp\": 1604906081.774793,\"errors\": {\"error; \": \"Could not find any team\"}}")))
+    })
     @GetMapping(path = "/random")
     public ResponseEntity<TeamDTO> findRandomTeam() throws EntityNotFoundException {
         TeamDO teamRandom = teamService.findRandom();
@@ -52,24 +68,30 @@ public class TeamResource {
         return ResponseEntity.ok(teamMapper.toTeamDTO(teamRandom));
     }
 
+    @Operation(summary = "Returns a list of soccer teams that has the specified name")
+    @ApiResponses(@ApiResponse(responseCode = "200", description = "Returns a list of soccer teams for the specified name", content = @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = TeamDTO.class, required = true)))))
     @GetMapping(path = "/name/{name}")
-    public ResponseEntity<List<TeamDTO>> findTeamByName(@PathVariable("name") String name) {
+    public ResponseEntity<List<TeamDTO>> findTeamByName(@Parameter(description = "soccer team name", required = true) @PathVariable("name") String name) {
         List<TeamDO> teams = teamService.findByName(name);
 
         return ResponseEntity.ok(teamMapper.toTeamDTOList(teams));
     }
 
+    @Operation(summary = "Returns all the soccer teams for the specified Country Code")
+    @ApiResponses(@ApiResponse(responseCode = "200", description = "Returns a list the soccer teams for the specified Country Code", content = @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = TeamDTO.class, required = true)))))
     @GetMapping(path = "/country/{countryCode}")
-    public ResponseEntity<List<TeamDTO>> findTeamByCountryCode(@PathVariable("countryCode") @CountryCode String countryCode,
-                                                               @RequestParam(value = "pageIndex", defaultValue = "0") int pageIndex,
-                                                               @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+    public ResponseEntity<List<TeamDTO>> findTeamByCountryCode(@Parameter(description = "country code", required = true) @PathVariable("countryCode") @CountryCode String countryCode,
+                                                               @Parameter(description = "page index") @RequestParam(value = "pageIndex", defaultValue = "0") int pageIndex,
+                                                               @Parameter(description = "page size") @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         List<TeamDO> teams = teamService.findByCountryCode(countryCode, pageIndex, pageSize);
 
         return ResponseEntity.ok(teamMapper.toTeamDTOList(teams));
     }
 
+    @Operation(summary = "Create a soccer team")
+    @ApiResponses(@ApiResponse(responseCode = "201", description = "The URI of the created soccer team", headers = {@Header(name = LOCATION, description = "URI location of the created soccer team", schema = @Schema(implementation = URI.class))}))
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity createTeam(@Valid @RequestBody TeamDTO teamDTO) {
+    public ResponseEntity<Void> createTeam(@io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class)), description = "soccer team to be created") @Valid @RequestBody TeamDTO teamDTO) {
         TeamDO teamDO = teamMapper.toTeamDO(teamDTO);
         TeamDO teamSaved = teamService.create(teamDO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -82,25 +104,40 @@ public class TeamResource {
         return ResponseEntity.created(location).build();
     }
 
+    @Operation(summary = "Update a soccer team for the specified team id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class, required = true)), description = "Returns the soccer team updated"),
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)), description = "When there is no soccer team available for the specified id")
+    })
     @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<TeamDTO> updateTeam(@PathVariable("id") Long teamId,
-                                              @Valid @RequestBody TeamDTO teamDTO) throws EntityNotFoundException {
+    public ResponseEntity<TeamDTO> updateTeam(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId,
+                                              @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class)), description = "soccer team to be updated") @Valid @RequestBody TeamDTO teamDTO) throws EntityNotFoundException {
         TeamDO teamDO = teamMapper.toTeamDO(teamDTO);
         TeamDO teamUpdated = teamService.update(teamId, teamDO);
 
         return ResponseEntity.ok(teamMapper.toTeamDTO(teamUpdated));
     }
 
+    @Operation(summary = "Update the soccer team level for the specified team id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class, required = true)), description = "Returns the soccer team with the updated level"),
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)), description = "When there is no soccer team available for the specified id")
+    })
     @PatchMapping(path = "/{id}/level/{value}")
-    public ResponseEntity<TeamDTO> updateTeamLevel(@PathVariable("id") Long teamId,
-                                                   @Range(min = 1.0, max = 10.0) @PathVariable("value") Double level) throws EntityNotFoundException {
+    public ResponseEntity<TeamDTO> updateTeamLevel(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId,
+                                                   @Parameter(required = true, description = "soccer team level") @Range(min = 1.0, max = 10.0) @PathVariable("value") Double level) throws EntityNotFoundException {
         TeamDO teamUpdated = teamService.updateLevel(teamId, level);
 
         return ResponseEntity.ok(teamMapper.toTeamDTO(teamUpdated));
     }
 
+    @Operation(summary = "Delete the soccer team for the specified team id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Soccer Team deleted"),
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true, description = "When there is no soccer team available for the specified id")))
+    })
     @DeleteMapping(path = "{id}")
-    public ResponseEntity deleteTeam(@PathVariable("id") Long teamId) throws EntityNotFoundException {
+    public ResponseEntity<Void> deleteTeam(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId) throws EntityNotFoundException {
         teamService.delete(teamId);
 
         return ResponseEntity.noContent().build();
