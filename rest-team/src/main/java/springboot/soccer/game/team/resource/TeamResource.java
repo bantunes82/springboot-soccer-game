@@ -59,7 +59,7 @@ public class TeamResource {
     @Operation(summary = "Returns a random soccer team")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "When there is at least one soccer team available", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class, required = true))),
-            @ApiResponse(responseCode = "404", description = "When there is no soccer team available", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true, example = "{\"timestamp\": 1604906081.774793,\"errors\": {\"error; \": \"Could not find any team\"}}")))
+            @ApiResponse(responseCode = "404", description = "When there is no soccer team available", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)))
     })
     @GetMapping(path = "/random")
     public ResponseEntity<TeamDTO> findRandomTeam() throws EntityNotFoundException {
