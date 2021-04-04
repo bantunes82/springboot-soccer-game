@@ -12,7 +12,8 @@ import java.util.Map;
 @Schema(description = "Errors", required = true, example = "{\n" +
         "  \"timestamp\": \"2021-04-03T14:57:59.670094Z\",\n" +
         "  \"errors\": {\n" +
-        "    \"error\": \"Could not find team with id: 234\"\n" +
+        "    \"error\": \"Could not find team with id: 234\"\n" + ", " +
+        "    \"name\": \"Team name must be between 3 and 50 chars\"\n" +
         "  }\n" +
         "}")
 @Getter

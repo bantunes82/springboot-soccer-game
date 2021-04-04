@@ -78,7 +78,10 @@ public class TeamResource {
     }
 
     @Operation(summary = "Returns all the soccer teams for the specified Country Code")
-    @ApiResponses(@ApiResponse(responseCode = "200", description = "Returns a list the soccer teams for the specified Country Code", content = @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = TeamDTO.class, required = true)))))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns a list the soccer teams for the specified Country Code", content = @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = TeamDTO.class, required = true)))),
+            @ApiResponse(responseCode = "400", description = "When the countryCode is invalid", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)))
+    })
     @GetMapping(path = "/country/{countryCode}")
     public ResponseEntity<List<TeamDTO>> findTeamByCountryCode(@Parameter(description = "country code", required = true) @PathVariable("countryCode") @CountryCode String countryCode,
                                                                @Parameter(description = "page index") @RequestParam(value = "pageIndex", defaultValue = "0") int pageIndex,
@@ -89,7 +92,10 @@ public class TeamResource {
     }
 
     @Operation(summary = "Create a soccer team")
-    @ApiResponses(@ApiResponse(responseCode = "201", description = "The URI of the created soccer team", headers = {@Header(name = LOCATION, description = "URI location of the created soccer team", schema = @Schema(implementation = URI.class))}))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "The URI of the created soccer team", headers = {@Header(name = LOCATION, description = "URI location of the created soccer team", schema = @Schema(implementation = URI.class))}),
+            @ApiResponse(responseCode = "400", description = "When the content of the TeamDTO is invalid", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)))
+    })
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createTeam(@io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class)), description = "soccer team to be created") @Valid @RequestBody TeamDTO teamDTO) {
         TeamDO teamDO = teamMapper.toTeamDO(teamDTO);
@@ -107,7 +113,8 @@ public class TeamResource {
     @Operation(summary = "Update a soccer team for the specified team id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class, required = true)), description = "Returns the soccer team updated"),
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)), description = "When there is no soccer team available for the specified id")
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)), description = "When there is no soccer team available for the specified id"),
+            @ApiResponse(responseCode = "400", description = "When the content of the TeamDTO is invalid", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)))
     })
     @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<TeamDTO> updateTeam(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId,
@@ -121,7 +128,8 @@ public class TeamResource {
     @Operation(summary = "Update the soccer team level for the specified team id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class, required = true)), description = "Returns the soccer team with the updated level"),
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)), description = "When there is no soccer team available for the specified id")
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)), description = "When there is no soccer team available for the specified id"),
+            @ApiResponse(responseCode = "400", description = "When the team level is invalid", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)))
     })
     @PatchMapping(path = "/{id}/level/{value}")
     public ResponseEntity<TeamDTO> updateTeamLevel(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId,
@@ -134,7 +142,7 @@ public class TeamResource {
     @Operation(summary = "Delete the soccer team for the specified team id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Soccer Team deleted"),
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true, description = "When there is no soccer team available for the specified id")))
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)), description = "When there is no soccer team available for the specified id"),
     })
     @DeleteMapping(path = "{id}")
     public ResponseEntity<Void> deleteTeam(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId) throws EntityNotFoundException {
