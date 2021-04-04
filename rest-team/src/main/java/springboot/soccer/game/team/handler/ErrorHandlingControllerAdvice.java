@@ -41,6 +41,7 @@ public class ErrorHandlingControllerAdvice {
         return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
     }
 
+    // @Validate For Validating Path Variables and Request Parameters
     @ExceptionHandler(ConstraintViolationException.class)
     ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
         log.debug("Errors while beans validation: %s", ex.getMessage());
@@ -53,6 +54,7 @@ public class ErrorHandlingControllerAdvice {
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
     }
 
+    // error handle for @Valid
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<Object> onMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         log.debug("Errors while beans validation: %s", ex.getMessage());
