@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,6 +32,7 @@ import static springboot.soccer.game.team.constants.Validation.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@Tag("integration")
 class TeamResourceIntegrationTest extends Containers {
 
     private static final ObjectMapper MAPPER = new ObjectMapper()
