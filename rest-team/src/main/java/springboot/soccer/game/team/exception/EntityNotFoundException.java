@@ -5,7 +5,7 @@ import lombok.Getter;
 public class EntityNotFoundException extends Exception {
 
     @Getter
-    private final Object[] args;
+    private final transient Object[] args;
 
     public EntityNotFoundException(String messageKey, Object... args)
     {
