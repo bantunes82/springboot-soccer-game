@@ -12,9 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.MessageSource;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import springboot.soccer.game.team.container.Containers;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import springboot.soccer.game.team.dataaccessobject.TeamRepository;
 import springboot.soccer.game.team.datatransferobject.CountryDTO;
 import springboot.soccer.game.team.datatransferobject.TeamDTO;
@@ -32,8 +36,9 @@ import static springboot.soccer.game.team.constants.Validation.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@Testcontainers
 @Tag("integration")
-class TeamResourceIntegrationTest extends Containers {
+class TeamResourceIntegrationTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .setSerializationInclusion(JsonInclude.Include.NON_NULL)
@@ -44,7 +49,7 @@ class TeamResourceIntegrationTest extends Containers {
     private static final String TEAMS_JSON = "[{\"name\":\"Sport Club Corinthians Paulista\",\"nickName\":\"Timao\",\"founded\":\"1910-09-01\",\"level\":8.0,\"picture\":\"https://conteudo.imguol.com.br//c/esporte/futebol/times/desktop/corinthians.jpg\",\"countryDTO\":{\"name\":\"Brazil\",\"code\":\"BR\"}}]";
     private static final String CORINTHIANS_TEAM_JSON = "{\"name\":\"Sport Club Corinthians Paulista\",\"nickName\":\"Timao\",\"founded\":\"1910-09-01\",\"level\":8.0,\"picture\":\"https://conteudo.imguol.com.br//c/esporte/futebol/times/desktop/corinthians.jpg\",\"countryDTO\":{\"name\":\"Brazil\",\"code\":\"BR\"}}";
     private static final String BAYERN_TEAM_JSON = "{\"name\":\"FC Bayern de Munchen\",\"nickName\":\"Bayer\",\"founded\":\"1900-02-27\",\"level\":8.55,\"picture\":\"https://storage.googleapis.com/www-paredro-com/uploads/2019/02/%E2%96%B7-Esta-es-la-historia-del-logo-del-Bayern-Mu%CC%81nich-el-gigante-de-Baviera.jpg\",\"countryDTO\":{\"name\":\"Germany\",\"code\":\"DE\"}}";
-    private static String TEAM_PATH = "/v1/teams/";
+    private static String TEAM_RESOURCE_PATH = "/v1/teams/";
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -55,6 +60,19 @@ class TeamResourceIntegrationTest extends Containers {
     private String invalidTeamDTO;
     private String invalidTeamDTONullValues;
     private String invalidTeamDTONullCountryDTO;
+
+    @Container
+    private static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer<>("postgres:13.2")
+            .withDatabaseName("teams_database")
+            .withUsername("team")
+            .withPassword("team");
+
+    @DynamicPropertySource
+    static void registryProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+    }
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
@@ -69,7 +87,7 @@ class TeamResourceIntegrationTest extends Containers {
     void findRandomTeam_GivenThereIsNoTeam_ReturnsNotFound() throws Exception {
         teamRepository.deleteAll();
 
-        mockMvc.perform(get(TEAM_PATH + "/random"))
+        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/random"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json("{\"errors\":{\"error\":\"" + getErrorMessage(THERE_IS_NOT_ANY_TEAM, Locale.ENGLISH) + "\"}}"));
@@ -79,7 +97,7 @@ class TeamResourceIntegrationTest extends Containers {
     void findRandomTeam_GivenThereIsNoTeam_ReturnsNotFound_Spanish() throws Exception {
         teamRepository.deleteAll();
 
-        mockMvc.perform(get(TEAM_PATH + "/random")
+        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/random")
                 .header(ACCEPT_LANGUAGE, ES)
         )
                 .andExpect(status().isNotFound())
@@ -90,7 +108,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void findRandomTeam_GivenThereIsTeam_ReturnsOK() throws Exception {
-        mockMvc.perform(get(TEAM_PATH + "/random"))
+        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/random"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json(CORINTHIANS_TEAM_JSON));
@@ -99,7 +117,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void findTeamByName_GivenNoExistentTeamName_ReturnsEmptyTeamList() throws Exception {
-        mockMvc.perform(get(TEAM_PATH + "/name/XXXX"))
+        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/name/XXXX"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json("[]"));
@@ -107,7 +125,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void findTeamByName_GivenExistentTeamName_ReturnsTeamListWithOneElement() throws Exception {
-        mockMvc.perform(get(TEAM_PATH + "/name/Sport Club Corinthians Paulista"))
+        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/name/Sport Club Corinthians Paulista"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json(TEAMS_JSON));
@@ -116,7 +134,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void findTeamByCountryCode_GivenNoExistentTeamWithTheCountryCode_ReturnsEmptyTeamList() throws Exception {
-        mockMvc.perform(get(TEAM_PATH + "/country/AR"))
+        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/country/AR"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json("[]"));
@@ -124,7 +142,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void findTeamByCountryCode_GivenInvalidCountryCode_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(get(TEAM_PATH + "/country/XX"))
+        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/country/XX"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json("{\"errors\":{\"findTeamByCountryCode.countryCode\":\"" + getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH) + "\"}}"));
@@ -132,7 +150,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void findTeamByCountryCode_GivenInvalidCountryCode_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(get(TEAM_PATH + "/country/XX")
+        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/country/XX")
                 .header(ACCEPT_LANGUAGE, ES)
         )
                 .andExpect(status().isBadRequest())
@@ -143,7 +161,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void findTeamByCountryCode_GivenExistentTeamWithTheCountryCode_ReturnsTeamListWithOneElement() throws Exception {
-        mockMvc.perform(get(TEAM_PATH + "/country/BR"))
+        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/country/BR"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json(TEAMS_JSON));
@@ -152,7 +170,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeam_GivenInvalidDTOValues_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(put(TEAM_PATH + "-1")
+        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1")
                 .contentType(APPLICATION_JSON)
                 .content(invalidTeamDTO)
         )
@@ -167,7 +185,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeam_GivenInvalidDTOValues_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(put(TEAM_PATH + "-1")
+        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1")
                 .contentType(APPLICATION_JSON)
                 .header(ACCEPT_LANGUAGE, ES)
                 .content(invalidTeamDTO)
@@ -183,7 +201,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeam_GivenInvalidDTONullValues_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(put(TEAM_PATH + "-1")
+        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1")
                 .contentType(APPLICATION_JSON)
                 .content(invalidTeamDTONullValues)
         )
@@ -199,7 +217,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeam_GivenInvalidDTONullValues_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(put(TEAM_PATH + "-1")
+        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1")
                 .contentType(APPLICATION_JSON)
                 .header(ACCEPT_LANGUAGE, ES)
                 .content(invalidTeamDTONullValues)
@@ -217,7 +235,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeam_GivenInvalidDTONullCountryDTO_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(put(TEAM_PATH + "-1")
+        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1")
                 .contentType(APPLICATION_JSON)
                 .content(invalidTeamDTONullCountryDTO)
         )
@@ -232,7 +250,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeam_GivenInvalidDTONullCountryDTO_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(put(TEAM_PATH + "-1")
+        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1")
                 .contentType(APPLICATION_JSON)
                 .header(ACCEPT_LANGUAGE, ES)
                 .content(invalidTeamDTONullCountryDTO)
@@ -249,7 +267,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeam_GivenInvalidTeamId_ReturnsNotFound() throws Exception {
-        mockMvc.perform(put(TEAM_PATH + "-1000")
+        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1000")
                 .contentType(APPLICATION_JSON)
                 .content(bayernMunchen)
         )
@@ -260,7 +278,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeam_GivenInvalidTeamId_ReturnsNotFound_Spanish() throws Exception {
-        mockMvc.perform(put(TEAM_PATH + "-1000")
+        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1000")
                 .contentType(APPLICATION_JSON)
                 .header(ACCEPT_LANGUAGE, ES)
                 .content(bayernMunchen)
@@ -273,7 +291,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeam_GivenValidDTO_ReturnsOK() throws Exception {
-        mockMvc.perform(put(TEAM_PATH + "-1")
+        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1")
                 .contentType(APPLICATION_JSON)
                 .content(bayernMunchen)
         )
@@ -285,7 +303,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeamLevel_GivenLowerRangeLevelNotAllowed_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(patch(TEAM_PATH + "-1/level/0.9"))
+        mockMvc.perform(patch(TEAM_RESOURCE_PATH + "-1/level/0.9"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json("{\"errors\":{\"updateTeamLevel.level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH) + "\"}}"));
@@ -293,7 +311,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeamLevel_GivenLowerRangeLevelNotAllowed_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(patch(TEAM_PATH + "-1/level/0.9")
+        mockMvc.perform(patch(TEAM_RESOURCE_PATH + "-1/level/0.9")
                 .header(ACCEPT_LANGUAGE, ES)
         )
                 .andExpect(status().isBadRequest())
@@ -303,7 +321,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeamLevel_GivenUpperRangeLevelNotAllowed_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(patch(TEAM_PATH + "-1/level/10.1"))
+        mockMvc.perform(patch(TEAM_RESOURCE_PATH + "-1/level/10.1"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json("{\"errors\":{\"updateTeamLevel.level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH) + "\"}}"));
@@ -311,7 +329,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeamLevel_GivenUpperRangeLevelNotAllowed_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(patch(TEAM_PATH + "-1/level/10.1")
+        mockMvc.perform(patch(TEAM_RESOURCE_PATH + "-1/level/10.1")
                 .header(ACCEPT_LANGUAGE, ES)
         )
                 .andExpect(status().isBadRequest())
@@ -321,7 +339,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeamLevel_GivenInvalidTeamId_ReturnsNotFound() throws Exception {
-        mockMvc.perform(patch(TEAM_PATH + "-1000/level/8"))
+        mockMvc.perform(patch(TEAM_RESOURCE_PATH + "-1000/level/8"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json("{\"errors\":{\"error\":\"" + getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, Locale.ENGLISH) + "\"}}"));
@@ -329,7 +347,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeamLevel_GivenInvalidTeamId_ReturnsNotFound_Spanish() throws Exception {
-        mockMvc.perform(patch(TEAM_PATH + "-1000/level/8")
+        mockMvc.perform(patch(TEAM_RESOURCE_PATH + "-1000/level/8")
                 .header(ACCEPT_LANGUAGE, ES)
         )
                 .andExpect(status().isNotFound())
@@ -339,7 +357,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void updateTeamLevel_GivenValidRangeLevel_ReturnsOK() throws Exception {
-        mockMvc.perform(patch(TEAM_PATH + "-1/level/8.8"))
+        mockMvc.perform(patch(TEAM_RESOURCE_PATH + "-1/level/8.8"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json("{\"level\":8.4}"));
@@ -347,7 +365,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void deleteTeam_GivenInvalidTeamId_ReturnsNotFound() throws Exception {
-        mockMvc.perform(delete(TEAM_PATH + "-1000"))
+        mockMvc.perform(delete(TEAM_RESOURCE_PATH + "-1000"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().json("{\"errors\":{\"error\":\"" + getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, Locale.ENGLISH) + "\"}}"));
@@ -355,7 +373,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void deleteTeam_GivenInvalidTeamId_ReturnsNotFound_Spanish() throws Exception {
-        mockMvc.perform(delete(TEAM_PATH + "-1000")
+        mockMvc.perform(delete(TEAM_RESOURCE_PATH + "-1000")
                 .header(ACCEPT_LANGUAGE, ES)
         )
                 .andExpect(status().isNotFound())
@@ -365,13 +383,13 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void deleteTeam_GivenValidTeamId_ReturnsNoContent() throws Exception {
-        mockMvc.perform(delete(TEAM_PATH + "-1"))
+        mockMvc.perform(delete(TEAM_RESOURCE_PATH + "-1"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void createTeam_GivenInvalidDTOValues_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(post(TEAM_PATH)
+        mockMvc.perform(post(TEAM_RESOURCE_PATH)
                 .contentType(APPLICATION_JSON)
                 .content(invalidTeamDTO)
         )
@@ -386,7 +404,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void createTeam_GivenInvalidDTOValues_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(post(TEAM_PATH)
+        mockMvc.perform(post(TEAM_RESOURCE_PATH)
                 .contentType(APPLICATION_JSON)
                 .header(ACCEPT_LANGUAGE, ES)
                 .content(invalidTeamDTO)
@@ -402,7 +420,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void createTeam_GivenInvalidDTONullValues_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(post(TEAM_PATH)
+        mockMvc.perform(post(TEAM_RESOURCE_PATH)
                 .contentType(APPLICATION_JSON)
                 .content(invalidTeamDTONullValues)
         )
@@ -418,7 +436,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void createTeam_GivenInvalidDTONullValues_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(post(TEAM_PATH)
+        mockMvc.perform(post(TEAM_RESOURCE_PATH)
                 .contentType(APPLICATION_JSON)
                 .header(ACCEPT_LANGUAGE, ES)
                 .content(invalidTeamDTONullValues)
@@ -435,7 +453,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void createTeam_GivenInvalidDTONullCountryDTO_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(post(TEAM_PATH)
+        mockMvc.perform(post(TEAM_RESOURCE_PATH)
                 .contentType(APPLICATION_JSON)
                 .content(invalidTeamDTONullCountryDTO)
         )
@@ -450,7 +468,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void createTeam_GivenInvalidDTONullCountryDTO_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(post(TEAM_PATH)
+        mockMvc.perform(post(TEAM_RESOURCE_PATH)
                 .contentType(APPLICATION_JSON)
                 .header(ACCEPT_LANGUAGE, ES)
                 .content(invalidTeamDTONullCountryDTO)
@@ -466,7 +484,7 @@ class TeamResourceIntegrationTest extends Containers {
 
     @Test
     void createTeam_GivenValidDTO_ReturnsCreated() throws Exception {
-        mockMvc.perform(post(TEAM_PATH)
+        mockMvc.perform(post(TEAM_RESOURCE_PATH)
                 .contentType(APPLICATION_JSON)
                 .content(bayernMunchen)
         )
