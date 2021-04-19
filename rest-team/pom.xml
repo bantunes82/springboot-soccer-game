@@ -23,7 +23,7 @@
 		<testcontainers.version>1.15.2</testcontainers.version>
 		<pojo.tester.version>[0.7.6]</pojo.tester.version>
 		<org.mapstruct.version>[1.4.1.Final]</org.mapstruct.version>
-		<springdoc-openapi-ui.vesion>[1.5.6]</springdoc-openapi-ui.vesion>
+		<springdoc-openapi-ui.vesion>[1.5.7]</springdoc-openapi-ui.vesion>
 		<jacoco.version>[0.8.6]</jacoco.version>
 	</properties>
 	<dependencies>
