@@ -9,3 +9,25 @@ services:
       - POSTGRES_PASSWORD=password
     volumes:
       - ./db-init/initialize-databases.sql:/docker-entrypoint-initdb.d/init.sql
+
+  prometheus:
+    image: "prom/prometheus"
+    network_mode: 'host' # On Linux, this is required to let Prometheus access the other containers.
+    container_name: "prometheus"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/configuration/prometheus-linux.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    build: grafana
+    network_mode: 'host' # On Linux, this is required to let Grafana access the other containers.
+    container_name: "grafana"
+    user: "root"
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/dashboards:/etc/grafana/dashboards
+    depends_on:
+      - prometheus
