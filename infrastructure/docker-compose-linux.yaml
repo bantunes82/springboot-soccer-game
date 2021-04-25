@@ -10,6 +10,19 @@ services:
     volumes:
       - ./db-init/initialize-databases.sql:/docker-entrypoint-initdb.d/init.sql
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:12.0.4
+    container_name: keycloak
+    environment:
+      - DB_VENDOR=h2
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+    command: -b 0.0.0.0 -Djboss.http.port=8080 -Dkeycloak.profile.feature.upload_scripts=enabled -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/tmp/keycloak/realms -Dkeycloak.migration.strategy=OVERWRITE_EXISTING
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./keycloak/realms:/tmp/keycloak/realms/
+
   prometheus:
     image: "prom/prometheus"
     network_mode: 'host' # On Linux, this is required to let Prometheus access the other containers.
