@@ -2,8 +2,11 @@ package springboot.soccer.game.team;
 
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.MessageSource;
@@ -21,6 +24,12 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
                         url = "https://github.com/bantunes82",
                         email = "bantunes82@gmail.com")),
         externalDocs = @ExternalDocumentation(url = "https://github.com/bantunes82/springboot-soccer-game/tree/main/rest-team")
+)
+@SecuritySchemes(value = {
+        @SecurityScheme(name = "accessToken",
+                type = SecuritySchemeType.HTTP,
+                description = "Access token for the user that belongs to TEAM role",
+                scheme = "Bearer")}
 )
 @SpringBootApplication
 public class RestTeamApplication {
