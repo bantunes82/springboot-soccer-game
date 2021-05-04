@@ -1,497 +1,599 @@
 package springboot.soccer.game.team.resource;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.MessageSource;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.testcontainers.containers.BindMode;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import springboot.soccer.game.team.dataaccessobject.TeamRepository;
+import springboot.soccer.game.team.auth.AccessToken;
 import springboot.soccer.game.team.datatransferobject.CountryDTO;
+import springboot.soccer.game.team.datatransferobject.ErrorDTO;
 import springboot.soccer.game.team.datatransferobject.TeamDTO;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Locale;
 
 import static org.springframework.http.HttpHeaders.ACCEPT_LANGUAGE;
-import static org.springframework.http.HttpHeaders.LOCATION;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import static springboot.soccer.game.team.constants.Validation.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
 @Tag("integration")
 class TeamResourceIntegrationTest {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-            .registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     private static final String ES = "ES";
     private static final Locale SPAIN_LOCALE = Locale.forLanguageTag(ES);
-    private static final String TEAMS_JSON = "[{\"name\":\"Sport Club Corinthians Paulista\",\"nickName\":\"Timao\",\"founded\":\"1910-09-01\",\"level\":8.0,\"picture\":\"https://conteudo.imguol.com.br//c/esporte/futebol/times/desktop/corinthians.jpg\",\"countryDTO\":{\"name\":\"Brazil\",\"code\":\"BR\"}}]";
-    private static final String CORINTHIANS_TEAM_JSON = "{\"name\":\"Sport Club Corinthians Paulista\",\"nickName\":\"Timao\",\"founded\":\"1910-09-01\",\"level\":8.0,\"picture\":\"https://conteudo.imguol.com.br//c/esporte/futebol/times/desktop/corinthians.jpg\",\"countryDTO\":{\"name\":\"Brazil\",\"code\":\"BR\"}}";
-    private static final String BAYERN_TEAM_JSON = "{\"name\":\"FC Bayern de Munchen\",\"nickName\":\"Bayer\",\"founded\":\"1900-02-27\",\"level\":8.55,\"picture\":\"https://storage.googleapis.com/www-paredro-com/uploads/2019/02/%E2%96%B7-Esta-es-la-historia-del-logo-del-Bayern-Mu%CC%81nich-el-gigante-de-Baviera.jpg\",\"countryDTO\":{\"name\":\"Germany\",\"code\":\"DE\"}}";
     private static String TEAM_RESOURCE_PATH = "/v1/teams/";
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private MessageSource messageSource;
-    @Autowired
-    private TeamRepository teamRepository;
-    private String bayernMunchen;
-    private String invalidTeamDTO;
-    private String invalidTeamDTONullValues;
-    private String invalidTeamDTONullCountryDTO;
-
     @Container
-    private static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer<>("postgres:13.2")
+    private static PostgreSQLContainer DATABASE = new PostgreSQLContainer<>("postgres:13.2")
             .withDatabaseName("teams_database")
             .withUsername("team")
             .withPassword("team");
+    @Container
+    private static GenericContainer IDENTITY_ACCESS_MANAGEMENT = new GenericContainer("quay.io/keycloak/keycloak:12.0.4")
+            .withCommand("-b 0.0.0.0 -Djboss.http.port=8082 -Dkeycloak.profile.feature.upload_scripts=enabled -Dkeycloak.migration.action=import " +
+                    "-Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/tmp/keycloak/realms -Dkeycloak.migration.strategy=OVERWRITE_EXISTING")
+            .withClasspathResourceMapping("./keycloak/realms/", "/tmp/keycloak/realms/", BindMode.READ_ONLY)
+            .withStartupTimeout(Duration.ofSeconds(120))
+            .withExposedPorts(8082)
+            .withEnv("DB_VENDOR", "h2")
+            .waitingFor(Wait.forHttp("/auth"));
+    @Autowired
+    private TestRestTemplate testRestTemplate;
+    @Autowired
+    private MessageSource messageSource;
+    @Value("${keycloak.auth-server-url}/realms/${keycloak.realm}")
+    private String authServerUrl;
+    @Value("${keycloak.resource}")
+    private String clientId;
+    private TeamDTO bayernMunchen;
+    private TeamDTO borussiaDortmund;
+    private TeamDTO invalidTeamDTO;
+    private TeamDTO invalidTeamDTONullValues;
+    private TeamDTO invalidTeamDTONullCountryDTO;
+    private HttpHeaders headers;
 
     @DynamicPropertySource
     static void registryProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
-        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+        registry.add("spring.datasource.url", DATABASE::getJdbcUrl);
+        registry.add("spring.datasource.password", DATABASE::getPassword);
+        registry.add("spring.datasource.username", DATABASE::getUsername);
+
+        String authServerUrl = String.format("http://%s:%d/auth", IDENTITY_ACCESS_MANAGEMENT.getHost(), IDENTITY_ACCESS_MANAGEMENT.getMappedPort(8082));
+        registry.add("keycloak.auth-server-url", () -> authServerUrl);
+        registry.add("keycloak.realm", () -> "team-realm");
+        registry.add("keycloak.resource", () -> "team-client");
+        registry.add("keycloak.bearer-only", () -> "true");
+        registry.add("keycloak.security-constraints[0].authRoles[0]", () -> "team");
+        registry.add("keycloak.security-constraints[0].securityCollections[0].patterns[0]", () -> "/v1/teams/*");
+        registry.add("keycloak.security-constraints[0].securityCollections[0].methods[0]", () -> "POST");
+        registry.add("keycloak.security-constraints[0].securityCollections[0].methods[1]", () -> "PUT");
+        registry.add("keycloak.security-constraints[0].securityCollections[0].methods[2]", () -> "PATCH");
+        registry.add("keycloak.security-constraints[0].securityCollections[0].methods[3]", () -> "DELETE");
     }
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
         createBayerMunchenTeam();
+        createBorussiaDortmundTeam();
         createInvalidTeamDTO();
         createInvalidTeamDTONullValues();
         createInvalidTeamDTONullCountryDTO();
+        headers = new HttpHeaders();
 
     }
 
     @Test
-    void findRandomTeam_GivenThereIsNoTeam_ReturnsNotFound() throws Exception {
-        teamRepository.deleteAll();
+    void findRandomTeam_GivenThereIsTeam_ReturnsOK() {
+        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/random", HttpMethod.GET, new HttpEntity<>(headers), TeamDTO.class);
 
-        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/random"))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"error\":\"" + getErrorMessage(THERE_IS_NOT_ANY_TEAM, Locale.ENGLISH) + "\"}}"));
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertNotNull(response.getBody());
     }
 
     @Test
-    void findRandomTeam_GivenThereIsNoTeam_ReturnsNotFound_Spanish() throws Exception {
-        teamRepository.deleteAll();
+    void findTeamByName_GivenNoExistentTeamName_ReturnsEmptyTeamList() {
+        ParameterizedTypeReference<List<TeamDTO>> paramType = new ParameterizedTypeReference<>() {
+        };
+        ResponseEntity<List<TeamDTO>> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/name/XXXX", HttpMethod.GET, new HttpEntity<>(headers), paramType);
 
-        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/random")
-                .header(ACCEPT_LANGUAGE, ES)
-        )
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"error\":\"" + getErrorMessage(THERE_IS_NOT_ANY_TEAM, SPAIN_LOCALE) + "\"}}"));
-    }
-
-
-    @Test
-    void findRandomTeam_GivenThereIsTeam_ReturnsOK() throws Exception {
-        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/random"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json(CORINTHIANS_TEAM_JSON));
-    }
-
-
-    @Test
-    void findTeamByName_GivenNoExistentTeamName_ReturnsEmptyTeamList() throws Exception {
-        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/name/XXXX"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("[]"));
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(0, response.getBody().size());
     }
 
     @Test
-    void findTeamByName_GivenExistentTeamName_ReturnsTeamListWithOneElement() throws Exception {
-        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/name/Sport Club Corinthians Paulista"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json(TEAMS_JSON));
-    }
+    void findTeamByName_GivenExistentTeamName_ReturnsTeamListWithOneElement() {
+        ParameterizedTypeReference<List<TeamDTO>> paramType = new ParameterizedTypeReference<>() {
+        };
+        ResponseEntity<List<TeamDTO>> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/name/Sport Club Corinthians Paulista", HttpMethod.GET, new HttpEntity<>(headers), paramType);
 
-
-    @Test
-    void findTeamByCountryCode_GivenNoExistentTeamWithTheCountryCode_ReturnsEmptyTeamList() throws Exception {
-        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/country/AR"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("[]"));
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(1, response.getBody().size());
+        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).getName());
+        Assertions.assertEquals("BR", response.getBody().get(0).getCountryDTO().getCode());
     }
 
     @Test
-    void findTeamByCountryCode_GivenInvalidCountryCode_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/country/XX"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"findTeamByCountryCode.countryCode\":\"" + getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH) + "\"}}"));
+    void findTeamByCountryCode_GivenNoExistentTeamWithTheCountryCode_ReturnsEmptyTeamList() {
+        ParameterizedTypeReference<List<TeamDTO>> paramType = new ParameterizedTypeReference<>() {
+        };
+        ResponseEntity<List<TeamDTO>> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/country/IT", HttpMethod.GET, new HttpEntity<>(headers), paramType);
+
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(0, response.getBody().size());
     }
 
     @Test
-    void findTeamByCountryCode_GivenInvalidCountryCode_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/country/XX")
-                .header(ACCEPT_LANGUAGE, ES)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"findTeamByCountryCode.countryCode\":\"" +  getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE) + "\"}}"));
+    void findTeamByCountryCode_GivenInvalidCountryCode_ReturnsBadRequest() {
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/country/XX", HttpMethod.GET, new HttpEntity<>(headers), ErrorDTO.class);
 
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("findTeamByCountryCode.countryCode"));
     }
 
     @Test
-    void findTeamByCountryCode_GivenExistentTeamWithTheCountryCode_ReturnsTeamListWithOneElement() throws Exception {
-        mockMvc.perform(get(TEAM_RESOURCE_PATH + "/country/BR"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json(TEAMS_JSON));
-    }
+    void findTeamByCountryCode_GivenInvalidCountryCode_ReturnsBadRequest_Spanish() {
+        headers.add(ACCEPT_LANGUAGE, ES);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/country/XX", HttpMethod.GET, new HttpEntity<>(headers), ErrorDTO.class);
 
-
-    @Test
-    void updateTeam_GivenInvalidDTOValues_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1")
-                .contentType(APPLICATION_JSON)
-                .content(invalidTeamDTO)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.name\":\"" + getErrorMessage(COUNTRY_NAME_SIZE, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.code\":\"" + getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_PAST, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_SIZE, Locale.ENGLISH) + "\"}}"));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("findTeamByCountryCode.countryCode"));
     }
 
     @Test
-    void updateTeam_GivenInvalidDTOValues_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1")
-                .contentType(APPLICATION_JSON)
-                .header(ACCEPT_LANGUAGE, ES)
-                .content(invalidTeamDTO)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.name\":\"" + getErrorMessage(COUNTRY_NAME_SIZE, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.code\":\"" + getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_PAST, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_SIZE, SPAIN_LOCALE) + "\"}}"));
+    void findTeamByCountryCode_GivenExistentTeamWithTheCountryCode_ReturnsTeamListWithOneElement() {
+        ParameterizedTypeReference<List<TeamDTO>> paramType = new ParameterizedTypeReference<>() {
+        };
+        ResponseEntity<List<TeamDTO>> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/country/BR", HttpMethod.GET, new HttpEntity<>(headers), paramType);
+
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(1, response.getBody().size());
+        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).getName());
+        Assertions.assertEquals("BR", response.getBody().get(0).getCountryDTO().getCode());
     }
 
     @Test
-    void updateTeam_GivenInvalidDTONullValues_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1")
-                .contentType(APPLICATION_JSON)
-                .content(invalidTeamDTONullValues)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.name\":\"" + getErrorMessage(COUNTRY_NAME_BLANK, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.code\":\"" + getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"picture\":\"" + getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH) + "\"}}"));
+    void updateTeam_GivenInvalidDTOValues_ReturnsBadRequest() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-2", HttpMethod.PUT, new HttpEntity<>(invalidTeamDTO, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_SIZE, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_PAST, Locale.ENGLISH), response.getBody().getErrors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_SIZE, Locale.ENGLISH), response.getBody().getErrors().get("name"));
     }
 
     @Test
-    void updateTeam_GivenInvalidDTONullValues_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1")
-                .contentType(APPLICATION_JSON)
-                .header(ACCEPT_LANGUAGE, ES)
-                .content(invalidTeamDTONullValues)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.name\":\"" + getErrorMessage(COUNTRY_NAME_BLANK, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.code\":\"" + getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"picture\":\"" + getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE) + "\"}}"));
-    }
+    void updateTeam_GivenInvalidDTOValues_ReturnsBadRequest_Spanish() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        headers.add(ACCEPT_LANGUAGE, ES);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-2", HttpMethod.PUT, new HttpEntity<>(invalidTeamDTO, headers), ErrorDTO.class);
 
-
-    @Test
-    void updateTeam_GivenInvalidDTONullCountryDTO_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1")
-                .contentType(APPLICATION_JSON)
-                .content(invalidTeamDTONullCountryDTO)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"countryDTO\":\"" + getErrorMessage(TEAM_COUNTRY_NULL, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"picture\":\"" + getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH) + "\"}}"));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_SIZE, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_PAST, SPAIN_LOCALE), response.getBody().getErrors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_SIZE, SPAIN_LOCALE), response.getBody().getErrors().get("name"));
     }
 
     @Test
-    void updateTeam_GivenInvalidDTONullCountryDTO_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1")
-                .contentType(APPLICATION_JSON)
-                .header(ACCEPT_LANGUAGE, ES)
-                .content(invalidTeamDTONullCountryDTO)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"countryDTO\":\"" + getErrorMessage(TEAM_COUNTRY_NULL, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"picture\":\"" + getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE) + "\"}}"));
-    }
+    void updateTeam_GivenInvalidDTONullValues_ReturnsBadRequest() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-2", HttpMethod.PUT, new HttpEntity<>(invalidTeamDTONullValues, headers), ErrorDTO.class);
 
-
-    @Test
-    void updateTeam_GivenInvalidTeamId_ReturnsNotFound() throws Exception {
-        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1000")
-                .contentType(APPLICATION_JSON)
-                .content(bayernMunchen)
-        )
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"error\":\"" + getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, Locale.ENGLISH) + "\"}}"));
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("name"));
     }
 
     @Test
-    void updateTeam_GivenInvalidTeamId_ReturnsNotFound_Spanish() throws Exception {
-        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1000")
-                .contentType(APPLICATION_JSON)
-                .header(ACCEPT_LANGUAGE, ES)
-                .content(bayernMunchen)
-        )
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"error\":\"" + getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, SPAIN_LOCALE) + "\"}}"));
+    void updateTeam_GivenInvalidDTONullValues_ReturnsBadRequest_Spanish() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        headers.add(ACCEPT_LANGUAGE, ES);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-2", HttpMethod.PUT, new HttpEntity<>(invalidTeamDTONullValues, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("name"));
+    }
+
+    @Test
+    void updateTeam_GivenInvalidDTONullCountryDTO_ReturnsBadRequest() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-2", HttpMethod.PUT, new HttpEntity<>(invalidTeamDTONullCountryDTO, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(TEAM_COUNTRY_NULL, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("name"));
+    }
+
+    @Test
+    void updateTeam_GivenInvalidDTONullCountryDTO_ReturnsBadRequest_Spanish() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        headers.add(ACCEPT_LANGUAGE, ES);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-2", HttpMethod.PUT, new HttpEntity<>(invalidTeamDTONullCountryDTO, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(TEAM_COUNTRY_NULL, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("name"));
+    }
+
+    @Test
+    void updateTeam_GivenInvalidTeamId_ReturnsNotFound() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-1000", HttpMethod.PUT, new HttpEntity<>(bayernMunchen, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, Locale.ENGLISH), response.getBody().getErrors().get("error"));
     }
 
 
     @Test
-    void updateTeam_GivenValidDTO_ReturnsOK() throws Exception {
-        mockMvc.perform(put(TEAM_RESOURCE_PATH + "-1")
-                .contentType(APPLICATION_JSON)
-                .content(bayernMunchen)
-        )
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json(BAYERN_TEAM_JSON));
+    void updateTeam_GivenInvalidTeamId_ReturnsNotFound_Spanish() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        headers.add(ACCEPT_LANGUAGE, ES);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-1000", HttpMethod.PUT, new HttpEntity<>(bayernMunchen, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
+    }
+
+    @Test
+    void updateTeam_GivenValidDTOAndNotAllowedRoleUser_ReturnsForbidden() {
+        headers.setBearerAuth(getAccessTokenForNotAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-2", HttpMethod.PUT, new HttpEntity<>(bayernMunchen, headers), TeamDTO.class);
+
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    void updateTeam_GivenValidDTOAndInvalidAccessToken_ReturnsUnauthorized() {
+        headers.setBearerAuth("XX");
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-2", HttpMethod.PUT, new HttpEntity<>(bayernMunchen, headers), TeamDTO.class);
+
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
 
     @Test
-    void updateTeamLevel_GivenLowerRangeLevelNotAllowed_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(patch(TEAM_RESOURCE_PATH + "-1/level/0.9"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"updateTeamLevel.level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH) + "\"}}"));
+    void updateTeam_GivenValidDTOAndAllowedRoleUser_ReturnsOK() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-2", HttpMethod.PUT, new HttpEntity<>(bayernMunchen, headers), TeamDTO.class);
+
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals("FC Bayern de Munchen", response.getBody().getName());
+        Assertions.assertEquals("DE", response.getBody().getCountryDTO().getCode());
     }
 
     @Test
-    void updateTeamLevel_GivenLowerRangeLevelNotAllowed_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(patch(TEAM_RESOURCE_PATH + "-1/level/0.9")
-                .header(ACCEPT_LANGUAGE, ES)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"updateTeamLevel.level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE) + "\"}}"));
+    void updateTeamLevel_GivenLowerRangeLevelNotAllowed_ReturnsBadRequest() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-3/level/0.9", HttpMethod.PATCH, new HttpEntity<>(headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("updateTeamLevel.level"));
     }
 
     @Test
-    void updateTeamLevel_GivenUpperRangeLevelNotAllowed_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(patch(TEAM_RESOURCE_PATH + "-1/level/10.1"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"updateTeamLevel.level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH) + "\"}}"));
+    void updateTeamLevel_GivenLowerRangeLevelNotAllowed_ReturnsBadRequest_Spanish() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.add(ACCEPT_LANGUAGE, ES);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-3/level/0.9", HttpMethod.PATCH, new HttpEntity<>(headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("updateTeamLevel.level"));
     }
 
     @Test
-    void updateTeamLevel_GivenUpperRangeLevelNotAllowed_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(patch(TEAM_RESOURCE_PATH + "-1/level/10.1")
-                .header(ACCEPT_LANGUAGE, ES)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"updateTeamLevel.level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE) + "\"}}"));
+    void updateTeamLevel_GivenUpperRangeLevelNotAllowed_ReturnsBadRequest() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-3/level/10.1", HttpMethod.PATCH, new HttpEntity<>(headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("updateTeamLevel.level"));
     }
 
     @Test
-    void updateTeamLevel_GivenInvalidTeamId_ReturnsNotFound() throws Exception {
-        mockMvc.perform(patch(TEAM_RESOURCE_PATH + "-1000/level/8"))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"error\":\"" + getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, Locale.ENGLISH) + "\"}}"));
+    void updateTeamLevel_GivenUpperRangeLevelNotAllowed_ReturnsBadRequest_Spanish() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.add(ACCEPT_LANGUAGE, ES);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-3/level/10.1", HttpMethod.PATCH, new HttpEntity<>(headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("updateTeamLevel.level"));
     }
 
     @Test
-    void updateTeamLevel_GivenInvalidTeamId_ReturnsNotFound_Spanish() throws Exception {
-        mockMvc.perform(patch(TEAM_RESOURCE_PATH + "-1000/level/8")
-                .header(ACCEPT_LANGUAGE, ES)
-        )
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"error\":\"" + getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, SPAIN_LOCALE) + "\"}}"));
+    void updateTeamLevel_GivenInvalidTeamId_ReturnsNotFound() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-1000/level/8", HttpMethod.PATCH, new HttpEntity<>(headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, Locale.ENGLISH), response.getBody().getErrors().get("error"));
     }
 
     @Test
-    void updateTeamLevel_GivenValidRangeLevel_ReturnsOK() throws Exception {
-        mockMvc.perform(patch(TEAM_RESOURCE_PATH + "-1/level/8.8"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"level\":8.4}"));
+    void updateTeamLevel_GivenInvalidTeamId_ReturnsNotFound_Spanish() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.add(ACCEPT_LANGUAGE, ES);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-1000/level/8", HttpMethod.PATCH, new HttpEntity<>(headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
     }
 
     @Test
-    void deleteTeam_GivenInvalidTeamId_ReturnsNotFound() throws Exception {
-        mockMvc.perform(delete(TEAM_RESOURCE_PATH + "-1000"))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"error\":\"" + getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, Locale.ENGLISH) + "\"}}"));
+    void updateTeamLevel_GivenValidRangeLevelAndNotAllowedRoleUser_ReturnsForbidden() {
+        headers.setBearerAuth(getAccessTokenForNotAllowedRoleUser());
+        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-3/level/8.8", HttpMethod.PATCH, new HttpEntity<>(headers), TeamDTO.class);
+
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
-    void deleteTeam_GivenInvalidTeamId_ReturnsNotFound_Spanish() throws Exception {
-        mockMvc.perform(delete(TEAM_RESOURCE_PATH + "-1000")
-                .header(ACCEPT_LANGUAGE, ES)
-        )
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"error\":\"" + getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, SPAIN_LOCALE) + "\"}}"));
+    void updateTeamLevel_GivenValidRangeLevelAndInvalidAccessToken_ReturnsUnauthorized() {
+        headers.setBearerAuth("XX");
+        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-3/level/8.8", HttpMethod.PATCH, new HttpEntity<>(headers), TeamDTO.class);
+
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+    }
+
+
+    @Test
+    void updateTeamLevel_GivenValidRangeLevelAndAllowedRoleUser_ReturnsOK() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-3/level/8.8", HttpMethod.PATCH, new HttpEntity<>(headers), TeamDTO.class);
+
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(8.350000000000001, response.getBody().getLevel());
     }
 
     @Test
-    void deleteTeam_GivenValidTeamId_ReturnsNoContent() throws Exception {
-        mockMvc.perform(delete(TEAM_RESOURCE_PATH + "-1"))
-                .andExpect(status().isNoContent());
+    void deleteTeam_GivenInvalidTeamId_ReturnsNotFound() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-1000", HttpMethod.DELETE, new HttpEntity<>(headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, Locale.ENGLISH), response.getBody().getErrors().get("error"));
     }
 
     @Test
-    void createTeam_GivenInvalidDTOValues_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(post(TEAM_RESOURCE_PATH)
-                .contentType(APPLICATION_JSON)
-                .content(invalidTeamDTO)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.name\":\"" + getErrorMessage(COUNTRY_NAME_SIZE, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.code\":\"" + getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_PAST, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_SIZE, Locale.ENGLISH) + "\"}}"));
+    void deleteTeam_GivenInvalidTeamId_ReturnsNotFound_Spanish() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.add(ACCEPT_LANGUAGE, ES);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-1000", HttpMethod.DELETE, new HttpEntity<>(headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
     }
 
     @Test
-    void createTeam_GivenInvalidDTOValues_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(post(TEAM_RESOURCE_PATH)
-                .contentType(APPLICATION_JSON)
-                .header(ACCEPT_LANGUAGE, ES)
-                .content(invalidTeamDTO)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.name\":\"" + getErrorMessage(COUNTRY_NAME_SIZE, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.code\":\"" + getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_PAST, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_SIZE, SPAIN_LOCALE) + "\"}}"));
+    void deleteTeam_GivenValidTeamIdAndNotAllowedRoleUser_ReturnsForbidden() {
+        headers.setBearerAuth(getAccessTokenForNotAllowedRoleUser());
+        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-4", HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
+
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
-    void createTeam_GivenInvalidDTONullValues_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(post(TEAM_RESOURCE_PATH)
-                .contentType(APPLICATION_JSON)
-                .content(invalidTeamDTONullValues)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.name\":\"" + getErrorMessage(COUNTRY_NAME_BLANK, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.code\":\"" + getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"picture\":\"" + getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH) + "\"}}"));
+    void deleteTeam_GivenValidTeamIdAndInvalidAccessToken_ReturnsUnauthorized() {
+        headers.setBearerAuth("XX");
+        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-4", HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
+
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
     @Test
-    void createTeam_GivenInvalidDTONullValues_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(post(TEAM_RESOURCE_PATH)
-                .contentType(APPLICATION_JSON)
-                .header(ACCEPT_LANGUAGE, ES)
-                .content(invalidTeamDTONullValues)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.name\":\"" + getErrorMessage(COUNTRY_NAME_BLANK, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"countryDTO.code\":\"" + getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"picture\":\"" + getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE) + "\"}}"));
+    void deleteTeam_GivenValidTeamIdAndAllowedRoleUser_ReturnsNoContent() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-4", HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
+
+        Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test
-    void createTeam_GivenInvalidDTONullCountryDTO_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(post(TEAM_RESOURCE_PATH)
-                .contentType(APPLICATION_JSON)
-                .content(invalidTeamDTONullCountryDTO)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"countryDTO\":\"" + getErrorMessage(TEAM_COUNTRY_NULL, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"picture\":\"" + getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH) + "\"}}"));
+    void createTeam_GivenInvalidDTOValues_ReturnsBadRequest() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(invalidTeamDTO, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_SIZE, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_PAST, Locale.ENGLISH), response.getBody().getErrors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_SIZE, Locale.ENGLISH), response.getBody().getErrors().get("name"));
     }
 
     @Test
-    void createTeam_GivenInvalidDTONullCountryDTO_ReturnsBadRequest_Spanish() throws Exception {
-        mockMvc.perform(post(TEAM_RESOURCE_PATH)
-                .contentType(APPLICATION_JSON)
-                .header(ACCEPT_LANGUAGE, ES)
-                .content(invalidTeamDTONullCountryDTO)
-        )
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().json("{\"errors\":{\"countryDTO\":\"" + getErrorMessage(TEAM_COUNTRY_NULL, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"picture\":\"" + getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"founded\":\"" + getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"level\":\"" + getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE) + "\"}}"))
-                .andExpect(content().json("{\"errors\":{\"name\":\"" + getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE) + "\"}}"));
+    void createTeam_GivenInvalidDTOValues_ReturnsBadRequest_Spanish() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        headers.add(ACCEPT_LANGUAGE, ES);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(invalidTeamDTO, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_SIZE, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_PAST, SPAIN_LOCALE), response.getBody().getErrors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_SIZE, SPAIN_LOCALE), response.getBody().getErrors().get("name"));
+
     }
 
     @Test
-    void createTeam_GivenValidDTO_ReturnsCreated() throws Exception {
-        mockMvc.perform(post(TEAM_RESOURCE_PATH)
-                .contentType(APPLICATION_JSON)
-                .content(bayernMunchen)
-        )
-                .andExpect(status().isCreated())
-                .andExpect(header().string(LOCATION, "http://localhost/v1/teams/1"));
+    void createTeam_GivenInvalidDTONullValues_ReturnsBadRequest() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(invalidTeamDTONullValues, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("name"));
     }
 
+
+    @Test
+    void createTeam_GivenInvalidDTONullValues_ReturnsBadRequest_Spanish() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        headers.add(ACCEPT_LANGUAGE, ES);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(invalidTeamDTONullValues, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("name"));
+    }
+
+    @Test
+    void createTeam_GivenInvalidDTONullCountryDTO_ReturnsBadRequest() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(invalidTeamDTONullCountryDTO, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(TEAM_COUNTRY_NULL, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("name"));
+    }
+
+    @Test
+    void createTeam_GivenInvalidDTONullCountryDTO_ReturnsBadRequest_Spanish() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        headers.add(ACCEPT_LANGUAGE, ES);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(invalidTeamDTONullCountryDTO, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(TEAM_COUNTRY_NULL, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("name"));
+    }
+
+    @Test
+    void createTeam_GivenValidDTOAndNotAllowedRoleUser_ReturnsForbidden() {
+        headers.setBearerAuth(getAccessTokenForNotAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(borussiaDortmund, headers), Void.class);
+
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    void createTeam_GivenValidDTOAndInvalidAccessToken_ReturnsUnauthorized() {
+        headers.setBearerAuth("XX");
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(borussiaDortmund, headers), Void.class);
+
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+    }
+
+    @Test
+    void createTeam_GivenValidDTOAndAllowedRoleUser_ReturnsCreated() {
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(borussiaDortmund, headers), Void.class);
+
+        Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        Assertions.assertTrue(response.getHeaders().getLocation().toString().contains("/v1/teams/1"));
+    }
 
     private String getErrorMessage(String messageKeyWithBraces, Locale locale) {
         return getErrorMessage(messageKeyWithBraces, null, locale);
@@ -504,7 +606,7 @@ class TeamResourceIntegrationTest {
 
     private void createBayerMunchenTeam() throws JsonProcessingException {
         CountryDTO germany = new CountryDTO("Germany", "DE");
-        TeamDTO teamDTO = TeamDTO.builder()
+        bayernMunchen = TeamDTO.builder()
                 .countryDTO(germany)
                 .founded(LocalDate.of(1900, 2, 27))
                 .level(9.1d)
@@ -512,13 +614,23 @@ class TeamResourceIntegrationTest {
                 .picture("https://storage.googleapis.com/www-paredro-com/uploads/2019/02/%E2%96%B7-Esta-es-la-historia-del-logo-del-Bayern-Mu%CC%81nich-el-gigante-de-Baviera.jpg")
                 .nickName("Bayer")
                 .build();
-
-        bayernMunchen = MAPPER.writeValueAsString(teamDTO);
     }
 
-    private void createInvalidTeamDTO() throws JsonProcessingException {
+
+    private void createBorussiaDortmundTeam() {
+        CountryDTO germany = new CountryDTO("Germany", "DE");
+        borussiaDortmund = TeamDTO.builder()
+                .countryDTO(germany)
+                .founded(LocalDate.of(1909, 12, 19))
+                .level(8.8d)
+                .name("Borussia Dortmund")
+                .picture("https://conteudo.imguol.com.br/p/pp/2020/eiplus/champions/times/borussia.png")
+                .build();
+    }
+
+    private void createInvalidTeamDTO() {
         CountryDTO invalidCountryDTO = new CountryDTO("XX", "XX");
-        TeamDTO teamDTO = TeamDTO.builder()
+        invalidTeamDTO = TeamDTO.builder()
                 .countryDTO(invalidCountryDTO)
                 .founded(LocalDate.now())
                 .level(11d)
@@ -526,20 +638,46 @@ class TeamResourceIntegrationTest {
                 .picture("picture")
                 .nickName("nickname")
                 .build();
-
-        invalidTeamDTO = MAPPER.writeValueAsString(teamDTO);
     }
 
-    private void createInvalidTeamDTONullValues() throws JsonProcessingException {
+    private void createInvalidTeamDTONullValues() {
         CountryDTO invalidCountryDTONullValues = new CountryDTO(null, null);
-        TeamDTO teamDTO = TeamDTO.builder()
+        invalidTeamDTONullValues = TeamDTO.builder()
                 .countryDTO(invalidCountryDTONullValues)
                 .build();
-
-        invalidTeamDTONullValues = MAPPER.writeValueAsString(teamDTO);
     }
 
-    private void createInvalidTeamDTONullCountryDTO() throws JsonProcessingException {
-        invalidTeamDTONullCountryDTO = MAPPER.writeValueAsString(TeamDTO.builder().build());
+    private void createInvalidTeamDTONullCountryDTO() {
+        invalidTeamDTONullCountryDTO = TeamDTO.builder().build();
     }
+
+    private String getAccessTokenForAllowedRoleUser() {
+        return getAccessToken("teamuser", "teamuser");
+    }
+
+    private String getAccessTokenForNotAllowedRoleUser() {
+        return getAccessToken("test", "test");
+    }
+
+    private String getAccessToken(String username, String password) {
+        HttpEntity<MultiValueMap<String, String>> tokenRequest = createTokenRequest(username, password);
+        ResponseEntity<AccessToken> response = testRestTemplate.exchange(authServerUrl.concat("/protocol/openid-connect/token"), HttpMethod.POST, tokenRequest, AccessToken.class);
+
+        return response.getBody().getAccessToken();
+    }
+
+    private HttpEntity<MultiValueMap<String, String>> createTokenRequest(String username, String password) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "password");
+        body.add("client_id", clientId);
+        body.add("client_secret", "6fe5572d-d0f7-4121-8fc4-d2768bf82836");
+        body.add("username", username);
+        body.add("password", password);
+
+        return new HttpEntity<>(body, headers);
+    }
+
 }

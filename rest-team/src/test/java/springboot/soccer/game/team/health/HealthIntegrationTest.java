@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Testcontainers
 @Tag("integration")
-public class HealthIntegrationTest {
+class HealthIntegrationTest {
 
     private static String HEALTH_PATH = "/actuator/health";
 
