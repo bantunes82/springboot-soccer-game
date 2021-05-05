@@ -40,14 +40,5 @@ public abstract class AbstractIT {
 
         String authServerUrl = String.format("http://%s:%d/auth", IDENTITY_ACCESS_MANAGEMENT.getHost(), IDENTITY_ACCESS_MANAGEMENT.getMappedPort(8082));
         registry.add("keycloak.auth-server-url", () -> authServerUrl);
-        registry.add("keycloak.realm", () -> "team-realm");
-        registry.add("keycloak.resource", () -> "team-client");
-        registry.add("keycloak.bearer-only", () -> "true");
-        registry.add("keycloak.security-constraints[0].authRoles[0]", () -> "team");
-        registry.add("keycloak.security-constraints[0].securityCollections[0].patterns[0]", () -> "/v1/teams/*");
-        registry.add("keycloak.security-constraints[0].securityCollections[0].methods[0]", () -> "POST");
-        registry.add("keycloak.security-constraints[0].securityCollections[0].methods[1]", () -> "PUT");
-        registry.add("keycloak.security-constraints[0].securityCollections[0].methods[2]", () -> "PATCH");
-        registry.add("keycloak.security-constraints[0].securityCollections[0].methods[3]", () -> "DELETE");
     }
 }
