@@ -27,7 +27,7 @@ public class CountryCodeValidator implements ConstraintValidator<CountryCode, Ob
                     .anyMatch(code -> code.equals(value));
 
             if (!isValid) {
-                log.debug("Country Code is invalid: %s", value);
+                log.debug("Country Code is invalid: {}", value);
                 context.disableDefaultConstraintViolation();
                 context.buildConstraintViolationWithTemplate(message)
                         .addConstraintViolation();

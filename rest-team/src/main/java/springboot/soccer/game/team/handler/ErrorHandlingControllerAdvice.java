@@ -34,7 +34,7 @@ public class ErrorHandlingControllerAdvice {
     @ExceptionHandler(EntityNotFoundException.class)
     ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex, Locale locale) {
         String message = messageSource.getMessage(ex.getMessage(), ex.getArgs(), locale);
-        log.debug("Errors while finding entity: %s", message);
+        log.debug("Errors while finding entity: {}", message);
 
         ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error", message));
 
@@ -44,7 +44,7 @@ public class ErrorHandlingControllerAdvice {
     // @Validate For Validating Path Variables and Request Parameters
     @ExceptionHandler(ConstraintViolationException.class)
     ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
-        log.debug("Errors while beans validation: %s", ex.getMessage());
+        log.debug("Errors while beans validation: {}", ex.getMessage());
 
         Map<String, String> errors = ex.getConstraintViolations()
                 .stream()
@@ -56,8 +56,8 @@ public class ErrorHandlingControllerAdvice {
 
     // error handle for @Valid
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    ResponseEntity<Object> onMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        log.debug("Errors while beans validation: %s", ex.getMessage());
+    ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        log.debug("Errors while beans validation: {}", ex.getMessage());
 
           Map<String, String> errors = ex.getBindingResult()
                 .getFieldErrors()

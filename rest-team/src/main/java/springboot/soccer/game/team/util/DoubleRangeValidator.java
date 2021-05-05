@@ -28,7 +28,7 @@ public class DoubleRangeValidator implements ConstraintValidator<Range, Object> 
             isValid = value.compareTo(maxPrecision) <= 0 && value.compareTo(minPrecision) >= 0;
 
             if (!isValid) {
-                log.debug("Range is invalid: %s", value);
+                log.debug("Range is invalid: {}", value);
                 context.disableDefaultConstraintViolation();
                 context.buildConstraintViolationWithTemplate(message)
                         .addConstraintViolation();

@@ -113,7 +113,7 @@ public class TeamResource {
                 .buildAndExpand(teamSaved.getId())
                 .toUri();
 
-        log.debug("New team created with URI %s", location);
+        log.debug("New team created with URI {}", location);
 
         return ResponseEntity.created(location).build();
     }
