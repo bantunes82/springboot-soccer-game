@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -19,6 +20,8 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static springboot.soccer.game.team.constants.Validation.ERROR_TO_PERSIST;
 
 @Slf4j
 @RestControllerAdvice
@@ -64,6 +67,15 @@ public class ErrorHandlingControllerAdvice {
                 .stream()
                 .collect(Collectors.toMap(FieldError::getField,DefaultMessageSourceResolvable::getDefaultMessage, (existing, replacement) -> existing ));
         ErrorDTO errorDTO = new ErrorDTO(errors);
+
+        return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex, Locale locale) {
+        log.debug("Error while persisting the information: {}", ex.getMessage());
+
+        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error", messageSource.getMessage(ERROR_TO_PERSIST, null, locale)));
 
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
     }

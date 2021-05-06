@@ -50,6 +50,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
     private String clientId;
     private TeamDTO bayernMunchen;
     private TeamDTO borussiaDortmund;
+    private TeamDTO corinthians;
     private TeamDTO invalidTeamDTO;
     private TeamDTO invalidTeamDTONullValues;
     private TeamDTO invalidTeamDTONullCountryDTO;
@@ -57,6 +58,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
+        createCorinthiansTeam();
         createBayerMunchenTeam();
         createBorussiaDortmundTeam();
         createInvalidTeamDTO();
@@ -260,6 +262,30 @@ class TeamResourceIntegrationTest extends AbstractIT {
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
         Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
     }
+
+    @Test
+    void updateTeam_GivenExistentTeam_ReturnsBadRequest(){
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-2", HttpMethod.PUT, new HttpEntity<>(corinthians, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST, Locale.ENGLISH), response.getBody().getErrors().get("error"));
+    }
+
+    @Test
+    void updateTeam_GivenExistentTeam_ReturnsBadRequest_Spanish(){
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        headers.add(ACCEPT_LANGUAGE, ES);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-2", HttpMethod.PUT, new HttpEntity<>(corinthians, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
+    }
+
 
     @Test
     void updateTeam_GivenValidDTOAndNotAllowedRoleUser_ReturnsForbidden() {
@@ -525,6 +551,29 @@ class TeamResourceIntegrationTest extends AbstractIT {
     }
 
     @Test
+    void createTeam_GivenExistentTeam_ReturnsBadRequest(){
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(corinthians, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST, Locale.ENGLISH), response.getBody().getErrors().get("error"));
+    }
+
+    @Test
+    void createTeam_GivenExistentTeam_ReturnsBadRequest_Spanish(){
+        headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
+        headers.setContentType(APPLICATION_JSON);
+        headers.add(ACCEPT_LANGUAGE, ES);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(corinthians, headers), ErrorDTO.class);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
+        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
+    }
+
+    @Test
     void createTeam_GivenValidDTOAndNotAllowedRoleUser_ReturnsForbidden() {
         headers.setBearerAuth(getAccessTokenForNotAllowedRoleUser());
         headers.setContentType(APPLICATION_JSON);
@@ -549,7 +598,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
         ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(borussiaDortmund, headers), Void.class);
 
         Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        Assertions.assertTrue(response.getHeaders().getLocation().toString().contains("/v1/teams/1"));
+        Assertions.assertTrue(response.getHeaders().getLocation().toString().contains("/v1/teams/3"));
     }
 
     private String getErrorMessage(String messageKeyWithBraces, Locale locale) {
@@ -561,7 +610,20 @@ class TeamResourceIntegrationTest extends AbstractIT {
     }
 
 
-    private void createBayerMunchenTeam() throws JsonProcessingException {
+    private void createCorinthiansTeam(){
+        CountryDTO brazil = new CountryDTO("Brazil", "BR");
+        corinthians = TeamDTO.builder()
+                .countryDTO(brazil)
+                .founded(LocalDate.of(1910, 9, 1))
+                .level(8.0d)
+                .name("Sport Club Corinthians Paulista")
+                .picture("https://conteudo.imguol.com.br//c/esporte/futebol/times/desktop/corinthians.jpg")
+                .nickName("Timao")
+                .build();
+    }
+
+
+    private void createBayerMunchenTeam() {
         CountryDTO germany = new CountryDTO("Germany", "DE");
         bayernMunchen = TeamDTO.builder()
                 .countryDTO(germany)
