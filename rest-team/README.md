@@ -50,7 +50,7 @@ codes).
           curl -X POST http://localhost:8082/auth/realms/team-realm/protocol/openid-connect/token  --user team-client:6fe5572d-d0f7-4121-8fc4-d2768bf82836 -H 'content-type: application/x-www-form-urlencoded' -d 'username=test&password=test&grant_type=password'
         ```
 
- ![Swagger](https://i.ibb.co/PtVrRNB/swagger.png "Swagger Endpoints")
+ ![Swagger](https://i.ibb.co/p0s5Kpb/swagger.png "Swagger Endpoints")
 
 
 **Prometheus**
@@ -63,14 +63,8 @@ This is the url to access the [Grafana DashBoard](http://localhost:3000) from So
 
 The Grafana DashBoard should looks like this:
 
-![Application Metrics](https://i.ibb.co/LhFr5Wx/application-metrics.png
-"Application Metrics")
-
-![Vendor Metrics](https://i.ibb.co/TY9BNdL/vendor-metrics.png
-"Vendor Metrics")
-
-![Base Metrics](https://i.ibb.co/TgRKHkC/base-metrics.png
-"Base Metrics")
+![Metrics](https://i.ibb.co/tHjstNG/metric.png
+"Metrics")
 
 **Keycloak**
 
