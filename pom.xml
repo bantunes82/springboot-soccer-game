@@ -2,19 +2,105 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.4.5</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
     <groupId>springboot.soccer.game</groupId>
     <artifactId>super-parent-root</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
     <name>SpringBoot Soccer Game - R00T</name>
+    <modules>
+        <module>rest-team</module>
+    </modules>
     <properties>
         <sonar.host.url>http://localhost:9000</sonar.host.url>
         <sonar.login>admin</sonar.login>
         <sonar.password>sonar</sonar.password>
+        <java.version>11</java.version>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <compiler-plugin.version>3.8.1</compiler-plugin.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+        <sonar-plugin.version>3.8.0.2131</sonar-plugin.version>
+        <jacoco-plugin.version>0.8.6</jacoco-plugin.version>
+        <surefire-plugin.version>2.22.2</surefire-plugin.version>
+        <testcontainers.version>1.15.2</testcontainers.version>
+        <keycloak.version>12.0.4</keycloak.version>
+        <micrometer-prometheus.version>[1.6.5]</micrometer-prometheus.version>
+        <postgresql.version>[42.2.20]</postgresql.version>
+        <pojo.tester.version>[0.7.6]</pojo.tester.version>
+        <lombok.version>[1.18.16]</lombok.version>
+        <org.mapstruct.version>[1.4.1.Final]</org.mapstruct.version>
+        <springdoc-openapi-ui.vesion>[1.5.8]</springdoc-openapi-ui.vesion>
+        <jacoco.version>[0.8.6]</jacoco.version>
     </properties>
-    <modules>
-        <module>rest-team</module>
-    </modules>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak.bom</groupId>
+                <artifactId>keycloak-adapter-bom</artifactId>
+                <version>${keycloak.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-registry-prometheus</artifactId>
+                <version>${micrometer-prometheus.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc-openapi-ui.vesion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${org.mapstruct.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Test dependencies -->
+            <dependency>
+                <groupId>pl.pojo</groupId>
+                <artifactId>pojo-tester</artifactId>
+                <version>${pojo.tester.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jacoco</groupId>
+                <artifactId>org.jacoco.agent</artifactId>
+                <classifier>runtime</classifier>
+                <scope>test</scope>
+                <version>${jacoco.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>
