@@ -85,7 +85,7 @@ destroyed after the execution of them and the test methods are executed in speci
 The coverage is pretty good and you can take a look at the Jacoco plugin
 reports available in the IDE/command line.
 
-![Jacoco](https://i.ibb.co/tKLpft3/jacoco.png
+![Jacoco](https://i.ibb.co/SJ6stfb/jacoco.png
 "Jacoco Execution")
 
 ---
@@ -98,14 +98,14 @@ sudo sysctl -w vm.max_map_count=262144
 /springboot-soccer-game/infrastructure$ docker-compose -f sonarqube-docker-compose.yaml up
 ```
 This is the url to access the [SonarQube](http://localhost:9000/projects?sort=-analysis_date).
-
+The username and password is "admin"
 
 In case you have a Sonar instance running locally (or a Docker
 Container), you can execute the command `mvn clean install
 sonar:sonar` in order to observe the potential Bugs, Code smells,
 Technical Debt, etc. The results will be similar to this one:
 
-![SonarQube](https://i.ibb.co/mzz8SrJ/sonar.png
+![SonarQube](https://i.ibb.co/L1CfkDw/sonarqube.png
 "Sonar Execution")
 
 ---

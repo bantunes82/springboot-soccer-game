@@ -8,15 +8,12 @@ import springboot.soccer.game.team.domainobject.TeamDO;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 public interface TeamRepository extends PagingAndSortingRepository<TeamDO, Long> {
 
-    Random random = new SecureRandom();
-
     default Optional<TeamDO> findRandomAndDeletedIsFalse() {
         long countTeams = count();
-        int randomTeam = count() == 0 ? 1 : random.nextInt((int) countTeams);
+        int randomTeam = count() == 0 ? 1 : new SecureRandom().nextInt((int) countTeams);
 
         Pageable pageable = PageRequest.of(randomTeam,1);
 

@@ -19,7 +19,7 @@
     <properties>
         <sonar.host.url>http://localhost:9000</sonar.host.url>
         <sonar.login>admin</sonar.login>
-        <sonar.password>sonar</sonar.password>
+        <sonar.password>admin</sonar.password>
         <java.version>11</java.version>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
