@@ -36,7 +36,7 @@ public class RestTeamApplication {
 
     private static final String CLASSPATH_MESSAGES = "classpath:messages";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) {//NOSONAR
         SpringApplication.run(RestTeamApplication.class, args);
     }
 
