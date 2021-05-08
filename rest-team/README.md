@@ -69,7 +69,7 @@ The Grafana DashBoard should looks like this:
 **Keycloak**
 
 This is the url to access the [Keycloak console](http://localhost:8082/auth/) configuration.
-The username and password is "admin"
+The username and password are "admin"
 
 **Testing**
 
@@ -80,7 +80,7 @@ UI/functional.
 A caveat to be mentioned specially when it comes to the Integration
 Tests: as they were pretty complex and to speed up the integration tests execution,
 the test containers are created before the execution of the test methods in the Integration Test Class and they are
-destroyed after the execution of them and the test methods are executed in specified order.
+destroyed after the execution of them.
 
 The coverage is pretty good and you can take a look at the Jacoco plugin
 reports available in the IDE/command line.
@@ -98,10 +98,10 @@ sudo sysctl -w vm.max_map_count=262144
 /springboot-soccer-game/infrastructure$ docker-compose -f sonarqube-docker-compose.yaml up
 ```
 This is the url to access the [SonarQube](http://localhost:9000/projects?sort=-analysis_date).
-The username and password is "admin"
+The username and password are "admin"
 
 In case you have a Sonar instance running locally (or a Docker
-Container), you can execute the command `mvn clean install
+Container), you can execute the command `/springboot-soccer-game/infrastructure$ mvn clean install
 sonar:sonar` in order to observe the potential Bugs, Code smells,
 Technical Debt, etc. The results will be similar to this one:
 
