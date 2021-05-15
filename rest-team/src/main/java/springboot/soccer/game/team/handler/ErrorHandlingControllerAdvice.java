@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import springboot.soccer.game.team.datatransferobject.ErrorDTO;
 import springboot.soccer.game.team.exception.BusinessException;
@@ -31,6 +30,7 @@ import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.
 public class ErrorHandlingControllerAdvice {
 
     private final MessageSource messageSource;
+    private static final String ERROR = "error";
 
     @Autowired
     public ErrorHandlingControllerAdvice(MessageSource messageSource) {
@@ -40,10 +40,12 @@ public class ErrorHandlingControllerAdvice {
     @ExceptionHandler(BusinessException.class)
     ResponseEntity<ErrorDTO> handleBusinessException(BusinessException exception, Locale locale) {
         String userMessage = messageSource.getMessage(exception.getErrorCode().name(), exception.getParams(), locale);
+        int httpStatusCode = Integer.parseInt(messageSource.getMessage(exception.getErrorCode().name().concat(".code"),null, "500",locale));
+
         log.error(userMessage,exception);
 
-        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error", userMessage));
-        return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
+        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap(ERROR, userMessage));
+        return new ResponseEntity<>(errorDTO, HttpStatus.resolve(httpStatusCode));
     }
 
     // @Validate For Validating Path Variables and Request Parameters
@@ -76,7 +78,7 @@ public class ErrorHandlingControllerAdvice {
         String userMessage = messageSource.getMessage(ERROR_TO_PERSIST.name(), null, locale);
         log.error(userMessage, exception);
 
-        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error", userMessage));
+        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap(ERROR, userMessage));
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
     }
 
@@ -85,7 +87,7 @@ public class ErrorHandlingControllerAdvice {
         String userMessage = messageSource.getMessage(GENERAL.name(), null, locale);
         log.error(userMessage, exception);
 
-        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error", userMessage));
+        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap(ERROR, userMessage));
         return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
