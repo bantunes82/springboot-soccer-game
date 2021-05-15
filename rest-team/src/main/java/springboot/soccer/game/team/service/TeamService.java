@@ -12,15 +12,15 @@ import springboot.soccer.game.team.dataaccessobject.CountryRepository;
 import springboot.soccer.game.team.dataaccessobject.TeamRepository;
 import springboot.soccer.game.team.domainobject.CountryDO;
 import springboot.soccer.game.team.domainobject.TeamDO;
-import springboot.soccer.game.team.exception.EntityNotFoundException;
+import springboot.soccer.game.team.exception.BusinessException;
 import springboot.soccer.game.team.util.Range;
 
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
-import static springboot.soccer.game.team.constants.Validation.TEAM_NOT_FOUND;
-import static springboot.soccer.game.team.constants.Validation.THERE_IS_NOT_ANY_TEAM;
+import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.TEAM_NOT_FOUND;
+import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.THERE_IS_NO_TEAM_FOUND;
 
 @Service
 @Validated
@@ -37,7 +37,7 @@ public class TeamService {
     }
 
     public TeamDO findRandom() {
-        return teamRepository.findRandomAndDeletedIsFalse().orElseThrow(() -> new EntityNotFoundException(THERE_IS_NOT_ANY_TEAM));
+        return teamRepository.findRandomAndDeletedIsFalse().orElseThrow(() -> new BusinessException("Could not find any team", THERE_IS_NO_TEAM_FOUND));
     }
 
     public List<TeamDO> findByName(String name) {
@@ -45,7 +45,7 @@ public class TeamService {
     }
 
     public List<TeamDO> findByCountryCode(String countryCode, int pageIndex, int pageSize) {
-        Pageable pageable = PageRequest.of(pageIndex,pageSize, Sort.by("name"));
+        Pageable pageable = PageRequest.of(pageIndex, pageSize, Sort.by("name"));
         return teamRepository.findByCountryDOCodeAndDeletedIsFalse(countryCode, pageable);
     }
 
@@ -96,7 +96,7 @@ public class TeamService {
 
 
     private TeamDO findTeamChecked(Long teamId) {
-        return teamRepository.findByIdAndDeletedIsFalse(teamId).orElseThrow(() -> new EntityNotFoundException(TEAM_NOT_FOUND, teamId));
+        return teamRepository.findByIdAndDeletedIsFalse(teamId).orElseThrow(() -> new BusinessException("Could not find team with id: " + teamId, TEAM_NOT_FOUND, teamId));
     }
 
 

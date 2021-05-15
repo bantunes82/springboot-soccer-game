@@ -10,9 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import springboot.soccer.game.team.datatransferobject.ErrorDTO;
-import springboot.soccer.game.team.exception.EntityNotFoundException;
+import springboot.soccer.game.team.exception.BusinessException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -21,7 +22,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static springboot.soccer.game.team.constants.Validation.ERROR_TO_PERSIST;
+import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.ERROR_TO_PERSIST;
+import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.GENERAL;
+
 
 @Slf4j
 @RestControllerAdvice
@@ -34,50 +37,56 @@ public class ErrorHandlingControllerAdvice {
         this.messageSource = messageSource;
     }
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    ResponseEntity<ErrorDTO> handleEntityNotFoundException(EntityNotFoundException ex, Locale locale) {
-        String message = messageSource.getMessage(ex.getMessage(), ex.getArgs(), locale);
-        log.debug("Errors while finding entity: {}", message);
+    @ExceptionHandler(BusinessException.class)
+    ResponseEntity<ErrorDTO> handleBusinessException(BusinessException exception, Locale locale) {
+        String userMessage = messageSource.getMessage(exception.getErrorCode().name(), exception.getParams(), locale);
+        log.error(userMessage,exception);
 
-        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error", message));
-
+        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error", userMessage));
         return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
     }
 
     // @Validate For Validating Path Variables and Request Parameters
     @ExceptionHandler(ConstraintViolationException.class)
-    ResponseEntity<ErrorDTO> handleConstraintViolationException(ConstraintViolationException ex) {
-        log.debug("Errors while beans validation: {}", ex.getMessage());
-
-        Map<String, String> errors = ex.getConstraintViolations()
+    ResponseEntity<ErrorDTO> handleConstraintViolationException(ConstraintViolationException exception) {
+        Map<String, String> userMessage = exception.getConstraintViolations()
                 .stream()
                 .collect(Collectors.toMap(constraintViolation -> constraintViolation.getPropertyPath().toString(), ConstraintViolation::getMessage, (existing, replacement) -> existing));
-        ErrorDTO errorDTO = new ErrorDTO(errors);
+        log.error(userMessage.toString(), exception);
 
+        ErrorDTO errorDTO = new ErrorDTO(userMessage);
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
     }
 
     // error handle for @Valid
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    ResponseEntity<ErrorDTO> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        log.debug("Errors while beans validation: {}", ex.getMessage());
-
-          Map<String, String> errors = ex.getBindingResult()
+    ResponseEntity<ErrorDTO> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+          Map<String, String> userMessage = exception.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .collect(Collectors.toMap(FieldError::getField,DefaultMessageSourceResolvable::getDefaultMessage, (existing, replacement) -> existing ));
-        ErrorDTO errorDTO = new ErrorDTO(errors);
+        log.error(userMessage.toString(), exception);
 
+        ErrorDTO errorDTO = new ErrorDTO(userMessage);
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    ResponseEntity<ErrorDTO> handleDataIntegrityViolationException(DataIntegrityViolationException ex, Locale locale) {
-        log.debug("Error while persisting the information: {}", ex.getMessage());
+    ResponseEntity<ErrorDTO> handleDataIntegrityViolationException(DataIntegrityViolationException exception, Locale locale) {
+        String userMessage = messageSource.getMessage(ERROR_TO_PERSIST.name(), null, locale);
+        log.error(userMessage, exception);
 
-        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error", messageSource.getMessage(ERROR_TO_PERSIST, null, locale)));
-
+        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error", userMessage));
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorDTO> handleAnyOtherException(Exception exception, Locale locale) {
+        String userMessage = messageSource.getMessage(GENERAL.name(), null, locale);
+        log.error(userMessage, exception);
+
+        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error", userMessage));
+        return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

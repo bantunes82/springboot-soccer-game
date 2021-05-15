@@ -32,6 +32,7 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import static springboot.soccer.game.team.constants.Validation.*;
+import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.*;
 
 @Tag("integration")
 class TeamResourceIntegrationTest extends AbstractIT {
@@ -247,7 +248,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, Locale.ENGLISH), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, Locale.ENGLISH), response.getBody().getErrors().get("error"));
     }
 
 
@@ -260,7 +261,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
     }
 
     @Test
@@ -271,7 +272,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST, Locale.ENGLISH), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST.name(), Locale.ENGLISH), response.getBody().getErrors().get("error"));
     }
 
     @Test
@@ -283,7 +284,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST.name(), SPAIN_LOCALE), response.getBody().getErrors().get("error"));
     }
 
 
@@ -367,7 +368,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, Locale.ENGLISH), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, Locale.ENGLISH), response.getBody().getErrors().get("error"));
     }
 
     @Test
@@ -378,7 +379,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
     }
 
     @Test
@@ -415,7 +416,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, Locale.ENGLISH), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, Locale.ENGLISH), response.getBody().getErrors().get("error"));
     }
 
     @Test
@@ -426,7 +427,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND, new Object[]{-1000}, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
     }
 
     @Test
@@ -558,7 +559,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST, Locale.ENGLISH), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST.name(), Locale.ENGLISH), response.getBody().getErrors().get("error"));
     }
 
     @Test
@@ -570,7 +571,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST.name(), SPAIN_LOCALE), response.getBody().getErrors().get("error"));
     }
 
     @Test
@@ -608,7 +609,6 @@ class TeamResourceIntegrationTest extends AbstractIT {
     private String getErrorMessage(String messageKeyWithBraces, Object[] args, Locale locale) {
         return messageSource.getMessage(messageKeyWithBraces.replaceAll("[{}]", ""), args, locale);
     }
-
 
     private void createCorinthiansTeam(){
         CountryDTO brazil = new CountryDTO("Brazil", "BR");

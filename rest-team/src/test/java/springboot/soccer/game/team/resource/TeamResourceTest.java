@@ -15,7 +15,7 @@ import springboot.soccer.game.team.datatransferobject.CountryDTO;
 import springboot.soccer.game.team.datatransferobject.TeamDTO;
 import springboot.soccer.game.team.domainobject.CountryDO;
 import springboot.soccer.game.team.domainobject.TeamDO;
-import springboot.soccer.game.team.exception.EntityNotFoundException;
+import springboot.soccer.game.team.exception.BusinessException;
 import springboot.soccer.game.team.resource.mapper.TeamMapper;
 import springboot.soccer.game.team.service.TeamService;
 
@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
+import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.TEAM_NOT_FOUND;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -85,9 +86,10 @@ class TeamResourceTest {
 
     @Test
     void findRandomTeam_GivenThereIsNoTeam_ThrowsEntityNotFoundException() {
-        when(teamService.findRandom()).thenThrow(new EntityNotFoundException("Could not find any team"));
+        when(teamService.findRandom()).thenThrow(new BusinessException("Could not find any team", TEAM_NOT_FOUND));
 
-        Assertions.assertThrows(EntityNotFoundException.class, () -> teamResource.findRandomTeam(), "Could not find any team");
+        BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> teamResource.findRandomTeam(), "Could not find any team");
+        Assertions.assertEquals(TEAM_NOT_FOUND, exception.getErrorCode());
         verify(teamService).findRandom();
     }
 
@@ -178,9 +180,10 @@ class TeamResourceTest {
     @Test
     void updateTeam_GivenInvalidTeamId_ThrowsEntityNotFoundException() {
         when(teamMapper.toTeamDO(teamDTO)).thenReturn(teamDO);
-        when(teamService.update(1L, teamDO)).thenThrow(new EntityNotFoundException("Could not find team with id: 1"));
+        when(teamService.update(1L, teamDO)).thenThrow(new BusinessException("Could not find team with id: 1", TEAM_NOT_FOUND));
 
-        Assertions.assertThrows(EntityNotFoundException.class, () -> teamResource.updateTeam(1L, teamDTO), "Could not find team with id: 1");
+        BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> teamResource.updateTeam(1L, teamDTO), "Could not find team with id: 1");
+        Assertions.assertEquals(TEAM_NOT_FOUND, exception.getErrorCode());
         verify(teamMapper).toTeamDO(teamDTO);
         verify(teamService).update(1L, teamDO);
     }
@@ -200,9 +203,10 @@ class TeamResourceTest {
 
     @Test
     void updateTeamLevel_GivenInvalidTeamId_ThrowsEntityNotFoundException() {
-        when(teamService.updateLevel(1L, 8d)).thenThrow(new EntityNotFoundException("Could not find team with id: 1"));
+        when(teamService.updateLevel(1L, 8d)).thenThrow(new BusinessException("Could not find team with id: 1", TEAM_NOT_FOUND));
 
-        Assertions.assertThrows(EntityNotFoundException.class, () -> teamResource.updateTeamLevel(1L, 8d), "Could not find team with id: 1");
+        BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> teamResource.updateTeamLevel(1L, 8d), "Could not find team with id: 1");
+        Assertions.assertEquals(TEAM_NOT_FOUND, exception.getErrorCode());
         verify(teamService).updateLevel(1L, 8d);
     }
 
@@ -219,9 +223,10 @@ class TeamResourceTest {
 
     @Test
     void deleteTeam_GivenInvalidTeamId_ThrowsEntityNotFoundException() {
-        doThrow(new EntityNotFoundException("Could not find team with id: 1")).when(teamService).delete(1L);
+        doThrow(new BusinessException("Could not find team with id: 1", TEAM_NOT_FOUND)).when(teamService).delete(1L);
 
-        Assertions.assertThrows(EntityNotFoundException.class, () -> teamResource.deleteTeam(1L), "Could not find team with id: 1");
+        BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> teamResource.deleteTeam(1L), "Could not find team with id: 1");
+        Assertions.assertEquals(TEAM_NOT_FOUND, exception.getErrorCode());
         verify(teamService).delete(1L);
     }
 }

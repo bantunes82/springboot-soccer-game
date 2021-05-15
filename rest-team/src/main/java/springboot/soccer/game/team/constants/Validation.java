@@ -18,7 +18,4 @@ public class Validation {
     public static final String COUNTRY_NAME_SIZE =  "{constraint.country.nameSize}";
     public static final String COUNTRY_CODE_INVALID = "{constraint.country.codeInvalid}";
 
-    public static final String TEAM_NOT_FOUND = "exception.team.not.found";
-    public static final String THERE_IS_NOT_ANY_TEAM = "exception.there.is.not.any.team";
-    public static final String ERROR_TO_PERSIST = "exception.error.to.persist";
 }

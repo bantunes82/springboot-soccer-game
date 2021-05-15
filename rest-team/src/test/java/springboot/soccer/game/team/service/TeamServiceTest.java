@@ -14,7 +14,7 @@ import springboot.soccer.game.team.dataaccessobject.CountryRepository;
 import springboot.soccer.game.team.dataaccessobject.TeamRepository;
 import springboot.soccer.game.team.domainobject.CountryDO;
 import springboot.soccer.game.team.domainobject.TeamDO;
-import springboot.soccer.game.team.exception.EntityNotFoundException;
+import springboot.soccer.game.team.exception.BusinessException;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -69,7 +69,7 @@ class TeamServiceTest {
     void findRandom_GivenThereIsNoTeam_ThrowsEntityNotFoundException() {
         when(teamRepository.findRandomAndDeletedIsFalse()).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(EntityNotFoundException.class, () -> {
+        Assertions.assertThrows(BusinessException.class, () -> {
             teamService.findRandom();
         }, "Could not find any team");
         verify(teamRepository).findRandomAndDeletedIsFalse();
@@ -149,7 +149,7 @@ class TeamServiceTest {
         team1.setNickName("Coringao");
         when(teamRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(EntityNotFoundException.class, () -> {
+        Assertions.assertThrows(BusinessException.class, () -> {
             teamService.update(1L, team1);
         }, "Could not find team with id: 1");
         verify(teamRepository).findByIdAndDeletedIsFalse(1L);
@@ -172,7 +172,7 @@ class TeamServiceTest {
     void updateLevel_GivenNonExistingTeamId_ThrowsEntityNotFoundException() {
         when(teamRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(EntityNotFoundException.class, () -> {
+        Assertions.assertThrows(BusinessException.class, () -> {
             teamService.updateLevel(1L, 3.5);
         }, "Could not find team with id: 1");
         verify(teamRepository).findByIdAndDeletedIsFalse(1L);
@@ -192,7 +192,7 @@ class TeamServiceTest {
     void delete_GivenNonExistingTeamId_ThrowsEntityNotFoundException() {
         when(teamRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(EntityNotFoundException.class, () -> {
+        Assertions.assertThrows(BusinessException.class, () -> {
             teamService.delete(1L);
         }, "Could not find team with id: 1");
         verify(teamRepository).findByIdAndDeletedIsFalse(1L);
