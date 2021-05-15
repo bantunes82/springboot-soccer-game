@@ -35,7 +35,7 @@ public class ErrorHandlingControllerAdvice {
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex, Locale locale) {
+    ResponseEntity<ErrorDTO> handleEntityNotFoundException(EntityNotFoundException ex, Locale locale) {
         String message = messageSource.getMessage(ex.getMessage(), ex.getArgs(), locale);
         log.debug("Errors while finding entity: {}", message);
 
@@ -46,7 +46,7 @@ public class ErrorHandlingControllerAdvice {
 
     // @Validate For Validating Path Variables and Request Parameters
     @ExceptionHandler(ConstraintViolationException.class)
-    ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+    ResponseEntity<ErrorDTO> handleConstraintViolationException(ConstraintViolationException ex) {
         log.debug("Errors while beans validation: {}", ex.getMessage());
 
         Map<String, String> errors = ex.getConstraintViolations()
@@ -59,7 +59,7 @@ public class ErrorHandlingControllerAdvice {
 
     // error handle for @Valid
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    ResponseEntity<ErrorDTO> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         log.debug("Errors while beans validation: {}", ex.getMessage());
 
           Map<String, String> errors = ex.getBindingResult()
@@ -72,7 +72,7 @@ public class ErrorHandlingControllerAdvice {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex, Locale locale) {
+    ResponseEntity<ErrorDTO> handleDataIntegrityViolationException(DataIntegrityViolationException ex, Locale locale) {
         log.debug("Error while persisting the information: {}", ex.getMessage());
 
         ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap("error", messageSource.getMessage(ERROR_TO_PERSIST, null, locale)));

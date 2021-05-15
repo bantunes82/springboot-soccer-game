@@ -36,7 +36,7 @@ public class TeamService {
         this.countryRepository = countryRepository;
     }
 
-    public TeamDO findRandom() throws EntityNotFoundException {
+    public TeamDO findRandom() {
         return teamRepository.findRandomAndDeletedIsFalse().orElseThrow(() -> new EntityNotFoundException(THERE_IS_NOT_ANY_TEAM));
     }
 
@@ -57,7 +57,7 @@ public class TeamService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public TeamDO update(Long teamId, @Valid TeamDO team) throws EntityNotFoundException {
+    public TeamDO update(Long teamId, @Valid TeamDO team) {
         TeamDO teamSaved = findTeamChecked(teamId);
         Optional<CountryDO> countrySaved = countryRepository.findByCode(team.getCountryDO().getCode());
 
@@ -77,7 +77,7 @@ public class TeamService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public TeamDO updateLevel(Long teamId, @Range(min = 1.0, max = 10.0) Double level) throws EntityNotFoundException {
+    public TeamDO updateLevel(Long teamId, @Range(min = 1.0, max = 10.0) Double level) {
         TeamDO teamSaved = findTeamChecked(teamId);
         teamSaved.setLevel(generateNewLevel(level, teamSaved.getLevel()));
 
@@ -89,13 +89,13 @@ public class TeamService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void delete(Long teamId) throws EntityNotFoundException {
+    public void delete(Long teamId) {
         TeamDO teamDO = findTeamChecked(teamId);
         teamDO.setDeleted(true);
     }
 
 
-    private TeamDO findTeamChecked(Long teamId) throws EntityNotFoundException {
+    private TeamDO findTeamChecked(Long teamId) {
         return teamRepository.findByIdAndDeletedIsFalse(teamId).orElseThrow(() -> new EntityNotFoundException(TEAM_NOT_FOUND, teamId));
     }
 

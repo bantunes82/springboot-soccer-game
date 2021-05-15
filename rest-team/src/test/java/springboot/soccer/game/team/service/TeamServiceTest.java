@@ -56,7 +56,7 @@ class TeamServiceTest {
     }
 
     @Test
-    void findRandom_ReturnsTeam() throws EntityNotFoundException {
+    void findRandom_ReturnsTeam() {
         when(teamRepository.findRandomAndDeletedIsFalse()).thenReturn(Optional.of(team1));
 
         TeamDO teamDO = teamService.findRandom();
@@ -132,7 +132,7 @@ class TeamServiceTest {
     }
 
     @Test
-    void update_GivenExistingTeamId_ReturnsEntity() throws EntityNotFoundException {
+    void update_GivenExistingTeamId_ReturnsEntity() {
         team1.setId(1000L);
         team1.setNickName("Coringao");
         when(teamRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(team1));
@@ -156,7 +156,7 @@ class TeamServiceTest {
     }
 
     @Test
-    void updateLevel_GivenExistingTeamId_ReturnsCorrectAvg() throws EntityNotFoundException {
+    void updateLevel_GivenExistingTeamId_ReturnsCorrectAvg() {
         when(teamRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(team1));
 
         Double newRate = Double.valueOf(3.5);
@@ -179,7 +179,7 @@ class TeamServiceTest {
     }
 
     @Test
-    void delete_GivenExistingTeamId_ExecuteSuccessfully() throws EntityNotFoundException {
+    void delete_GivenExistingTeamId_ExecuteSuccessfully() {
         when(teamRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(team1));
 
         teamService.delete(1L);

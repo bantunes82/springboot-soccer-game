@@ -28,7 +28,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import springboot.soccer.game.team.datatransferobject.ErrorDTO;
 import springboot.soccer.game.team.datatransferobject.TeamDTO;
 import springboot.soccer.game.team.domainobject.TeamDO;
-import springboot.soccer.game.team.exception.EntityNotFoundException;
 import springboot.soccer.game.team.resource.mapper.TeamMapper;
 import springboot.soccer.game.team.service.TeamService;
 import springboot.soccer.game.team.util.CountryCode;
@@ -64,7 +63,7 @@ public class TeamResource {
     })
     // @Timed(value = "timeFindRandomTeam", description = "Times how long it takes to invoke the findRandomTeam method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @GetMapping(path = "/random")
-    public ResponseEntity<TeamDTO> findRandomTeam() throws EntityNotFoundException {
+    public ResponseEntity<TeamDTO> findRandomTeam() {
         TeamDO teamRandom = teamService.findRandom();
 
         return ResponseEntity.ok(teamMapper.toTeamDTO(teamRandom));
@@ -130,7 +129,7 @@ public class TeamResource {
     //@Timed(value = "timeUpdateTeam", description = "Times how long it takes to invoke the updateTeam method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<TeamDTO> updateTeam(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId,
-                                              @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class)), description = "soccer team to be updated") @Valid @RequestBody TeamDTO teamDTO) throws EntityNotFoundException {
+                                              @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class)), description = "soccer team to be updated") @Valid @RequestBody TeamDTO teamDTO) {
         TeamDO teamDO = teamMapper.toTeamDO(teamDTO);
         TeamDO teamUpdated = teamService.update(teamId, teamDO);
 
@@ -149,7 +148,7 @@ public class TeamResource {
     //@Timed(value = "timeUpdateTeamLevel", description = "Times how long it takes to invoke the updateTeamLevel method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @PatchMapping(path = "/{id}/level/{value}")
     public ResponseEntity<TeamDTO> updateTeamLevel(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId,
-                                                   @Parameter(required = true, description = "soccer team level") @Range(min = 1.0, max = 10.0) @PathVariable("value") Double level) throws EntityNotFoundException {
+                                                   @Parameter(required = true, description = "soccer team level") @Range(min = 1.0, max = 10.0) @PathVariable("value") Double level) {
         TeamDO teamUpdated = teamService.updateLevel(teamId, level);
 
         return ResponseEntity.ok(teamMapper.toTeamDTO(teamUpdated));
@@ -165,7 +164,7 @@ public class TeamResource {
     //@SecurityRequirement(name = "accessToken")
     //@Timed(value = "timeDeleteTeam", description = "Times how long it takes to invoke the deleteTeam method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @DeleteMapping(path = "{id}")
-    public ResponseEntity<Void> deleteTeam(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId) throws EntityNotFoundException {
+    public ResponseEntity<Void> deleteTeam(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId) {
         teamService.delete(teamId);
 
         return ResponseEntity.noContent().build();

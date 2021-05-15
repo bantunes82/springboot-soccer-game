@@ -71,7 +71,7 @@ class TeamResourceTest {
     }
 
     @Test
-    void findRandomTeam_ReturnsTeam() throws EntityNotFoundException {
+    void findRandomTeam_ReturnsTeam() {
         when(teamService.findRandom()).thenReturn(teamDO);
         when(teamMapper.toTeamDTO(teamDO)).thenReturn(teamDTO);
 
@@ -84,7 +84,7 @@ class TeamResourceTest {
     }
 
     @Test
-    void findRandomTeam_GivenThereIsNoTeam_ThrowsEntityNotFoundException() throws EntityNotFoundException {
+    void findRandomTeam_GivenThereIsNoTeam_ThrowsEntityNotFoundException() {
         when(teamService.findRandom()).thenThrow(new EntityNotFoundException("Could not find any team"));
 
         Assertions.assertThrows(EntityNotFoundException.class, () -> teamResource.findRandomTeam(), "Could not find any team");
@@ -161,7 +161,7 @@ class TeamResourceTest {
     }
 
     @Test
-    void updateTeam_GivenValidTeamId_ReturnsTeam() throws EntityNotFoundException {
+    void updateTeam_GivenValidTeamId_ReturnsTeam() {
         when(teamMapper.toTeamDO(teamDTO)).thenReturn(teamDO);
         when(teamService.update(1L, teamDO)).thenReturn(teamDO);
         when(teamMapper.toTeamDTO(teamDO)).thenReturn(teamDTO);
@@ -176,7 +176,7 @@ class TeamResourceTest {
     }
 
     @Test
-    void updateTeam_GivenInvalidTeamId_ThrowsEntityNotFoundException() throws EntityNotFoundException {
+    void updateTeam_GivenInvalidTeamId_ThrowsEntityNotFoundException() {
         when(teamMapper.toTeamDO(teamDTO)).thenReturn(teamDO);
         when(teamService.update(1L, teamDO)).thenThrow(new EntityNotFoundException("Could not find team with id: 1"));
 
@@ -186,7 +186,7 @@ class TeamResourceTest {
     }
 
     @Test
-    void updateTeamLevel_GivenValidTeamId_ReturnsTeam() throws EntityNotFoundException {
+    void updateTeamLevel_GivenValidTeamId_ReturnsTeam() {
         when(teamService.updateLevel(1L, 8d)).thenReturn(teamDO);
         when(teamMapper.toTeamDTO(teamDO)).thenReturn(teamDTO);
 
@@ -199,7 +199,7 @@ class TeamResourceTest {
     }
 
     @Test
-    void updateTeamLevel_GivenInvalidTeamId_ThrowsEntityNotFoundException() throws EntityNotFoundException {
+    void updateTeamLevel_GivenInvalidTeamId_ThrowsEntityNotFoundException() {
         when(teamService.updateLevel(1L, 8d)).thenThrow(new EntityNotFoundException("Could not find team with id: 1"));
 
         Assertions.assertThrows(EntityNotFoundException.class, () -> teamResource.updateTeamLevel(1L, 8d), "Could not find team with id: 1");
@@ -208,7 +208,7 @@ class TeamResourceTest {
 
 
     @Test
-    void deleteTeam_GivenValidTeamId_DeleteTeam() throws EntityNotFoundException {
+    void deleteTeam_GivenValidTeamId_DeleteTeam() {
         doNothing().when(teamService).delete(1L);
 
         ResponseEntity response = teamResource.deleteTeam(1L);
@@ -218,7 +218,7 @@ class TeamResourceTest {
     }
 
     @Test
-    void deleteTeam_GivenInvalidTeamId_ThrowsEntityNotFoundException() throws EntityNotFoundException {
+    void deleteTeam_GivenInvalidTeamId_ThrowsEntityNotFoundException() {
         doThrow(new EntityNotFoundException("Could not find team with id: 1")).when(teamService).delete(1L);
 
         Assertions.assertThrows(EntityNotFoundException.class, () -> teamResource.deleteTeam(1L), "Could not find team with id: 1");

@@ -2,7 +2,7 @@ package springboot.soccer.game.team.exception;
 
 import lombok.Getter;
 
-public class EntityNotFoundException extends Exception {
+public class EntityNotFoundException extends RuntimeException {
 
     @Getter
     private final transient Object[] args;
