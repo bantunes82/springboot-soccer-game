@@ -30,8 +30,8 @@ import springboot.soccer.game.team.datatransferobject.TeamDTO;
 import springboot.soccer.game.team.domainobject.TeamDO;
 import springboot.soccer.game.team.resource.mapper.TeamMapper;
 import springboot.soccer.game.team.service.TeamService;
-import springboot.soccer.game.team.util.CountryCode;
-import springboot.soccer.game.team.util.Range;
+import springboot.soccer.game.team.validation.CountryCode;
+import springboot.soccer.game.team.validation.Range;
 
 import javax.validation.Valid;
 import java.net.URI;

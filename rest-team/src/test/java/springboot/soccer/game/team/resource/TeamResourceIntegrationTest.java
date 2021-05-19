@@ -31,7 +31,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT_LANGUAGE;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-import static springboot.soccer.game.team.constants.Validation.*;
+import static springboot.soccer.game.team.validation.ConstraintMessage.*;
 import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.*;
 
 @Tag("integration")

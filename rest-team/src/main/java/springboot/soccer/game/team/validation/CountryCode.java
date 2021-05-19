@@ -1,6 +1,4 @@
-package springboot.soccer.game.team.util;
-
-import springboot.soccer.game.team.constants.Validation;
+package springboot.soccer.game.team.validation;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -14,15 +12,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({METHOD, FIELD, ANNOTATION_TYPE, PARAMETER})
 @Retention(RUNTIME)
-@Constraint(validatedBy = DoubleRangeValidator.class)
+@Constraint(validatedBy = CountryCodeValidator.class)
 @Documented
-public @interface Range
-{
-    String message() default Validation.TEAM_LEVEL_INVALID;
+public @interface CountryCode {
 
-    double min() default Double.MIN_VALUE;
-
-    double max() default Double.MAX_VALUE;
+    String message() default ConstraintMessage.COUNTRY_CODE_INVALID;
 
     Class<?>[] groups() default { };
 

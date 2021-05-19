@@ -13,7 +13,7 @@ import springboot.soccer.game.team.dataaccessobject.TeamRepository;
 import springboot.soccer.game.team.domainobject.CountryDO;
 import springboot.soccer.game.team.domainobject.TeamDO;
 import springboot.soccer.game.team.exception.BusinessException;
-import springboot.soccer.game.team.util.Range;
+import springboot.soccer.game.team.validation.Range;
 
 import javax.validation.Valid;
 import java.util.List;

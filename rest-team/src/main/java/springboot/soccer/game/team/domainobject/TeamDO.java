@@ -6,8 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import springboot.soccer.game.team.constants.Validation;
-import springboot.soccer.game.team.util.Range;
+import springboot.soccer.game.team.validation.ConstraintMessage;
+import springboot.soccer.game.team.validation.Range;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -40,21 +40,21 @@ public class TeamDO {
     @GeneratedValue
     private Long id;
 
-    @NotBlank(message = Validation.TEAM_NAME_BLANK)
-    @Size(min = 3, max = 50, message = Validation.TEAM_NAME_SIZE)
+    @NotBlank(message = ConstraintMessage.TEAM_NAME_BLANK)
+    @Size(min = 3, max = 50, message = ConstraintMessage.TEAM_NAME_SIZE)
     private String name;
 
     @Column(name = "nick_name")
     private String nickName;
 
-    @Past(message = Validation.TEAM_FOUNDED_PAST)
-    @NotNull(message = Validation.TEAM_FOUNDED_BLANK)
+    @Past(message = ConstraintMessage.TEAM_FOUNDED_PAST)
+    @NotNull(message = ConstraintMessage.TEAM_FOUNDED_BLANK)
     private LocalDate founded;
 
     @Range(min = 1.0, max = 10.0)
     private Double level;
 
-    @NotBlank(message = Validation.TEAM_PICTURE_BLANK)
+    @NotBlank(message = ConstraintMessage.TEAM_PICTURE_BLANK)
     private String picture;
 
     @Column(nullable = false)
@@ -62,7 +62,7 @@ public class TeamDO {
     private Boolean deleted = false;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @NotNull(message = Validation.TEAM_COUNTRY_NULL)
+    @NotNull(message = ConstraintMessage.TEAM_COUNTRY_NULL)
     @JoinColumn(name = "country", nullable = false)
     @Valid
     private CountryDO countryDO;

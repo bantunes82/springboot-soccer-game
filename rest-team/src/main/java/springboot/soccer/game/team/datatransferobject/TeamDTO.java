@@ -6,8 +6,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import springboot.soccer.game.team.constants.Validation;
-import springboot.soccer.game.team.util.Range;
+import springboot.soccer.game.team.validation.ConstraintMessage;
+import springboot.soccer.game.team.validation.Range;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -22,8 +22,8 @@ import java.time.LocalDate;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TeamDTO {
 
-    @NotBlank(message = Validation.TEAM_NAME_BLANK)
-    @Size(min = 3, max = 50, message = Validation.TEAM_NAME_SIZE)
+    @NotBlank(message = ConstraintMessage.TEAM_NAME_BLANK)
+    @Size(min = 3, max = 50, message = ConstraintMessage.TEAM_NAME_SIZE)
     private final String name;
 
     private final String nickName;
@@ -33,17 +33,17 @@ public class TeamDTO {
             pattern = "yyyy-MM-dd",
             description = "Team founded date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @Past(message = Validation.TEAM_FOUNDED_PAST)
-    @NotNull(message = Validation.TEAM_FOUNDED_BLANK)
+    @Past(message = ConstraintMessage.TEAM_FOUNDED_PAST)
+    @NotNull(message = ConstraintMessage.TEAM_FOUNDED_BLANK)
     private final LocalDate founded;
 
     @Range(min = 1.0, max = 10.0)
     private final Double level;
 
-    @NotBlank(message = Validation.TEAM_PICTURE_BLANK)
+    @NotBlank(message = ConstraintMessage.TEAM_PICTURE_BLANK)
     private final String picture;
 
-    @NotNull(message = Validation.TEAM_COUNTRY_NULL)
+    @NotNull(message = ConstraintMessage.TEAM_COUNTRY_NULL)
     @Valid
     private final CountryDTO countryDTO;
 

@@ -1,10 +1,10 @@
-package springboot.soccer.game.team.constants;
+package springboot.soccer.game.team.validation;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Validation {
+public class ConstraintMessage {
 
     public static final String TEAM_NAME_BLANK = "{constraint.team.nameNotBlank}";
     public static final String TEAM_NAME_SIZE =  "{constraint.team.nameSize}";
