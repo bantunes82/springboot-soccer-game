@@ -1,5 +1,6 @@
 package springboot.soccer.game.team.health;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -19,7 +20,12 @@ public class KeycloakHealthIndicator implements HealthIndicator {
     @Value("${keycloak.auth-server-url}/realms/${keycloak.realm}")
     private String oidcAuthServerUrl;
 
-    private RestTemplate restTemplate = new RestTemplate();
+    private RestTemplate restTemplate;
+
+    @Autowired
+    public KeycloakHealthIndicator(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @Override
     public Health health() {
