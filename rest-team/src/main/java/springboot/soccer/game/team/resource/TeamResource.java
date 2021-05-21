@@ -76,7 +76,7 @@ public class TeamResource {
     public ResponseEntity<List<TeamDTO>> findTeamByName(@Parameter(description = "soccer team name", required = true) @PathVariable("name") String name) {
         List<TeamDO> teams = teamService.findByName(name);
 
-        return ResponseEntity.ok(teamMapper.toTeamDTOList(teams));
+        return ResponseEntity.ok(teamMapper.toTeamDTOs(teams));
     }
 
     @Operation(summary = "Returns all the soccer teams for the specified Country Code")
@@ -91,7 +91,7 @@ public class TeamResource {
                                                                @Parameter(description = "page size") @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
         List<TeamDO> teams = teamService.findByCountryCode(countryCode, pageIndex, pageSize);
 
-        return ResponseEntity.ok(teamMapper.toTeamDTOList(teams));
+        return ResponseEntity.ok(teamMapper.toTeamDTOs(teams));
     }
 
     @Operation(summary = "Create a soccer team", security = @SecurityRequirement(name = "accessToken"))

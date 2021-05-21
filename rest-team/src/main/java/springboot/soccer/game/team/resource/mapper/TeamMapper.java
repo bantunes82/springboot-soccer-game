@@ -23,6 +23,6 @@ public interface TeamMapper {
     @InheritInverseConfiguration
     TeamDTO toTeamDTO(TeamDO teamDO);
 
-    List<TeamDTO> toTeamDTOList(List<TeamDO> teamDOs);
+    List<TeamDTO> toTeamDTOs(List<TeamDO> teamDOs);
 
 }

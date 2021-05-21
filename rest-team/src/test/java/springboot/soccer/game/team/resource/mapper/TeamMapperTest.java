@@ -107,7 +107,7 @@ class TeamMapperTest {
     void toTeamDTOList_ReturnsListTeamDTO() {
         when(countryMapper.toCountryDTO(countryDO)).thenReturn(countryDTO);
 
-        List<TeamDTO> results = teamMapper.toTeamDTOList(Arrays.asList(teamDO));
+        List<TeamDTO> results = teamMapper.toTeamDTOs(Arrays.asList(teamDO));
         TeamDTO result = results.get(0);
 
         Assertions.assertEquals(1, results.size());
@@ -122,7 +122,7 @@ class TeamMapperTest {
 
     @Test
     void toTeamDTOList_GivenNullValue_ReturnsNullValue() {
-        List<TeamDTO> results = teamMapper.toTeamDTOList(null);
+        List<TeamDTO> results = teamMapper.toTeamDTOs(null);
 
         Assertions.assertNull(results);
     }

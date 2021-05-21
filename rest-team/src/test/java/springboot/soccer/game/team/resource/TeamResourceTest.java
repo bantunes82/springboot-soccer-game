@@ -85,7 +85,7 @@ class TeamResourceTest {
     }
 
     @Test
-    void findRandomTeam_GivenThereIsNoTeam_ThrowsEntityNotFoundException() {
+    void findRandomTeam_GivenThereIsNoTeam_ThrowsBusinessException() {
         when(teamService.findRandom()).thenThrow(new BusinessException("Could not find any team", TEAM_NOT_FOUND));
 
         BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> teamResource.findRandomTeam(), "Could not find any team");
@@ -96,12 +96,12 @@ class TeamResourceTest {
     @Test
     void findTeamByName_GivenValidTeamName_ReturnsTeamList() {
         when(teamService.findByName("Sport Club Corinthians Paulista")).thenReturn(Arrays.asList(teamDO));
-        when(teamMapper.toTeamDTOList(Arrays.asList(teamDO))).thenReturn(Arrays.asList(teamDTO));
+        when(teamMapper.toTeamDTOs(Arrays.asList(teamDO))).thenReturn(Arrays.asList(teamDTO));
 
         ResponseEntity<List<TeamDTO>> response = teamResource.findTeamByName("Sport Club Corinthians Paulista");
 
         verify(teamService).findByName("Sport Club Corinthians Paulista");
-        verify(teamMapper).toTeamDTOList(Arrays.asList(teamDO));
+        verify(teamMapper).toTeamDTOs(Arrays.asList(teamDO));
         Assertions.assertEquals(200, response.getStatusCodeValue());
         Assertions.assertEquals(1, response.getBody().size());
         Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).getName());
@@ -110,12 +110,12 @@ class TeamResourceTest {
     @Test
     void findTeamByName_GivenInvalidTeamName_ReturnsEmptyTeamList() {
         when(teamService.findByName("XXX")).thenReturn(Collections.emptyList());
-        when(teamMapper.toTeamDTOList(Collections.emptyList())).thenReturn(Collections.emptyList());
+        when(teamMapper.toTeamDTOs(Collections.emptyList())).thenReturn(Collections.emptyList());
 
         ResponseEntity<List<TeamDTO>> response = teamResource.findTeamByName("XXX");
 
         verify(teamService).findByName("XXX");
-        verify(teamMapper).toTeamDTOList(Collections.emptyList());
+        verify(teamMapper).toTeamDTOs(Collections.emptyList());
         Assertions.assertEquals(200, response.getStatusCodeValue());
         Assertions.assertEquals(0, response.getBody().size());
     }
@@ -123,12 +123,12 @@ class TeamResourceTest {
     @Test
     void findTeamByCountryCode_GivenExistentCountryCode_ReturnsTeamList() {
         when(teamService.findByCountryCode("BR", 0, 10)).thenReturn(Arrays.asList(teamDO));
-        when(teamMapper.toTeamDTOList(Arrays.asList(teamDO))).thenReturn(Arrays.asList(teamDTO));
+        when(teamMapper.toTeamDTOs(Arrays.asList(teamDO))).thenReturn(Arrays.asList(teamDTO));
 
         ResponseEntity<List<TeamDTO>> response = teamResource.findTeamByCountryCode("BR", 0, 10);
 
         verify(teamService).findByCountryCode("BR", 0, 10);
-        verify(teamMapper).toTeamDTOList(Arrays.asList(teamDO));
+        verify(teamMapper).toTeamDTOs(Arrays.asList(teamDO));
         Assertions.assertEquals(200, response.getStatusCodeValue());
         Assertions.assertEquals(1, response.getBody().size());
         Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).getName());
@@ -137,12 +137,12 @@ class TeamResourceTest {
     @Test
     void findTeamByCountryCode_GivenNoExistentCountryCode_ReturnsEmptyTeamList() {
         when(teamService.findByCountryCode("BR", 0, 10)).thenReturn(Collections.emptyList());
-        when(teamMapper.toTeamDTOList(Collections.emptyList())).thenReturn(Collections.emptyList());
+        when(teamMapper.toTeamDTOs(Collections.emptyList())).thenReturn(Collections.emptyList());
 
         ResponseEntity<List<TeamDTO>> response = teamResource.findTeamByCountryCode("BR", 0, 10);
 
         verify(teamService).findByCountryCode("BR", 0, 10);
-        verify(teamMapper).toTeamDTOList(Collections.emptyList());
+        verify(teamMapper).toTeamDTOs(Collections.emptyList());
         Assertions.assertEquals(200, response.getStatusCodeValue());
         Assertions.assertEquals(0, response.getBody().size());
     }
@@ -178,7 +178,7 @@ class TeamResourceTest {
     }
 
     @Test
-    void updateTeam_GivenInvalidTeamId_ThrowsEntityNotFoundException() {
+    void updateTeam_GivenInvalidTeamId_ThrowsBusinessException() {
         when(teamMapper.toTeamDO(teamDTO)).thenReturn(teamDO);
         when(teamService.update(1L, teamDO)).thenThrow(new BusinessException("Could not find team with id: 1", TEAM_NOT_FOUND));
 
@@ -202,7 +202,7 @@ class TeamResourceTest {
     }
 
     @Test
-    void updateTeamLevel_GivenInvalidTeamId_ThrowsEntityNotFoundException() {
+    void updateTeamLevel_GivenInvalidTeamId_ThrowsBusinessException() {
         when(teamService.updateLevel(1L, 8d)).thenThrow(new BusinessException("Could not find team with id: 1", TEAM_NOT_FOUND));
 
         BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> teamResource.updateTeamLevel(1L, 8d), "Could not find team with id: 1");
@@ -222,7 +222,7 @@ class TeamResourceTest {
     }
 
     @Test
-    void deleteTeam_GivenInvalidTeamId_ThrowsEntityNotFoundException() {
+    void deleteTeam_GivenInvalidTeamId_ThrowsBusinessException() {
         doThrow(new BusinessException("Could not find team with id: 1", TEAM_NOT_FOUND)).when(teamService).delete(1L);
 
         BusinessException exception = Assertions.assertThrows(BusinessException.class, () -> teamResource.deleteTeam(1L), "Could not find team with id: 1");

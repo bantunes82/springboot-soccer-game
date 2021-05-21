@@ -66,7 +66,7 @@ class TeamServiceTest {
     }
 
     @Test
-    void findRandom_GivenThereIsNoTeam_ThrowsEntityNotFoundException() {
+    void findRandom_GivenThereIsNoTeam_ThrowsBusinessException() {
         when(teamRepository.findRandomAndDeletedIsFalse()).thenReturn(Optional.empty());
 
         Assertions.assertThrows(BusinessException.class, () -> {
@@ -144,7 +144,7 @@ class TeamServiceTest {
     }
 
     @Test
-    void update_GivenNonExistingTeamId_ThrowsEntityNotFoundException() {
+    void update_GivenNonExistingTeamId_ThrowsBusinessException() {
         team1.setId(1000L);
         team1.setNickName("Coringao");
         when(teamRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.empty());
@@ -169,7 +169,7 @@ class TeamServiceTest {
     }
 
     @Test
-    void updateLevel_GivenNonExistingTeamId_ThrowsEntityNotFoundException() {
+    void updateLevel_GivenNonExistingTeamId_ThrowsBusinessException() {
         when(teamRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(BusinessException.class, () -> {
@@ -189,7 +189,7 @@ class TeamServiceTest {
     }
 
     @Test
-    void delete_GivenNonExistingTeamId_ThrowsEntityNotFoundException() {
+    void delete_GivenNonExistingTeamId_ThrowsBusinessException() {
         when(teamRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(BusinessException.class, () -> {

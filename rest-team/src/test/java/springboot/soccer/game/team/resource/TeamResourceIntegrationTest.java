@@ -1,6 +1,5 @@
 package springboot.soccer.game.team.resource;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -58,7 +57,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
     private HttpHeaders headers;
 
     @BeforeEach
-    void setUp() throws JsonProcessingException {
+    void setUp() {
         createCorinthiansTeam();
         createBayerMunchenTeam();
         createBorussiaDortmundTeam();
