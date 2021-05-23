@@ -25,7 +25,8 @@ public class BusinessException extends RuntimeException {
         GENERAL,
         TEAM_NOT_FOUND,
         THERE_IS_NO_TEAM_FOUND,
-        ERROR_TO_PERSIST;
+        ERROR_TO_PERSIST,
+        ERROR_TO_PERSIST_OPTIMISTIC_LOCK;
     }
 
 }

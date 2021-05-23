@@ -7,6 +7,7 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,16 +22,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.ERROR_TO_PERSIST;
-import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.GENERAL;
+import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.*;
 
 
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandlingControllerAdvice {
 
-    private final MessageSource messageSource;
     private static final String ERROR = "error";
+    private final MessageSource messageSource;
 
     @Autowired
     public ErrorHandlingControllerAdvice(MessageSource messageSource) {
@@ -40,9 +40,9 @@ public class ErrorHandlingControllerAdvice {
     @ExceptionHandler(BusinessException.class)
     ResponseEntity<ErrorDTO> handleBusinessException(BusinessException exception, Locale locale) {
         String userMessage = messageSource.getMessage(exception.getErrorCode().name(), exception.getParams(), locale);
-        int httpStatusCode = Integer.parseInt(messageSource.getMessage(exception.getErrorCode().name().concat(".code"),null, "500",locale));
+        int httpStatusCode = Integer.parseInt(messageSource.getMessage(exception.getErrorCode().name().concat(".code"), null, "500", locale));
 
-        log.error(userMessage,exception);
+        log.error(userMessage, exception);
 
         ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap(ERROR, userMessage));
         return new ResponseEntity<>(errorDTO, HttpStatus.resolve(httpStatusCode));
@@ -63,10 +63,10 @@ public class ErrorHandlingControllerAdvice {
     // error handle for @Valid
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ErrorDTO> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
-          Map<String, String> userMessage = exception.getBindingResult()
+        Map<String, String> userMessage = exception.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .collect(Collectors.toMap(FieldError::getField,DefaultMessageSourceResolvable::getDefaultMessage, (existing, replacement) -> existing ));
+                .collect(Collectors.toMap(FieldError::getField, DefaultMessageSourceResolvable::getDefaultMessage, (existing, replacement) -> existing));
         log.error(userMessage.toString(), exception);
 
         ErrorDTO errorDTO = new ErrorDTO(userMessage);
@@ -80,6 +80,15 @@ public class ErrorHandlingControllerAdvice {
 
         ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap(ERROR, userMessage));
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ErrorDTO> handleObjectOptimisticLockingFailureException(ObjectOptimisticLockingFailureException exception, Locale locale) {
+        String userMessage = messageSource.getMessage(ERROR_TO_PERSIST_OPTIMISTIC_LOCK.name(), new Object[]{exception.getIdentifier()}, locale);
+        log.error(userMessage, exception);
+
+        ErrorDTO errorDTO = new ErrorDTO(Collections.singletonMap(ERROR, userMessage));
+        return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)

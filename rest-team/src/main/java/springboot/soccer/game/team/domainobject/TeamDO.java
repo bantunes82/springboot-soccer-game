@@ -34,7 +34,7 @@ import java.util.Optional;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public class TeamDO {
+public class TeamDO extends BaseDO {
 
     @Id
     @GeneratedValue

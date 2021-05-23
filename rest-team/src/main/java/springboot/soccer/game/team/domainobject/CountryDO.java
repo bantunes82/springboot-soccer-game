@@ -23,7 +23,7 @@ import java.util.Objects;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public class CountryDO {
+public class CountryDO extends BaseDO {
 
     @Id
     @GeneratedValue
