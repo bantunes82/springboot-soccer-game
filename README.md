@@ -23,4 +23,3 @@
 - Jacoco and Surefire plugin(test coverage)
 
 
-
