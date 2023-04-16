@@ -18,7 +18,6 @@
 
 **The following Test Libraries:**
 - Spring-boot Starter Test
-- Pojo Tester
 - Test Containers Dependencies
 - Jacoco and Surefire plugin(test coverage)
 

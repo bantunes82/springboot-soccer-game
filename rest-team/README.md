@@ -12,7 +12,7 @@ docker-compose installed in your local computer. This is the command
 that you have to run:
 
 ```shell script
-/springboot-soccer-game/infrastructure$ docker-compose -f docker-compose-linux.yaml up
+docker-compose -f ../infrastructure/docker-compose-linux.yaml up
 ```
 
 This command it will start the containers below:
@@ -24,8 +24,9 @@ This command it will start the containers below:
 ## Running the application
 
 ```shell script
-/springboot-soccer-game$ mvn clean package
-/springboot-soccer-game$ java -jar rest-team/target/rest-team-1.0.jar
+..
+mvn clean package
+java -jar target/rest-team-1.0.jar
 ```
 
 ## Overall Comments
@@ -95,14 +96,18 @@ reports available in the IDE/command line.
 Running Sonar as Docker container
 ```shell script
 sudo sysctl -w vm.max_map_count=262144
-/springboot-soccer-game/infrastructure$ docker-compose -f sonarqube-docker-compose.yaml up
+docker-compose -f ../infrastructure/sonarqube-docker-compose.yaml up
 ```
 This is the url to access the [SonarQube](http://localhost:9000/projects?sort=-analysis_date).
 The username and password are "admin"
 
 In case you have a Sonar instance running locally (or a Docker
-Container), you can execute the command `/springboot-soccer-game/infrastructure$ mvn clean install
-sonar:sonar` in order to observe the potential Bugs, Code smells,
+Container), you can execute the command:
+```shell script
+..
+mvn clean install sonar:sonar
+```
+In order to observe the potential Bugs, Code smells,
 Technical Debt, etc. The results will be similar to this one:
 
 ![SonarQube](https://i.ibb.co/L1CfkDw/sonarqube.png
