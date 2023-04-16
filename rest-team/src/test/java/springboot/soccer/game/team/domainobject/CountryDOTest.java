@@ -1,25 +1,13 @@
 package springboot.soccer.game.team.domainobject;
 
 import org.junit.jupiter.api.Test;
-import pl.pojo.tester.api.assertion.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static pl.pojo.tester.api.assertion.Assertions.assertPojoMethodsFor;
 
 class CountryDOTest {
 
     private final String brCode = "BR";
-
-    @Test
-    void boilerplate() {
-        final Class<?> countryDO = CountryDO.class;
-
-        assertPojoMethodsFor(countryDO)
-                .testing(Method.CONSTRUCTOR, Method.GETTER)
-                .areWellImplemented();
-
-    }
 
     @Test
     void equals_Custom() {

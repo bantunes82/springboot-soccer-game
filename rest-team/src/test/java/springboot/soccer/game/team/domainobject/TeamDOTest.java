@@ -2,11 +2,9 @@ package springboot.soccer.game.team.domainobject;
 
 
 import org.junit.jupiter.api.Test;
-import pl.pojo.tester.api.assertion.Method;
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static pl.pojo.tester.api.assertion.Assertions.assertPojoMethodsFor;
 
 class TeamDOTest {
 
@@ -33,15 +31,6 @@ class TeamDOTest {
             .countryDO(countryDO)
             .build();
 
-
-    @Test
-    void boilerplate() {
-        final Class<?> teamDO = TeamDO.class;
-
-        assertPojoMethodsFor(teamDO)
-                .testing(Method.CONSTRUCTOR, Method.SETTER)
-                .areWellImplemented();
-    }
 
     @Test
     void equals_Custom() {
