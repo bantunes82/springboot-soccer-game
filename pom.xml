@@ -17,6 +17,7 @@
         <module>rest-team</module>
     </modules>
     <properties>
+        <sonar.projectName>SpringBoot Soccer Game</sonar.projectName>
         <sonar.host.url>http://localhost:9000</sonar.host.url>
         <sonar.login>admin</sonar.login>
         <sonar.password>adminadmin</sonar.password>
