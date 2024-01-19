@@ -95,11 +95,17 @@ reports available in the IDE/command line.
 
 Running Sonar as Docker container
 ```shell script
-sudo sysctl -w vm.max_map_count=262144
+sudo sysctl -w vm.max_map_count=524288
+sudo sysctl -w fs.file-max=131072
+ulimit -n 131072
+ulimit -u 8192
 docker-compose -f ../infrastructure/sonarqube-docker-compose.yaml up
 ```
 This is the url to access the [SonarQube](http://localhost:9000/projects?sort=-analysis_date).
 The username and password are "admin"
+
+In the first access of the [SonarQube](http://localhost:9000/projects?sort=-analysis_date), you have to change the password, so please 
+change the password to "adminadmin".
 
 In case you have a Sonar instance running locally (or a Docker
 Container), you can execute the command:
