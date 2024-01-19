@@ -58,8 +58,8 @@ public class TeamResource {
 
     @Operation(summary = "Returns a random soccer team")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "When there is at least one soccer team available", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class, required = true))),
-            @ApiResponse(responseCode = "404", description = "When there is no soccer team available", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)))
+            @ApiResponse(responseCode = "200", description = "When there is at least one soccer team available", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class, requiredMode = Schema.RequiredMode.REQUIRED))),
+            @ApiResponse(responseCode = "404", description = "When there is no soccer team available", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)))
     })
     // @Timed(value = "timeFindRandomTeam", description = "Times how long it takes to invoke the findRandomTeam method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @GetMapping(path = "/random")
@@ -70,7 +70,7 @@ public class TeamResource {
     }
 
     @Operation(summary = "Returns a list of soccer teams that has the specified name")
-    @ApiResponses(@ApiResponse(responseCode = "200", description = "Returns a list of soccer teams for the specified name", content = @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = TeamDTO.class, required = true)))))
+    @ApiResponses(@ApiResponse(responseCode = "200", description = "Returns a list of soccer teams for the specified name", content = @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = TeamDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)))))
     //@Timed(value = "timeFindTeamByName", description = "Times how long it takes to invoke the findTeamByName method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @GetMapping(path = "/name/{name}")
     public ResponseEntity<List<TeamDTO>> findTeamByName(@Parameter(description = "soccer team name", required = true) @PathVariable("name") String name) {
@@ -81,8 +81,8 @@ public class TeamResource {
 
     @Operation(summary = "Returns all the soccer teams for the specified Country Code")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Returns a list the soccer teams for the specified Country Code", content = @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = TeamDTO.class, required = true)))),
-            @ApiResponse(responseCode = "400", description = "When the countryCode is invalid", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)))
+            @ApiResponse(responseCode = "200", description = "Returns a list the soccer teams for the specified Country Code", content = @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = TeamDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)))),
+            @ApiResponse(responseCode = "400", description = "When the countryCode is invalid", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)))
     })
     //@Timed(value = "timeFindTeamByCountryCode", description = "Times how long it takes to invoke the findTeamByCountryCode method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @GetMapping(path = "/country/{countryCode}")
@@ -97,7 +97,7 @@ public class TeamResource {
     @Operation(summary = "Create a soccer team", security = @SecurityRequirement(name = "accessToken"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "The URI of the created soccer team", headers = {@Header(name = LOCATION, description = "URI location of the created soccer team", schema = @Schema(implementation = URI.class))}),
-            @ApiResponse(responseCode = "400", description = "When the content of the TeamDTO is invalid", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true))),
+            @ApiResponse(responseCode = "400", description = "When the content of the TeamDTO is invalid", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, requiredMode = Schema.RequiredMode.REQUIRED))),
             @ApiResponse(responseCode = "401", description = "The Authorization header was not informed or the value is invalid"),
             @ApiResponse(responseCode = "403", description = "The Authorization header value is not allowed")
     })
@@ -119,9 +119,9 @@ public class TeamResource {
 
     @Operation(summary = "Update a soccer team for the specified team id", security = @SecurityRequirement(name = "accessToken"))
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class, required = true)), description = "Returns the soccer team updated"),
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)), description = "When there is no soccer team available for the specified id"),
-            @ApiResponse(responseCode = "400", description = "When the content of the TeamDTO is invalid", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true))),
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)), description = "Returns the soccer team updated"),
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)), description = "When there is no soccer team available for the specified id"),
+            @ApiResponse(responseCode = "400", description = "When the content of the TeamDTO is invalid", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, requiredMode = Schema.RequiredMode.REQUIRED))),
             @ApiResponse(responseCode = "401", description = "The Authorization header was not informed or the value is invalid"),
             @ApiResponse(responseCode = "403", description = "The Authorization header value is not allowed")
     })
@@ -138,9 +138,9 @@ public class TeamResource {
 
     @Operation(summary = "Update the soccer team level for the specified team id", security = @SecurityRequirement(name = "accessToken"))
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class, required = true)), description = "Returns the soccer team with the updated level"),
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)), description = "When there is no soccer team available for the specified id"),
-            @ApiResponse(responseCode = "400", description = "When the team level is invalid", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true))),
+            @ApiResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)), description = "Returns the soccer team with the updated level"),
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)), description = "When there is no soccer team available for the specified id"),
+            @ApiResponse(responseCode = "400", description = "When the team level is invalid", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, requiredMode = Schema.RequiredMode.REQUIRED))),
             @ApiResponse(responseCode = "401", description = "The Authorization header was not informed or the value is invalid"),
             @ApiResponse(responseCode = "403", description = "The Authorization header value is not allowed")
     })
@@ -157,7 +157,7 @@ public class TeamResource {
     @Operation(summary = "Delete the soccer team for the specified team id", security = @SecurityRequirement(name = "accessToken"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Soccer Team deleted"),
-            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, required = true)), description = "When there is no soccer team available for the specified id"),
+            @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)), description = "When there is no soccer team available for the specified id"),
             @ApiResponse(responseCode = "401", description = "The Authorization header was not informed or the value is invalid"),
             @ApiResponse(responseCode = "403", description = "The Authorization header value is not allowed")
     })

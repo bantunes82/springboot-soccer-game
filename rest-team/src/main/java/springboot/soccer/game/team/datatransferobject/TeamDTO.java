@@ -16,7 +16,7 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
-@Schema(description="Team Soccer", required = true)
+@Schema(description="Team Soccer", requiredMode = Schema.RequiredMode.REQUIRED)
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

@@ -9,7 +9,7 @@ import springboot.soccer.game.team.validation.CountryCode;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-@Schema(description="Country",required = true)
+@Schema(description="Country", requiredMode = Schema.RequiredMode.REQUIRED)
 @Getter
 @AllArgsConstructor
 public class CountryDTO {

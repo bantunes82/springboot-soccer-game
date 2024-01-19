@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
-@Schema(description = "Errors", required = true, example =
+@Schema(description = "Errors", requiredMode = Schema.RequiredMode.REQUIRED, example =
         """
             {
                 "timestamp": "2021-04-03T14:57:59.670094Z",
