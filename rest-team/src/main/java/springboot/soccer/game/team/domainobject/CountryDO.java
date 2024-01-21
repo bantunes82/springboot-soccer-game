@@ -39,10 +39,8 @@ public class CountryDO extends BaseDO {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CountryDO countryDO = (CountryDO) o;
-        return code.equals(countryDO.code);
+        return o instanceof CountryDO countryDO &&
+                code.equals(countryDO.code);
     }
 
     @Override
