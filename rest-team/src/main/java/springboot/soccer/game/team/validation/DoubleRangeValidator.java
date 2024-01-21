@@ -23,8 +23,7 @@ public class DoubleRangeValidator implements ConstraintValidator<Range, Object> 
     public boolean isValid(Object object, ConstraintValidatorContext context) {
         boolean isValid = false;
 
-        if (object instanceof Double) {
-            Double value = Double.valueOf(object.toString());
+        if (object instanceof Double value) {
             isValid = value.compareTo(maxPrecision) <= 0 && value.compareTo(minPrecision) >= 0;
 
             if (!isValid) {

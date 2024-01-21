@@ -21,10 +21,8 @@ public class CountryCodeValidator implements ConstraintValidator<CountryCode, Ob
     public boolean isValid(Object object, ConstraintValidatorContext context) {
         boolean isValid = false;
 
-        if (object instanceof String) {
-            String value = object.toString();
-            isValid = Arrays.stream(Locale.getISOCountries())
-                    .anyMatch(code -> code.equals(value));
+        if (object instanceof String value) {
+            isValid = Arrays.asList(Locale.getISOCountries()).contains(value);
 
             if (!isValid) {
                 log.debug("Country Code is invalid: {}", value);
