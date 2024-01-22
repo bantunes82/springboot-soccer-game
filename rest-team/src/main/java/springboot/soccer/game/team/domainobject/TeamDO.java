@@ -33,8 +33,8 @@ import java.util.Optional;
 @Setter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
-public class TeamDO extends BaseDO {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class TeamDO extends BaseDO {
 
     @Id
     @GeneratedValue

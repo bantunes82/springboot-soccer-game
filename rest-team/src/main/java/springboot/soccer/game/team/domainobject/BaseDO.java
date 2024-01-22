@@ -12,7 +12,7 @@ import javax.persistence.Version;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public class BaseDO {
+public sealed class BaseDO permits CountryDO, TeamDO {
 
     @Version
     private Long version;

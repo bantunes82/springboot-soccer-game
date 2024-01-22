@@ -27,8 +27,8 @@ import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.
 @Transactional(propagation = Propagation.SUPPORTS)
 public class TeamService {
 
-    private TeamRepository teamRepository;
-    private CountryRepository countryRepository;
+    private final TeamRepository teamRepository;
+    private final CountryRepository countryRepository;
 
     @Autowired
     public TeamService(TeamRepository teamRepository, CountryRepository countryRepository) {

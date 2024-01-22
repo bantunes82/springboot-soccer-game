@@ -47,8 +47,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = "/v1/teams", produces = APPLICATION_JSON_VALUE)
 public class TeamResource {
 
-    private TeamService teamService;
-    private TeamMapper teamMapper;
+    private final TeamService teamService;
+    private final TeamMapper teamMapper;
 
     @Autowired
     public TeamResource(TeamService teamService, TeamMapper teamMapper) {

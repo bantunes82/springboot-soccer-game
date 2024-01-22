@@ -2,11 +2,10 @@ package springboot.soccer.game.team.exception;
 
 import lombok.Getter;
 
+@Getter
 public class BusinessException extends RuntimeException {
 
-    @Getter
     private final transient Object[] params;
-    @Getter
     private final ErrorCode errorCode;
 
     public BusinessException(String message, ErrorCode errorCode, Object... params) {

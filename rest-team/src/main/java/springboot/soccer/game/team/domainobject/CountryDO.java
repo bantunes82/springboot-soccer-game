@@ -22,8 +22,8 @@ import java.util.Objects;
 })
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
-public class CountryDO extends BaseDO {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class CountryDO extends BaseDO {
 
     @Id
     @GeneratedValue
