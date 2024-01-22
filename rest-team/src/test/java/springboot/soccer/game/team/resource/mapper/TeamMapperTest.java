@@ -26,7 +26,6 @@ class TeamMapperTest {
     private CountryDTO countryDTO;
     private TeamDO teamDO;
     private TeamDTO teamDTO;
-
     @Mock
     private CountryMapper countryMapper;
     private TeamMapper teamMapper;
@@ -65,13 +64,13 @@ class TeamMapperTest {
 
         TeamDO result = teamMapper.toTeamDO(teamDTO);
 
-        Assertions.assertEquals(teamDTO.getName(), result.getName());
-        Assertions.assertEquals(teamDTO.getNickName(), result.getNickName().get());
-        Assertions.assertEquals(teamDTO.getPicture(), result.getPicture());
-        Assertions.assertEquals(teamDTO.getLevel(), result.getLevel());
-        Assertions.assertEquals(teamDTO.getFounded(), result.getFounded());
-        Assertions.assertEquals(teamDTO.getCountryDTO().getCode(), result.getCountryDO().getCode());
-        Assertions.assertEquals(teamDTO.getCountryDTO().getName(), result.getCountryDO().getName());
+        Assertions.assertEquals(teamDTO.name(), result.getName());
+        Assertions.assertEquals(teamDTO.nickName(), result.getNickName().get());
+        Assertions.assertEquals(teamDTO.picture(), result.getPicture());
+        Assertions.assertEquals(teamDTO.level(), result.getLevel());
+        Assertions.assertEquals(teamDTO.founded(), result.getFounded());
+        Assertions.assertEquals(teamDTO.countryDTO().code(), result.getCountryDO().getCode());
+        Assertions.assertEquals(teamDTO.countryDTO().name(), result.getCountryDO().getName());
     }
 
     @Test
@@ -87,13 +86,13 @@ class TeamMapperTest {
 
         TeamDTO result = teamMapper.toTeamDTO(teamDO);
 
-        Assertions.assertEquals(teamDO.getName(), result.getName());
-        Assertions.assertEquals(teamDO.getNickName().get(), result.getNickName());
-        Assertions.assertEquals(teamDO.getPicture(), result.getPicture());
-        Assertions.assertEquals(teamDO.getLevel(), result.getLevel());
-        Assertions.assertEquals(teamDO.getFounded(), result.getFounded());
-        Assertions.assertEquals(teamDO.getCountryDO().getCode(), result.getCountryDTO().getCode());
-        Assertions.assertEquals(teamDO.getCountryDO().getName(), result.getCountryDTO().getName());
+        Assertions.assertEquals(teamDO.getName(), result.name());
+        Assertions.assertEquals(teamDO.getNickName().get(), result.nickName());
+        Assertions.assertEquals(teamDO.getPicture(), result.picture());
+        Assertions.assertEquals(teamDO.getLevel(), result.level());
+        Assertions.assertEquals(teamDO.getFounded(), result.founded());
+        Assertions.assertEquals(teamDO.getCountryDO().getCode(), result.countryDTO().code());
+        Assertions.assertEquals(teamDO.getCountryDO().getName(), result.countryDTO().name());
     }
 
     @Test
@@ -111,13 +110,13 @@ class TeamMapperTest {
         TeamDTO result = results.get(0);
 
         Assertions.assertEquals(1, results.size());
-        Assertions.assertEquals(teamDO.getName(), result.getName());
-        Assertions.assertEquals(teamDO.getNickName().get(), result.getNickName());
-        Assertions.assertEquals(teamDO.getPicture(), result.getPicture());
-        Assertions.assertEquals(teamDO.getLevel(), result.getLevel());
-        Assertions.assertEquals(teamDO.getFounded(), result.getFounded());
-        Assertions.assertEquals(teamDO.getCountryDO().getCode(), result.getCountryDTO().getCode());
-        Assertions.assertEquals(teamDO.getCountryDO().getName(), result.getCountryDTO().getName());
+        Assertions.assertEquals(teamDO.getName(), result.name());
+        Assertions.assertEquals(teamDO.getNickName().get(), result.nickName());
+        Assertions.assertEquals(teamDO.getPicture(), result.picture());
+        Assertions.assertEquals(teamDO.getLevel(), result.level());
+        Assertions.assertEquals(teamDO.getFounded(), result.founded());
+        Assertions.assertEquals(teamDO.getCountryDO().getCode(), result.countryDTO().code());
+        Assertions.assertEquals(teamDO.getCountryDO().getName(), result.countryDTO().name());
     }
 
     @Test

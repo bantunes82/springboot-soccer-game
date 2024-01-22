@@ -25,8 +25,8 @@ class CountryMapperTest {
     void toCountryDO_ReturnsCountryDO() {
         CountryDO result = countryMapper.toCountryDO(countryDTO);
 
-        Assertions.assertEquals(countryDTO.getName(), result.getName());
-        Assertions.assertEquals(countryDTO.getCode(), result.getCode());
+        Assertions.assertEquals(countryDTO.name(), result.getName());
+        Assertions.assertEquals(countryDTO.code(), result.getCode());
     }
 
     @Test
@@ -40,8 +40,8 @@ class CountryMapperTest {
     void toCountryDTO_ReturnsCountryDTO() {
         CountryDTO result = countryMapper.toCountryDTO(countryDO);
 
-        Assertions.assertEquals(countryDO.getName(), result.getName());
-        Assertions.assertEquals(countryDO.getCode(), result.getCode());
+        Assertions.assertEquals(countryDO.getName(), result.name());
+        Assertions.assertEquals(countryDO.getCode(), result.code());
     }
 
     @Test

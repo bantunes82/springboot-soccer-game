@@ -81,7 +81,7 @@ class TeamResourceTest {
         verify(teamService).findRandom();
         verify(teamMapper).toTeamDTO(teamDO);
         Assertions.assertEquals(200, response.getStatusCodeValue());
-        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().getName());
+        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().name());
     }
 
     @Test
@@ -104,7 +104,7 @@ class TeamResourceTest {
         verify(teamMapper).toTeamDTOs(Arrays.asList(teamDO));
         Assertions.assertEquals(200, response.getStatusCodeValue());
         Assertions.assertEquals(1, response.getBody().size());
-        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).getName());
+        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).name());
     }
 
     @Test
@@ -131,7 +131,7 @@ class TeamResourceTest {
         verify(teamMapper).toTeamDTOs(Arrays.asList(teamDO));
         Assertions.assertEquals(200, response.getStatusCodeValue());
         Assertions.assertEquals(1, response.getBody().size());
-        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).getName());
+        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).name());
     }
 
     @Test
@@ -174,7 +174,7 @@ class TeamResourceTest {
         verify(teamService).update(1L, teamDO);
         verify(teamMapper).toTeamDTO(teamDO);
         Assertions.assertEquals(200, response.getStatusCodeValue());
-        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().getName());
+        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().name());
     }
 
     @Test
@@ -198,7 +198,7 @@ class TeamResourceTest {
         verify(teamService).updateLevel(1L, 8d);
         verify(teamMapper).toTeamDTO(teamDO);
         Assertions.assertEquals(200, response.getStatusCodeValue());
-        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().getName());
+        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().name());
     }
 
     @Test

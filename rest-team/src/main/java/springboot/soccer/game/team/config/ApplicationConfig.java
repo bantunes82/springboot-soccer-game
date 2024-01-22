@@ -48,9 +48,9 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public LocalValidatorFactoryBean getValidator() {
+    public LocalValidatorFactoryBean getValidator(MessageSource messageSource) {
         LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
-        bean.setValidationMessageSource(messageSource());
+        bean.setValidationMessageSource(messageSource);
         return bean;
     }
 

@@ -97,8 +97,8 @@ class TeamResourceIntegrationTest extends AbstractIT {
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
         Assertions.assertEquals(1, response.getBody().size());
-        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).getName());
-        Assertions.assertEquals("BR", response.getBody().get(0).getCountryDTO().getCode());
+        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).name());
+        Assertions.assertEquals("BR", response.getBody().get(0).countryDTO().code());
     }
 
     @Test
@@ -118,7 +118,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("findTeamByCountryCode.countryCode"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().errors().get("findTeamByCountryCode.countryCode"));
     }
 
     @Test
@@ -128,7 +128,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("findTeamByCountryCode.countryCode"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().errors().get("findTeamByCountryCode.countryCode"));
     }
 
     @Test
@@ -140,8 +140,8 @@ class TeamResourceIntegrationTest extends AbstractIT {
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
         Assertions.assertEquals(1, response.getBody().size());
-        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).getName());
-        Assertions.assertEquals("BR", response.getBody().get(0).getCountryDTO().getCode());
+        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).name());
+        Assertions.assertEquals("BR", response.getBody().get(0).countryDTO().code());
     }
 
     @Test
@@ -152,11 +152,11 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_SIZE, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.name"));
-        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.code"));
-        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_PAST, Locale.ENGLISH), response.getBody().getErrors().get("founded"));
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("level"));
-        Assertions.assertEquals(getErrorMessage(TEAM_NAME_SIZE, Locale.ENGLISH), response.getBody().getErrors().get("name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_SIZE, Locale.ENGLISH), response.getBody().errors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().errors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_PAST, Locale.ENGLISH), response.getBody().errors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().errors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_SIZE, Locale.ENGLISH), response.getBody().errors().get("name"));
     }
 
     @Test
@@ -168,11 +168,11 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_SIZE, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.name"));
-        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.code"));
-        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_PAST, SPAIN_LOCALE), response.getBody().getErrors().get("founded"));
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("level"));
-        Assertions.assertEquals(getErrorMessage(TEAM_NAME_SIZE, SPAIN_LOCALE), response.getBody().getErrors().get("name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_SIZE, SPAIN_LOCALE), response.getBody().errors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().errors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_PAST, SPAIN_LOCALE), response.getBody().errors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().errors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_SIZE, SPAIN_LOCALE), response.getBody().errors().get("name"));
     }
 
     @Test
@@ -183,12 +183,12 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.name"));
-        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.code"));
-        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("picture"));
-        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("founded"));
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("level"));
-        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_BLANK, Locale.ENGLISH), response.getBody().errors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().errors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH), response.getBody().errors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH), response.getBody().errors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().errors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH), response.getBody().errors().get("name"));
     }
 
     @Test
@@ -200,12 +200,12 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.name"));
-        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.code"));
-        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("picture"));
-        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("founded"));
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("level"));
-        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_BLANK, SPAIN_LOCALE), response.getBody().errors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().errors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE), response.getBody().errors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE), response.getBody().errors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().errors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE), response.getBody().errors().get("name"));
     }
 
     @Test
@@ -216,11 +216,11 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_COUNTRY_NULL, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO"));
-        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("picture"));
-        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("founded"));
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("level"));
-        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("name"));
+        Assertions.assertEquals(getErrorMessage(TEAM_COUNTRY_NULL, Locale.ENGLISH), response.getBody().errors().get("countryDTO"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH), response.getBody().errors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH), response.getBody().errors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().errors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH), response.getBody().errors().get("name"));
     }
 
     @Test
@@ -232,11 +232,11 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_COUNTRY_NULL, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO"));
-        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("picture"));
-        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("founded"));
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("level"));
-        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("name"));
+        Assertions.assertEquals(getErrorMessage(TEAM_COUNTRY_NULL, SPAIN_LOCALE), response.getBody().errors().get("countryDTO"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE), response.getBody().errors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE), response.getBody().errors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().errors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE), response.getBody().errors().get("name"));
     }
 
     @Test
@@ -247,7 +247,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, Locale.ENGLISH), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, Locale.ENGLISH), response.getBody().errors().get("error"));
     }
 
 
@@ -260,7 +260,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, SPAIN_LOCALE), response.getBody().errors().get("error"));
     }
 
     @Test
@@ -271,7 +271,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST.name(), Locale.ENGLISH), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST.name(), Locale.ENGLISH), response.getBody().errors().get("error"));
     }
 
     @Test
@@ -283,7 +283,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST.name(), SPAIN_LOCALE), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST.name(), SPAIN_LOCALE), response.getBody().errors().get("error"));
     }
 
 
@@ -314,8 +314,8 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals("FC Bayern de Munchen", response.getBody().getName());
-        Assertions.assertEquals("DE", response.getBody().getCountryDTO().getCode());
+        Assertions.assertEquals("FC Bayern de Munchen", response.getBody().name());
+        Assertions.assertEquals("DE", response.getBody().countryDTO().code());
     }
 
     @Test
@@ -325,7 +325,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("updateTeamLevel.level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().errors().get("updateTeamLevel.level"));
     }
 
     @Test
@@ -336,7 +336,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("updateTeamLevel.level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().errors().get("updateTeamLevel.level"));
     }
 
     @Test
@@ -346,7 +346,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("updateTeamLevel.level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().errors().get("updateTeamLevel.level"));
     }
 
     @Test
@@ -357,7 +357,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("updateTeamLevel.level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().errors().get("updateTeamLevel.level"));
     }
 
     @Test
@@ -367,7 +367,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, Locale.ENGLISH), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, Locale.ENGLISH), response.getBody().errors().get("error"));
     }
 
     @Test
@@ -378,7 +378,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, SPAIN_LOCALE), response.getBody().errors().get("error"));
     }
 
     @Test
@@ -405,7 +405,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(8.350000000000001, response.getBody().getLevel());
+        Assertions.assertEquals(8.350000000000001, response.getBody().level());
     }
 
     @Test
@@ -415,7 +415,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, Locale.ENGLISH), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, Locale.ENGLISH), response.getBody().errors().get("error"));
     }
 
     @Test
@@ -426,7 +426,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, SPAIN_LOCALE), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NOT_FOUND.name(), new Object[]{-1000}, SPAIN_LOCALE), response.getBody().errors().get("error"));
     }
 
     @Test
@@ -461,11 +461,11 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_SIZE, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.name"));
-        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.code"));
-        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_PAST, Locale.ENGLISH), response.getBody().getErrors().get("founded"));
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("level"));
-        Assertions.assertEquals(getErrorMessage(TEAM_NAME_SIZE, Locale.ENGLISH), response.getBody().getErrors().get("name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_SIZE, Locale.ENGLISH), response.getBody().errors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().errors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_PAST, Locale.ENGLISH), response.getBody().errors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().errors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_SIZE, Locale.ENGLISH), response.getBody().errors().get("name"));
     }
 
     @Test
@@ -477,11 +477,11 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_SIZE, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.name"));
-        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.code"));
-        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_PAST, SPAIN_LOCALE), response.getBody().getErrors().get("founded"));
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("level"));
-        Assertions.assertEquals(getErrorMessage(TEAM_NAME_SIZE, SPAIN_LOCALE), response.getBody().getErrors().get("name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_SIZE, SPAIN_LOCALE), response.getBody().errors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().errors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_PAST, SPAIN_LOCALE), response.getBody().errors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().errors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_SIZE, SPAIN_LOCALE), response.getBody().errors().get("name"));
 
     }
 
@@ -493,12 +493,12 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.name"));
-        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO.code"));
-        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("picture"));
-        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("founded"));
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("level"));
-        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_BLANK, Locale.ENGLISH), response.getBody().errors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, Locale.ENGLISH), response.getBody().errors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH), response.getBody().errors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH), response.getBody().errors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().errors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH), response.getBody().errors().get("name"));
     }
 
 
@@ -511,12 +511,12 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.name"));
-        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO.code"));
-        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("picture"));
-        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("founded"));
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("level"));
-        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_NAME_BLANK, SPAIN_LOCALE), response.getBody().errors().get("countryDTO.name"));
+        Assertions.assertEquals(getErrorMessage(COUNTRY_CODE_INVALID, SPAIN_LOCALE), response.getBody().errors().get("countryDTO.code"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE), response.getBody().errors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE), response.getBody().errors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().errors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE), response.getBody().errors().get("name"));
     }
 
     @Test
@@ -527,11 +527,11 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_COUNTRY_NULL, Locale.ENGLISH), response.getBody().getErrors().get("countryDTO"));
-        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("picture"));
-        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("founded"));
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().getErrors().get("level"));
-        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH), response.getBody().getErrors().get("name"));
+        Assertions.assertEquals(getErrorMessage(TEAM_COUNTRY_NULL, Locale.ENGLISH), response.getBody().errors().get("countryDTO"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, Locale.ENGLISH), response.getBody().errors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, Locale.ENGLISH), response.getBody().errors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, Locale.ENGLISH), response.getBody().errors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, Locale.ENGLISH), response.getBody().errors().get("name"));
     }
 
     @Test
@@ -543,11 +543,11 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(TEAM_COUNTRY_NULL, SPAIN_LOCALE), response.getBody().getErrors().get("countryDTO"));
-        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("picture"));
-        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("founded"));
-        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().getErrors().get("level"));
-        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE), response.getBody().getErrors().get("name"));
+        Assertions.assertEquals(getErrorMessage(TEAM_COUNTRY_NULL, SPAIN_LOCALE), response.getBody().errors().get("countryDTO"));
+        Assertions.assertEquals(getErrorMessage(TEAM_PICTURE_BLANK, SPAIN_LOCALE), response.getBody().errors().get("picture"));
+        Assertions.assertEquals(getErrorMessage(TEAM_FOUNDED_BLANK, SPAIN_LOCALE), response.getBody().errors().get("founded"));
+        Assertions.assertEquals(getErrorMessage(TEAM_LEVEL_INVALID, SPAIN_LOCALE), response.getBody().errors().get("level"));
+        Assertions.assertEquals(getErrorMessage(TEAM_NAME_BLANK, SPAIN_LOCALE), response.getBody().errors().get("name"));
     }
 
     @Test
@@ -558,7 +558,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST.name(), Locale.ENGLISH), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST.name(), Locale.ENGLISH), response.getBody().errors().get("error"));
     }
 
     @Test
@@ -570,7 +570,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST.name(), SPAIN_LOCALE), response.getBody().getErrors().get("error"));
+        Assertions.assertEquals(getErrorMessage(ERROR_TO_PERSIST.name(), SPAIN_LOCALE), response.getBody().errors().get("error"));
     }
 
     @Test
@@ -681,7 +681,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
         HttpEntity<MultiValueMap<String, String>> tokenRequest = createTokenRequest(username, password);
         ResponseEntity<AccessToken> response = testRestTemplate.exchange(authServerUrl.concat("/protocol/openid-connect/token"), HttpMethod.POST, tokenRequest, AccessToken.class);
 
-        return response.getBody().getAccessToken();
+        return response.getBody().accessToken();
     }
 
     private HttpEntity<MultiValueMap<String, String>> createTokenRequest(String username, String password) {

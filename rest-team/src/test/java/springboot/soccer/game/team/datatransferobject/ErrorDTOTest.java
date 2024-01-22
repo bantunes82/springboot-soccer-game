@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 class ErrorDTOTest {
     @Test
     void testErrorDTONullValueInTheConstructor() {
-        Assertions.assertThrows(NullPointerException.class, () -> new ErrorDTO(null), "errors is marked non-null but is null");
+        Assertions.assertThrows(NullPointerException.class, () -> new ErrorDTO(null), "the errors cannot be null");
     }
 
 }
