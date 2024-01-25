@@ -1,7 +1,6 @@
 package springboot.soccer.game.team.handler;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,8 +14,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import springboot.soccer.game.team.datatransferobject.ErrorDTO;
 import springboot.soccer.game.team.exception.BusinessException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
@@ -32,7 +31,6 @@ public class ErrorHandlingControllerAdvice {
     private static final String ERROR = "error";
     private final MessageSource messageSource;
 
-    @Autowired
     public ErrorHandlingControllerAdvice(MessageSource messageSource) {
         this.messageSource = messageSource;
     }

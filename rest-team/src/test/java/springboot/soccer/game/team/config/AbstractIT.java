@@ -23,8 +23,10 @@ public abstract class AbstractIT {
             .withPassword("team");
     @Container
     private static GenericContainer IDENTITY_ACCESS_MANAGEMENT = new GenericContainer("quay.io/keycloak/keycloak:12.0.4")
-            .withCommand("-b 0.0.0.0 -Djboss.http.port=8082 -Dkeycloak.profile.feature.upload_scripts=enabled -Dkeycloak.migration.action=import " +
-                    "-Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/tmp/keycloak/realms -Dkeycloak.migration.strategy=OVERWRITE_EXISTING")
+            .withCommand("""
+                    -b 0.0.0.0 -Djboss.http.port=8082 -Dkeycloak.profile.feature.upload_scripts=enabled -Dkeycloak.migration.action=import \
+                    -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/tmp/keycloak/realms -Dkeycloak.migration.strategy=OVERWRITE_EXISTING\
+                    """)
             .withClasspathResourceMapping("./keycloak/realms/", "/tmp/keycloak/realms/", BindMode.READ_ONLY)
             .withStartupTimeout(Duration.ofSeconds(120))
             .withExposedPorts(8082)
@@ -38,7 +40,7 @@ public abstract class AbstractIT {
         registry.add("spring.datasource.password", DATABASE::getPassword);
         registry.add("spring.datasource.username", DATABASE::getUsername);
 
-        String authServerUrl = String.format("http://%s:%d/auth", IDENTITY_ACCESS_MANAGEMENT.getHost(), IDENTITY_ACCESS_MANAGEMENT.getMappedPort(8082));
+        String authServerUrl = "http://%s:%d/auth".formatted(IDENTITY_ACCESS_MANAGEMENT.getHost(), IDENTITY_ACCESS_MANAGEMENT.getMappedPort(8082));
         registry.add("keycloak.auth-server-url", () -> authServerUrl);
     }
 }

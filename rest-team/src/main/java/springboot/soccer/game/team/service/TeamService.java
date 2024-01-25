@@ -1,6 +1,5 @@
 package springboot.soccer.game.team.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,7 +14,7 @@ import springboot.soccer.game.team.domainobject.TeamDO;
 import springboot.soccer.game.team.exception.BusinessException;
 import springboot.soccer.game.team.validation.Range;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +29,6 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final CountryRepository countryRepository;
 
-    @Autowired
     public TeamService(TeamRepository teamRepository, CountryRepository countryRepository) {
         this.teamRepository = teamRepository;
         this.countryRepository = countryRepository;

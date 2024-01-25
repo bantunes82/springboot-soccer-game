@@ -1,6 +1,5 @@
 package springboot.soccer.game.team.health;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -22,7 +21,6 @@ public class KeycloakHealthIndicator implements HealthIndicator {
 
     private RestTemplate restTemplate;
 
-    @Autowired
     public KeycloakHealthIndicator(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }

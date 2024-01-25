@@ -2,6 +2,7 @@ package springboot.soccer.game.team.dataaccessobject;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import springboot.soccer.game.team.domainobject.TeamDO;
 
@@ -9,7 +10,7 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 
-public interface TeamRepository extends PagingAndSortingRepository<TeamDO, Long> {
+public interface TeamRepository extends PagingAndSortingRepository<TeamDO, Long>, CrudRepository<TeamDO, Long> {
 
     default Optional<TeamDO> findRandomAndDeletedIsFalse() {
         long countTeams = count();

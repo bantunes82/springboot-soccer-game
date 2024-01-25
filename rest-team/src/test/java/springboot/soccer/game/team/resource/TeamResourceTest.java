@@ -20,7 +20,7 @@ import springboot.soccer.game.team.resource.mapper.TeamMapper;
 import springboot.soccer.game.team.service.TeamService;
 
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
