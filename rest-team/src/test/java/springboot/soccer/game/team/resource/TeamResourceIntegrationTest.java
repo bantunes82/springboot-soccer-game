@@ -41,7 +41,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
     private TestRestTemplate testRestTemplate;
     @Autowired
     private MessageSource messageSource;
-    @Value("${keycloak.auth-server-url}/realms/${keycloak.realm}")
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String authServerUrl;
     @Value("${keycloak.resource}")
     private String clientId;
@@ -285,7 +285,6 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
 
     @Test
-    @Disabled("Disabled keycloak integration temporally due to migration to SpringBoot3")
     void updateTeam_GivenValidDTOAndNotAllowedRoleUser_ReturnsForbidden() {
         headers.setBearerAuth(getAccessTokenForNotAllowedRoleUser());
         headers.setContentType(APPLICATION_JSON);
@@ -295,7 +294,6 @@ class TeamResourceIntegrationTest extends AbstractIT {
     }
 
     @Test
-    @Disabled("Disabled keycloak integration temporally due to migration to SpringBoot3")
     void updateTeam_GivenValidDTOAndInvalidAccessToken_ReturnsUnauthorized() {
         headers.setBearerAuth("XX");
         headers.setContentType(APPLICATION_JSON);
@@ -381,19 +379,17 @@ class TeamResourceIntegrationTest extends AbstractIT {
     }
 
     @Test
-    @Disabled("Disabled keycloak integration temporally due to migration to SpringBoot3")
     void updateTeamLevel_GivenValidRangeLevelAndNotAllowedRoleUser_ReturnsForbidden() {
         headers.setBearerAuth(getAccessTokenForNotAllowedRoleUser());
-        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-3/level/8.8", HttpMethod.PATCH, new HttpEntity<>(headers), TeamDTO.class);
+        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-3/level/8.8", HttpMethod.PATCH, new HttpEntity<>(headers), TeamDTO.class);
 
         Assertions.assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
-    @Disabled("Disabled keycloak integration temporally due to migration to SpringBoot3")
     void updateTeamLevel_GivenValidRangeLevelAndInvalidAccessToken_ReturnsUnauthorized() {
         headers.setBearerAuth("XX");
-        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-3/level/8.8", HttpMethod.PATCH, new HttpEntity<>(headers), TeamDTO.class);
+        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-3/level/8.8", HttpMethod.PATCH, new HttpEntity<>(headers), TeamDTO.class);
 
         Assertions.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
@@ -431,19 +427,17 @@ class TeamResourceIntegrationTest extends AbstractIT {
     }
 
     @Test
-    @Disabled("Disabled keycloak integration temporally due to migration to SpringBoot3")
     void deleteTeam_GivenValidTeamIdAndNotAllowedRoleUser_ReturnsForbidden() {
         headers.setBearerAuth(getAccessTokenForNotAllowedRoleUser());
-        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-4", HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
+        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-4", HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
 
         Assertions.assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
-    @Disabled("Disabled keycloak integration temporally due to migration to SpringBoot3")
     void deleteTeam_GivenValidTeamIdAndInvalidAccessToken_ReturnsUnauthorized() {
         headers.setBearerAuth("XX");
-        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "-4", HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
+        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-4", HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
 
         Assertions.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
@@ -577,7 +571,6 @@ class TeamResourceIntegrationTest extends AbstractIT {
     }
 
     @Test
-    @Disabled("Disabled keycloak integration temporally due to migration to SpringBoot3")
     void createTeam_GivenValidDTOAndNotAllowedRoleUser_ReturnsForbidden() {
         headers.setBearerAuth(getAccessTokenForNotAllowedRoleUser());
         headers.setContentType(APPLICATION_JSON);
@@ -587,7 +580,6 @@ class TeamResourceIntegrationTest extends AbstractIT {
     }
 
     @Test
-    @Disabled("Disabled keycloak integration temporally due to migration to SpringBoot3")
     void createTeam_GivenValidDTOAndInvalidAccessToken_ReturnsUnauthorized() {
         headers.setBearerAuth("XX");
         headers.setContentType(APPLICATION_JSON);

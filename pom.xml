@@ -30,7 +30,6 @@
         <jacoco.version>[0.8.11]</jacoco.version>
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
         <testcontainers.version>1.19.3</testcontainers.version>
-        <keycloak.version>23.0.4</keycloak.version>
         <micrometer-prometheus.version>[1.12.2]</micrometer-prometheus.version>
         <postgresql.version>[42.7.1]</postgresql.version>
         <lombok.version>1.18.30</lombok.version>
@@ -46,13 +45,6 @@
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
                 <version>${testcontainers.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak.bom</groupId>
-                <artifactId>keycloak-adapter-bom</artifactId>
-                <version>${keycloak.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

@@ -16,7 +16,7 @@ import java.util.Collections;
 @Component
 public class KeycloakHealthIndicator implements HealthIndicator {
 
-    @Value("${keycloak.auth-server-url}/realms/${keycloak.realm}")
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String oidcAuthServerUrl;
 
     private RestTemplate restTemplate;
