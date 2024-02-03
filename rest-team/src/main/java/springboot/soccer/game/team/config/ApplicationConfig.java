@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.security.SecuritySchemes;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.MessageSource;
@@ -18,6 +17,7 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -49,11 +49,14 @@ public class ApplicationConfig {
     private static final String CLASSPATH_MESSAGES = "classpath:messages";
     private static final String PATH_ENDPOINT = "/v1/teams/**";
 
-    @Autowired
-    private JwtAuthenticationConverter jwtAuthenticationConverter;
+    private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
     @Value("${keycloak.security.role}")
     private String role;
+
+    public ApplicationConfig(JwtAuthenticationConverter jwtAuthenticationConverter) {
+        this.jwtAuthenticationConverter = jwtAuthenticationConverter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -74,6 +77,11 @@ public class ApplicationConfig {
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
+    }
+
+    @Bean
+    public GrantedAuthorityDefaults grantedAuthorityDefaults() {
+        return new GrantedAuthorityDefaults(""); //DEFAULT "ROLE_"
     }
 
 
