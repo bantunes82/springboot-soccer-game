@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,7 +32,7 @@ import springboot.soccer.game.team.service.TeamService;
 import springboot.soccer.game.team.validation.CountryCode;
 import springboot.soccer.game.team.validation.Range;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -50,7 +49,6 @@ public class TeamResource {
     private final TeamService teamService;
     private final TeamMapper teamMapper;
 
-    @Autowired
     public TeamResource(TeamService teamService, TeamMapper teamMapper) {
         this.teamService = teamService;
         this.teamMapper = teamMapper;
@@ -73,7 +71,7 @@ public class TeamResource {
     @ApiResponses(@ApiResponse(responseCode = "200", description = "Returns a list of soccer teams for the specified name", content = @Content(mediaType = APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = TeamDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)))))
     //@Timed(value = "timeFindTeamByName", description = "Times how long it takes to invoke the findTeamByName method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @GetMapping(path = "/name/{name}")
-    public ResponseEntity<List<TeamDTO>> findTeamByName(@Parameter(description = "soccer team name", required = true) @PathVariable("name") String name) {
+    public ResponseEntity<List<TeamDTO>> findTeamByName(@Parameter(description = "soccer team name", required = true) @PathVariable String name) {
         List<TeamDO> teams = teamService.findByName(name);
 
         return ResponseEntity.ok(teamMapper.toTeamDTOs(teams));
@@ -86,9 +84,9 @@ public class TeamResource {
     })
     //@Timed(value = "timeFindTeamByCountryCode", description = "Times how long it takes to invoke the findTeamByCountryCode method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @GetMapping(path = "/country/{countryCode}")
-    public ResponseEntity<List<TeamDTO>> findTeamByCountryCode(@Parameter(description = "country code", required = true) @PathVariable("countryCode") @CountryCode String countryCode,
-                                                               @Parameter(description = "page index") @RequestParam(value = "pageIndex", defaultValue = "0") int pageIndex,
-                                                               @Parameter(description = "page size") @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
+    public ResponseEntity<List<TeamDTO>> findTeamByCountryCode(@Parameter(description = "country code", required = true) @PathVariable @CountryCode String countryCode,
+                                                               @Parameter(description = "page index") @RequestParam(defaultValue = "0") int pageIndex,
+                                                               @Parameter(description = "page size") @RequestParam(defaultValue = "10") int pageSize) {
         List<TeamDO> teams = teamService.findByCountryCode(countryCode, pageIndex, pageSize);
 
         return ResponseEntity.ok(teamMapper.toTeamDTOs(teams));

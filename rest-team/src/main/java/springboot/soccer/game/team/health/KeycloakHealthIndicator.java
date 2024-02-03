@@ -1,6 +1,5 @@
 package springboot.soccer.game.team.health;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -17,12 +16,11 @@ import java.util.Collections;
 @Component
 public class KeycloakHealthIndicator implements HealthIndicator {
 
-    @Value("${keycloak.auth-server-url}/realms/${keycloak.realm}")
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String oidcAuthServerUrl;
 
     private RestTemplate restTemplate;
 
-    @Autowired
     public KeycloakHealthIndicator(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }

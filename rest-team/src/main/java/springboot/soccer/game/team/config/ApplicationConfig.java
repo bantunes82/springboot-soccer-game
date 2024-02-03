@@ -7,11 +7,19 @@ import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.security.SecuritySchemes;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.client.RestTemplate;
 
@@ -35,9 +43,45 @@ import java.time.Duration;
                 scheme = "Bearer")}
 )
 @Configuration
+@EnableWebSecurity
 public class ApplicationConfig {
 
     private static final String CLASSPATH_MESSAGES = "classpath:messages";
+    private static final String PATH_ENDPOINT = "/v1/teams/**";
+
+    private final JwtAuthenticationConverter jwtAuthenticationConverter;
+
+    @Value("${keycloak.security.role}")
+    private String role;
+
+    public ApplicationConfig(JwtAuthenticationConverter jwtAuthenticationConverter) {
+        this.jwtAuthenticationConverter = jwtAuthenticationConverter;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(http -> {
+                    http.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/actuator/**").permitAll();
+                    http.requestMatchers(HttpMethod.GET, PATH_ENDPOINT).permitAll();
+                    http.requestMatchers(HttpMethod.PUT, PATH_ENDPOINT).hasRole(role);
+                    http.requestMatchers(HttpMethod.DELETE, PATH_ENDPOINT).hasRole(role);
+                    http.requestMatchers(HttpMethod.POST, PATH_ENDPOINT).hasRole(role);
+                    http.requestMatchers(HttpMethod.PATCH, PATH_ENDPOINT).hasRole(role);
+                    http.anyRequest().authenticated();
+                })
+                //.oauth2ResourceServer((oauth2) -> oauth2.jwt(withDefaults()))
+                .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .build();
+    }
+
+    @Bean
+    public GrantedAuthorityDefaults grantedAuthorityDefaults() {
+        return new GrantedAuthorityDefaults(""); //DEFAULT "ROLE_"
+    }
+
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {

@@ -2,6 +2,7 @@ package springboot.soccer.game.team.datatransferobject;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -17,9 +18,9 @@ import java.util.Objects;
 public record ErrorDTO(Map<String, String> errors) {
     public ErrorDTO {
         if (Objects.isNull(errors)) {
-            throw new NullPointerException("the errors cannot be null");
+            errors = Collections.emptyMap();
+        } else {
+            errors = Map.copyOf(errors);
         }
-        errors = Map.copyOf(errors);
     }
-
 }

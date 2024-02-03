@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.18</version>
+        <version>3.2.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>springboot.soccer.game</groupId>
@@ -30,12 +30,13 @@
         <jacoco.version>[0.8.11]</jacoco.version>
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
         <testcontainers.version>1.19.3</testcontainers.version>
-        <keycloak.version>23.0.4</keycloak.version>
         <micrometer-prometheus.version>[1.12.2]</micrometer-prometheus.version>
         <postgresql.version>[42.7.1]</postgresql.version>
-        <lombok.version>[1.18.30]</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
         <org.mapstruct.version>[1.5.5.Final]</org.mapstruct.version>
-        <springdoc-openapi-ui.vesion>[1.7.0]</springdoc-openapi-ui.vesion>
+        <springdoc-openapi-starter-webmvc-ui.vesion>[2.3.0]</springdoc-openapi-starter-webmvc-ui.vesion>
+        <jakarta.validation-api.version>[3.0.2]</jakarta.validation-api.version>
+        <httpclient5.version>[5.3]</httpclient5.version>
     </properties>
 
     <dependencyManagement>
@@ -44,13 +45,6 @@
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
                 <version>${testcontainers.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak.bom</groupId>
-                <artifactId>keycloak-adapter-bom</artifactId>
-                <version>${keycloak.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -63,8 +57,8 @@
             </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-ui</artifactId>
-                <version>${springdoc-openapi-ui.vesion}</version>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc-openapi-starter-webmvc-ui.vesion}</version>
             </dependency>
             <dependency>
                 <groupId>org.postgresql</groupId>
@@ -83,6 +77,16 @@
                 <artifactId>mapstruct</artifactId>
                 <version>${org.mapstruct.version}</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+                <version>${jakarta.validation-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>${httpclient5.version}</version>
             </dependency>
 
             <!-- Test dependencies -->

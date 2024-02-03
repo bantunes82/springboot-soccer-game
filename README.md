@@ -9,9 +9,9 @@
 - Spring-boot Starter Validation
 - Spring-boot Starter Data Jpa
 - Spring-boot Starter Actuator
+- Springdoc Openapi Starter Webmvc ui
+- Spring-boot Starter Oauth2 Resource Server
 - Micrometer Registry Prometheus
-- Springdoc Openapi ui
-- Keycloak Spring-boot Starter
 - Postgresql
 - Lombok
 - MapStruct
