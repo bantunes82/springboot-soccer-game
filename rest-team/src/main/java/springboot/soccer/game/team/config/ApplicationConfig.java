@@ -2,6 +2,7 @@ package springboot.soccer.game.team.config;
 
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -17,6 +18,7 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -37,10 +39,13 @@ import java.time.Duration;
         externalDocs = @ExternalDocumentation(url = "https://github.com/bantunes82/springboot-soccer-game/tree/main/rest-team")
 )
 @SecuritySchemes(value = {
-        @SecurityScheme(name = "accessToken",
-                type = SecuritySchemeType.HTTP,
-                description = "Access token for the user that belongs to TEAM role",
-                scheme = "Bearer")}
+        @SecurityScheme(name = "Keycloak",
+                openIdConnectUrl = "http://localhost:8082/auth/realms/team-realm/.well-known/openid-configuration",
+                scheme = "bearer",
+                type = SecuritySchemeType.OPENIDCONNECT,
+                in = SecuritySchemeIn.HEADER,
+                description = "Username and password for the user that belongs to TEAM role"
+        )}
 )
 @Configuration
 @EnableWebSecurity
@@ -61,7 +66,7 @@ public class ApplicationConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(http -> {
                     http.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/actuator/**").permitAll();
                     http.requestMatchers(HttpMethod.GET, PATH_ENDPOINT).permitAll();

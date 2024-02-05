@@ -33,6 +33,7 @@ import springboot.soccer.game.team.validation.CountryCode;
 import springboot.soccer.game.team.validation.Range;
 
 import jakarta.validation.Valid;
+
 import java.net.URI;
 import java.util.List;
 
@@ -92,14 +93,14 @@ public class TeamResource {
         return ResponseEntity.ok(teamMapper.toTeamDTOs(teams));
     }
 
-    @Operation(summary = "Create a soccer team", security = @SecurityRequirement(name = "accessToken"))
+    @Operation(summary = "Create a soccer team", security = @SecurityRequirement(name = "Keycloak"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "The URI of the created soccer team", headers = {@Header(name = LOCATION, description = "URI location of the created soccer team", schema = @Schema(implementation = URI.class))}),
             @ApiResponse(responseCode = "400", description = "When the content of the TeamDTO is invalid", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, requiredMode = Schema.RequiredMode.REQUIRED))),
             @ApiResponse(responseCode = "401", description = "The Authorization header was not informed or the value is invalid"),
             @ApiResponse(responseCode = "403", description = "The Authorization header value is not allowed")
     })
-    //@SecurityRequirement(name = "accessToken")
+    //@SecurityRequirement(name = "Keycloak")
     //@Timed(value = "timeCreateTeam", description = "Times how long it takes to invoke the createTeam method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createTeam(@io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class)), description = "soccer team to be created") @Valid @RequestBody TeamDTO teamDTO) {
@@ -115,7 +116,7 @@ public class TeamResource {
         return ResponseEntity.created(location).build();
     }
 
-    @Operation(summary = "Update a soccer team for the specified team id", security = @SecurityRequirement(name = "accessToken"))
+    @Operation(summary = "Update a soccer team for the specified team id", security = @SecurityRequirement(name = "Keycloak"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)), description = "Returns the soccer team updated"),
             @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)), description = "When there is no soccer team available for the specified id"),
@@ -123,7 +124,7 @@ public class TeamResource {
             @ApiResponse(responseCode = "401", description = "The Authorization header was not informed or the value is invalid"),
             @ApiResponse(responseCode = "403", description = "The Authorization header value is not allowed")
     })
-    //@SecurityRequirement(name = "accessToken")
+    //@SecurityRequirement(name = "Keycloak")
     //@Timed(value = "timeUpdateTeam", description = "Times how long it takes to invoke the updateTeam method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<TeamDTO> updateTeam(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId,
@@ -134,7 +135,7 @@ public class TeamResource {
         return ResponseEntity.ok(teamMapper.toTeamDTO(teamUpdated));
     }
 
-    @Operation(summary = "Update the soccer team level for the specified team id", security = @SecurityRequirement(name = "accessToken"))
+    @Operation(summary = "Update the soccer team level for the specified team id", security = @SecurityRequirement(name = "Keycloak"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)), description = "Returns the soccer team with the updated level"),
             @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)), description = "When there is no soccer team available for the specified id"),
@@ -142,7 +143,7 @@ public class TeamResource {
             @ApiResponse(responseCode = "401", description = "The Authorization header was not informed or the value is invalid"),
             @ApiResponse(responseCode = "403", description = "The Authorization header value is not allowed")
     })
-    //@SecurityRequirement(name = "accessToken")
+    //@SecurityRequirement(name = "Keycloak")
     //@Timed(value = "timeUpdateTeamLevel", description = "Times how long it takes to invoke the updateTeamLevel method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @PatchMapping(path = "/{id}/level/{value}")
     public ResponseEntity<TeamDTO> updateTeamLevel(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId,
@@ -152,14 +153,14 @@ public class TeamResource {
         return ResponseEntity.ok(teamMapper.toTeamDTO(teamUpdated));
     }
 
-    @Operation(summary = "Delete the soccer team for the specified team id", security = @SecurityRequirement(name = "accessToken"))
+    @Operation(summary = "Delete the soccer team for the specified team id", security = @SecurityRequirement(name = "Keycloak"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Soccer Team deleted"),
             @ApiResponse(responseCode = "404", content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorDTO.class, requiredMode = Schema.RequiredMode.REQUIRED)), description = "When there is no soccer team available for the specified id"),
             @ApiResponse(responseCode = "401", description = "The Authorization header was not informed or the value is invalid"),
             @ApiResponse(responseCode = "403", description = "The Authorization header value is not allowed")
     })
-    //@SecurityRequirement(name = "accessToken")
+    //@SecurityRequirement(name = "Keycloak")
     //@Timed(value = "timeDeleteTeam", description = "Times how long it takes to invoke the deleteTeam method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @DeleteMapping(path = "{id}")
     public ResponseEntity<Void> deleteTeam(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId) {

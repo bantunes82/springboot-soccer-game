@@ -40,16 +40,12 @@ codes).
 
 **Swagger - How to call the endpoints via swagger-ui**
 - For the Soccer team application endpoints
-    - You have to set the Authorization header for the applications endpoints that have the **LOCKER** signal, to set the Authorization header you have put the access token value inside the **"Authorize"** field in the right side of the page.
+    - You have to set the Authorization header for the applications endpoints that have the **LOCKER** signal, to generate the Authorization header you have put the username and password values inside the **"Authorize"** field in the right side of the page.
 
-      To retrieve the access token for user **teamuser** that belong to the **"team"** role from Keycloak server, you have to run the command below:
-        ```shell script
-           curl -X POST http://localhost:8082/auth/realms/team-realm/protocol/openid-connect/token -H 'content-type: application/x-www-form-urlencoded' -d 'username=teamuser&password=teamuser&grant_type=password&client_id=team-client&client_secret=6fe5572d-d0f7-4121-8fc4-d2768bf82836'
-        ```
-      To retrieve the access token for user **test** that does not belong to the **"team"** role from Keycloak server, you have to run the command below:
-        ```shell script
-          curl -X POST http://localhost:8082/auth/realms/team-realm/protocol/openid-connect/token  -H 'content-type: application/x-www-form-urlencoded' -d 'username=test&password=test&grant_type=password&client_id=team-client&client_secret=6fe5572d-d0f7-4121-8fc4-d2768bf82836'
-        ```
+      - To generate the access token for the Authorization header for the user **teamuser** that belong to the **"team"** role from Keycloak server, you have fill the fields "username" and "password" with the value "teamuser" inside of the section "Keycloak (OAuth2, password)"
+
+      - To generate the access token for the Authorization header for the user **test** that does not belong to the **"team"** role from Keycloak server, you have fill the fields "username" and "password" with the value "test" inside of the section "Keycloak (OAuth2, password)"
+
 
  ![Swagger](https://i.ibb.co/p0s5Kpb/swagger.png "Swagger Endpoints")
 
