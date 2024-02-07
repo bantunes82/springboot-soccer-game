@@ -17,10 +17,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 class HealthIntegrationTest extends AbstractIT {
 
-    private static String HEALTH_PATH = "/actuator/health";
+    private static final String HEALTH_PATH = "/actuator/health";
+
+    private final MockMvc mockMvc;
 
     @Autowired
-    private MockMvc mockMvc;
+    HealthIntegrationTest(MockMvc mockMvc) {
+        this.mockMvc = mockMvc;
+    }
 
     @Test
     void shouldPingLiveness() throws Exception {

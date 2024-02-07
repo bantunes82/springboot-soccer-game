@@ -35,12 +35,10 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
     private static final String ES = "ES";
     private static final Locale SPAIN_LOCALE = Locale.forLanguageTag(ES);
-    private static String TEAM_RESOURCE_PATH = "/v1/teams";
+    private static final String TEAM_RESOURCE_PATH = "/v1/teams";
 
-    @Autowired
-    private TestRestTemplate testRestTemplate;
-    @Autowired
-    private MessageSource messageSource;
+    private final TestRestTemplate testRestTemplate;
+    private final MessageSource messageSource;
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String authServerUrl;
     @Value("${keycloak.resource}")
@@ -52,6 +50,12 @@ class TeamResourceIntegrationTest extends AbstractIT {
     private TeamDTO invalidTeamDTONullValues;
     private TeamDTO invalidTeamDTONullCountryDTO;
     private HttpHeaders headers;
+
+    @Autowired
+    public TeamResourceIntegrationTest(TestRestTemplate testRestTemplate, MessageSource messageSource) {
+        this.testRestTemplate = testRestTemplate;
+        this.messageSource = messageSource;
+    }
 
     @BeforeEach
     void setUp() {
