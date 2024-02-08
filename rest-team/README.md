@@ -107,7 +107,7 @@ In case you have a Sonar instance running locally (or a Docker
 Container), you can execute the command:
 ```shell script
 ..
-mvn clean install sonar:sonar
+mvn clean install -Psonar
 ```
 In order to observe the potential Bugs, Code smells,
 Technical Debt, etc. The results will be similar to this one:
