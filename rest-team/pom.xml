@@ -67,6 +67,14 @@
             <artifactId>httpclient5</artifactId>
         </dependency>
 
+        <!--Documentation to configure Automatic Restart in IntelliJ:
+        https://www.jetbrains.com/help/idea/spring-boot.html#spring-boot-endpoints-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
