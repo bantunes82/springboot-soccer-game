@@ -29,7 +29,6 @@
         <jacoco-plugin.version>0.8.11</jacoco-plugin.version>
         <jacoco.version>[0.8.11]</jacoco.version>
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
-        <micrometer-prometheus.version>[1.12.2]</micrometer-prometheus.version>
         <postgresql.version>[42.7.1]</postgresql.version>
         <lombok.version>1.18.30</lombok.version>
         <org.mapstruct.version>[1.5.5.Final]</org.mapstruct.version>
@@ -40,12 +39,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-registry-prometheus</artifactId>
-                <version>${micrometer-prometheus.version}</version>
-                <scope>runtime</scope>
-            </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
