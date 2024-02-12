@@ -55,12 +55,11 @@ public class ApplicationConfig {
     private static final String PATH_ENDPOINT = "/v1/teams/**";
 
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
+    private final String role;
 
-    @Value("${keycloak.security.role}")
-    private String role;
-
-    public ApplicationConfig(JwtAuthenticationConverter jwtAuthenticationConverter) {
+    public ApplicationConfig(JwtAuthenticationConverter jwtAuthenticationConverter, @Value("${keycloak.security.role}") String role) {
         this.jwtAuthenticationConverter = jwtAuthenticationConverter;
+        this.role = role;
     }
 
     @Bean

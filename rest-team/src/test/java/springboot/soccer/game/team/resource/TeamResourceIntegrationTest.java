@@ -41,10 +41,8 @@ class TeamResourceIntegrationTest extends AbstractIT {
 
     private final TestRestTemplate testRestTemplate;
     private final MessageSource messageSource;
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    private String authServerUrl;
-    @Value("${keycloak.resource}")
-    private String clientId;
+    private final String authServerUrl;
+    private final String clientId;
     private TeamDTO bayernMunchen;
     private TeamDTO borussiaDortmund;
     private TeamDTO corinthians;
@@ -54,9 +52,13 @@ class TeamResourceIntegrationTest extends AbstractIT {
     private HttpHeaders headers;
 
     @Autowired
-    public TeamResourceIntegrationTest(TestRestTemplate testRestTemplate, MessageSource messageSource) {
+    public TeamResourceIntegrationTest(TestRestTemplate testRestTemplate, MessageSource messageSource,
+                                       @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String authServerUrl,
+                                       @Value("${keycloak.resource}") String clientId) {
         this.testRestTemplate = testRestTemplate;
         this.messageSource = messageSource;
+        this.authServerUrl = authServerUrl;
+        this.clientId = clientId;
     }
 
     @BeforeEach
@@ -612,7 +614,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
         return messageSource.getMessage(messageKeyWithBraces.replaceAll("[{}]", ""), args, locale);
     }
 
-    private void createCorinthiansTeam(){
+    private void createCorinthiansTeam() {
         CountryDTO brazil = new CountryDTO("Brazil", "BR");
         corinthians = TeamDTO.builder()
                 .countryDTO(brazil)

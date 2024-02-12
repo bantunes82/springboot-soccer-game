@@ -16,12 +16,13 @@ import java.util.Collections;
 @Component
 public class KeycloakHealthIndicator implements HealthIndicator {
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    private String oidcAuthServerUrl;
+    private final String oidcAuthServerUrl;
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
-    public KeycloakHealthIndicator(RestTemplate restTemplate) {
+    public KeycloakHealthIndicator(@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String oidcAuthServerUrl,
+                                   RestTemplate restTemplate) {
+        this.oidcAuthServerUrl = oidcAuthServerUrl;
         this.restTemplate = restTemplate;
     }
 
