@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import springboot.soccer.game.team.auth.AccessToken;
-import springboot.soccer.game.team.config.AbstractIT;
+import springboot.soccer.game.team.config.TestContainersConfiguration;
 import springboot.soccer.game.team.datatransferobject.CountryDTO;
 import springboot.soccer.game.team.datatransferobject.ErrorDTO;
 import springboot.soccer.game.team.datatransferobject.TeamDTO;
@@ -32,8 +33,9 @@ import static springboot.soccer.game.team.validation.ConstraintMessage.*;
 import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(TestContainersConfiguration.class)
 @Tag("integration")
-class TeamResourceIntegrationTest extends AbstractIT {
+class TeamResourceIntegrationTest {
 
     private static final String ES = "ES";
     private static final Locale SPAIN_LOCALE = Locale.forLanguageTag(ES);

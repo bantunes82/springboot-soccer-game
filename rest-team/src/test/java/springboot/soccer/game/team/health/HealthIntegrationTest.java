@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
-import springboot.soccer.game.team.config.AbstractIT;
+import springboot.soccer.game.team.config.TestContainersConfiguration;
 
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -16,8 +17,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@Import(TestContainersConfiguration.class)
 @Tag("integration")
-class HealthIntegrationTest extends AbstractIT {
+class HealthIntegrationTest {
 
     private static final String HEALTH_PATH = "/actuator/health";
     private static final String LIVENESS_RESPONSE = """
