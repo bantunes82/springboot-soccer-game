@@ -22,10 +22,7 @@ public class TestContainersConfiguration {
     @Bean
     @ServiceConnection
     PostgreSQLContainer<?> postgres() {
-        return new PostgreSQLContainer<>(POSTGRES_IMAGE)
-                .withDatabaseName("teams_database")
-                .withUsername("team")
-                .withPassword("team");
+        return new PostgreSQLContainer<>(POSTGRES_IMAGE);
     }
 
     @Bean
