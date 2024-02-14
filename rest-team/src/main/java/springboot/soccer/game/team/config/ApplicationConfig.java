@@ -2,12 +2,12 @@ package springboot.soccer.game.team.config;
 
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import io.swagger.v3.oas.annotations.security.SecuritySchemes;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.MessageSource;
@@ -38,15 +38,6 @@ import java.time.Duration;
                         email = "bantunes82@gmail.com")),
         externalDocs = @ExternalDocumentation(url = "https://github.com/bantunes82/springboot-soccer-game/tree/main/rest-team")
 )
-@SecuritySchemes(value = {
-        @SecurityScheme(name = "Keycloak",
-                openIdConnectUrl = "http://localhost:8082/auth/realms/team-realm/.well-known/openid-configuration",
-                scheme = "bearer",
-                type = SecuritySchemeType.OPENIDCONNECT,
-                in = SecuritySchemeIn.HEADER,
-                description = "Username and password for the user that belongs to TEAM role"
-        )}
-)
 @Configuration
 @EnableWebSecurity
 public class ApplicationConfig {
@@ -54,16 +45,23 @@ public class ApplicationConfig {
     private static final String CLASSPATH_MESSAGES = "classpath:messages";
     private static final String PATH_ENDPOINT = "/v1/teams/**";
 
-    private final JwtAuthenticationConverter jwtAuthenticationConverter;
-    private final String role;
-
-    public ApplicationConfig(JwtAuthenticationConverter jwtAuthenticationConverter, @Value("${keycloak.security.role}") String role) {
-        this.jwtAuthenticationConverter = jwtAuthenticationConverter;
-        this.role = role;
+    @Bean
+    public OpenAPI customOpenAPI(@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String jwtIssuerUri) {
+        return new OpenAPI()
+                .components(new Components()
+                        .addSecuritySchemes("Keycloak",
+                                new SecurityScheme()
+                                        .openIdConnectUrl(jwtIssuerUri+"/.well-known/openid-configuration")
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                                        .type(SecurityScheme.Type.OPENIDCONNECT)
+                                        .in(SecurityScheme.In.HEADER)
+                                        .description("Username and password for the user that belongs to TEAM role")));
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,JwtAuthenticationConverter jwtAuthenticationConverter,
+                                                   @Value("${keycloak.security.role}") String role) throws Exception {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(http -> {
