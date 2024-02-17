@@ -4,30 +4,34 @@ This project uses Spring Boot, makes it easy to create stand-alone, production-g
 
 This API allows CRUD operations on a soccer team.
 
-## Before running the application
+## Running the application
+### Approach 1 - Using Docker Compose at Development Time
 
-Before start running the application we need to start the containers
-that this application depends on, for that you need to have docker and
+With this approach you need to have docker and
 docker-compose installed in your local computer. This is the command
 that you have to run:
 
 ```shell script
-docker-compose -f ../infrastructure/docker-compose-linux.yaml up
+mvn spring-boot:run
 ```
 
-This command it will start the containers below:
+This command will start the containers below and the rest-team application will connect with the first two containers:
 -  Postgres
 -  Keycloak
 -  Prometheus
 -  Grafana
 
-## Running the application
+### Approach 2 - Using Test Containers at Development Time
+
+With this approach you need to have only docker installed in your local computer. This is the command that you have to run:
 
 ```shell script
-..
-mvn clean package
-java -jar target/rest-team-1.0.jar
+mvn spring-boot:test-run -Dspring-boot.run.profiles=test
 ```
+
+This command will start the containers below and the rest-team application will connect with both containers:
+-  Postgres
+-  Keycloak
 
 ## Overall Comments
 
@@ -50,11 +54,11 @@ codes).
  ![Swagger](https://i.ibb.co/p0s5Kpb/swagger.png "Swagger Endpoints")
 
 
-**Prometheus**
+**Prometheus (available only for the Approach 1 - Using Docker Compose at Development Time)**
 
 This is the url to access the metrics from [prometheus](http://localhost:9090/graph).
 
-**Grafana**
+**Grafana (available only for the Approach 1 - Using Docker Compose at Development Time)**
 
 This is the url to access the [Grafana DashBoard](http://localhost:3000) from Soccer Team application.
 

@@ -4,6 +4,9 @@
 
 - [rest-team](https://github.com/bantunes82/springboot-soccer-game/tree/main/rest-team) - This API allows CRUD operations on a soccer team.
 
+**Java Version of this project:**
+- 21
+
 **It is using the follow technologies:**
 - Spring-boot Starter Web
 - Spring-boot Starter Validation
