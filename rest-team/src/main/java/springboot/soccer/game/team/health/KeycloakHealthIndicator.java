@@ -11,10 +11,12 @@ import org.springframework.web.client.RestClient;
 @Component
 public class KeycloakHealthIndicator implements HealthIndicator {
 
+    private final String oidcAuthServerUrl;
     private final RestClient restClient;
 
-    public KeycloakHealthIndicator(@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String oidcAuthServerUrl) {
-        this.restClient = RestClient.builder().baseUrl(oidcAuthServerUrl).build();
+    public KeycloakHealthIndicator(@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String oidcAuthServerUrl,  RestClient restClient) {
+        this.oidcAuthServerUrl = oidcAuthServerUrl;
+        this.restClient = restClient;
     }
 
     @Override
@@ -30,6 +32,7 @@ public class KeycloakHealthIndicator implements HealthIndicator {
         try {
             return restClient
                     .get()
+                    .uri(oidcAuthServerUrl)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .toBodilessEntity()

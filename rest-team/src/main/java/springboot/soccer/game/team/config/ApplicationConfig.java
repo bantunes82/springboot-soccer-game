@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,6 +23,9 @@ import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.client.RestClient;
+
+import java.time.Duration;
 
 
 @OpenAPIDefinition(
@@ -79,6 +83,16 @@ public class ApplicationConfig {
     @Bean
     public GrantedAuthorityDefaults grantedAuthorityDefaults() {
         return new GrantedAuthorityDefaults(""); //DEFAULT "ROLE_"
+    }
+
+    @Bean
+    public RestClient restClient(RestClient.Builder builder) {
+        var jdkClientHttpRequestFactory = new JdkClientHttpRequestFactory();
+        jdkClientHttpRequestFactory.setReadTimeout(Duration.ofSeconds(3));
+
+        return builder
+                .requestFactory(new JdkClientHttpRequestFactory())
+                .build();
     }
 
     @Bean
