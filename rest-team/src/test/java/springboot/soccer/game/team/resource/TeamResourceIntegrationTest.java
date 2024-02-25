@@ -3,8 +3,10 @@ package springboot.soccer.game.team.resource;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import springboot.soccer.game.team.auth.AccessToken;
-import springboot.soccer.game.team.config.AbstractIT;
+import springboot.soccer.game.team.config.TestContainersConfiguration;
 import springboot.soccer.game.team.datatransferobject.CountryDTO;
 import springboot.soccer.game.team.datatransferobject.ErrorDTO;
 import springboot.soccer.game.team.datatransferobject.TeamDTO;
@@ -30,21 +32,19 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static springboot.soccer.game.team.validation.ConstraintMessage.*;
 import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.*;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Import(TestContainersConfiguration.class)
 @Tag("integration")
-class TeamResourceIntegrationTest extends AbstractIT {
+class TeamResourceIntegrationTest {
 
     private static final String ES = "ES";
     private static final Locale SPAIN_LOCALE = Locale.forLanguageTag(ES);
-    private static String TEAM_RESOURCE_PATH = "/v1/teams";
+    private static final String TEAM_RESOURCE_PATH = "/v1/teams";
 
-    @Autowired
-    private TestRestTemplate testRestTemplate;
-    @Autowired
-    private MessageSource messageSource;
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    private String authServerUrl;
-    @Value("${keycloak.resource}")
-    private String clientId;
+    private final TestRestTemplate testRestTemplate;
+    private final MessageSource messageSource;
+    private final String authServerUrl;
+    private final String clientId;
     private TeamDTO bayernMunchen;
     private TeamDTO borussiaDortmund;
     private TeamDTO corinthians;
@@ -52,6 +52,16 @@ class TeamResourceIntegrationTest extends AbstractIT {
     private TeamDTO invalidTeamDTONullValues;
     private TeamDTO invalidTeamDTONullCountryDTO;
     private HttpHeaders headers;
+
+    @Autowired
+    public TeamResourceIntegrationTest(TestRestTemplate testRestTemplate, MessageSource messageSource,
+                                       @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String authServerUrl,
+                                       @Value("${keycloak.resource}") String clientId) {
+        this.testRestTemplate = testRestTemplate;
+        this.messageSource = messageSource;
+        this.authServerUrl = authServerUrl;
+        this.clientId = clientId;
+    }
 
     @BeforeEach
     void setUp() {
@@ -606,7 +616,7 @@ class TeamResourceIntegrationTest extends AbstractIT {
         return messageSource.getMessage(messageKeyWithBraces.replaceAll("[{}]", ""), args, locale);
     }
 
-    private void createCorinthiansTeam(){
+    private void createCorinthiansTeam() {
         CountryDTO brazil = new CountryDTO("Brazil", "BR");
         corinthians = TeamDTO.builder()
                 .countryDTO(brazil)

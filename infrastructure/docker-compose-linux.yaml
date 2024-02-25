@@ -31,6 +31,8 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus/configuration/prometheus-linux.yml:/etc/prometheus/prometheus.yml
+    labels:
+      org.springframework.boot.ignore: true
 
   grafana:
     build: grafana
@@ -44,3 +46,5 @@ services:
       - ./grafana/dashboards:/etc/grafana/dashboards
     depends_on:
       - prometheus
+    labels:
+      org.springframework.boot.ignore: true

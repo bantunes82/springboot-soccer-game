@@ -18,9 +18,11 @@ import java.util.stream.Collectors;
 
 @Component
 public class JwtAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
+    private final String principleAttribute;
 
-    @Value("${jwt.auth.converter.principle-attribute}")
-    private String principleAttribute;
+    public JwtAuthenticationConverter(@Value("${jwt.auth.converter.principle-attribute}") String principleAttribute) {
+        this.principleAttribute = principleAttribute;
+    }
 
     @Override
     public AbstractAuthenticationToken convert(@NonNull Jwt jwt) {

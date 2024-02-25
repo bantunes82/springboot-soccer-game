@@ -3,26 +3,20 @@ package springboot.soccer.game.team.health;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.Collections;
+import org.springframework.web.client.RestClient;
 
 @Component
 public class KeycloakHealthIndicator implements HealthIndicator {
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    private String oidcAuthServerUrl;
+    private final String oidcAuthServerUrl;
+    private final RestClient restClient;
 
-    private RestTemplate restTemplate;
-
-    public KeycloakHealthIndicator(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public KeycloakHealthIndicator(@Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String oidcAuthServerUrl,  RestClient restClient) {
+        this.oidcAuthServerUrl = oidcAuthServerUrl;
+        this.restClient = restClient;
     }
 
     @Override
@@ -36,12 +30,12 @@ public class KeycloakHealthIndicator implements HealthIndicator {
 
     private boolean checkHealthOfOidcAuthServer() {
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-
-            return restTemplate
-                    .exchange(oidcAuthServerUrl, HttpMethod.GET, entity, Void.class)
+            return restClient
+                    .get()
+                    .uri(oidcAuthServerUrl)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .toBodilessEntity()
                     .getStatusCode() == HttpStatus.OK;
         } catch (RuntimeException ex) {
             return false;
