@@ -103,6 +103,12 @@ https://www.jetbrains.com/help/idea/spring-boot.html#spring-boot-endpoints-->
             <classifier>runtime</classifier>
             <scope>test</scope>
         </dependency>
+        <!-- Test Library to verify pinned threads using virtual threads https://github.com/cescoffier/loom-unit-->
+        <dependency>
+            <groupId>me.escoffier.loom</groupId>
+            <artifactId>loom-unit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

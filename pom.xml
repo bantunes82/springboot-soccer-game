@@ -35,6 +35,7 @@
         <springdoc-openapi-starter-webmvc-ui.vesion>[2.3.0]</springdoc-openapi-starter-webmvc-ui.vesion>
         <jakarta.validation-api.version>[3.0.2]</jakarta.validation-api.version>
         <httpclient5.version>[5.3]</httpclient5.version>
+        <loom-unit.version>0.3.0</loom-unit.version>
     </properties>
 
     <dependencyManagement>
@@ -81,6 +82,12 @@
                 <scope>test</scope>
                 <version>${jacoco.version}</version>
             </dependency>
+            <dependency>
+                <groupId>me.escoffier.loom</groupId>
+                <artifactId>loom-unit</artifactId>
+                <version>${loom-unit.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -117,6 +124,7 @@
                     <systemPropertyVariables>
                         <jacoco-agent.destfile>${project.build.directory}/jacoco-ut.exec</jacoco-agent.destfile>
                         <maven.home>${maven.home}</maven.home>
+                        <argLine>-Djdk.tracePinnedThreads</argLine>
                     </systemPropertyVariables>
                 </configuration>
                 <executions>

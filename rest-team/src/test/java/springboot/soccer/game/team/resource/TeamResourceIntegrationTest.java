@@ -1,6 +1,9 @@
 package springboot.soccer.game.team.resource;
 
+import me.escoffier.loom.loomunit.LoomUnitExtension;
+import me.escoffier.loom.loomunit.ShouldNotPin;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,6 +38,8 @@ import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestContainersConfiguration.class)
 @Tag("integration")
+@ExtendWith(LoomUnitExtension.class)
+@ShouldNotPin
 class TeamResourceIntegrationTest {
 
     private static final String ES = "ES";
