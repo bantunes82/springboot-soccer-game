@@ -26,7 +26,7 @@ This command will start the containers below and the rest-team application will 
 With this approach you need to have only docker installed in your local computer. This is the command that you have to run:
 
 ```shell script
-mvn spring-boot:test-run -Dspring-boot.run.profiles=test
+mvn spring-boot:test-run
 ```
 
 This command will start the containers below and the rest-team application will connect with both containers:
