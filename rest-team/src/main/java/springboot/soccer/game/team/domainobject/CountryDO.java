@@ -1,5 +1,6 @@
 package springboot.soccer.game.team.domainobject;
 
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,11 +8,6 @@ import lombok.NoArgsConstructor;
 import springboot.soccer.game.team.validation.ConstraintMessage;
 import springboot.soccer.game.team.validation.CountryCode;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
@@ -26,7 +22,7 @@ import java.util.Objects;
 public final class CountryDO extends BaseDO {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = ConstraintMessage.COUNTRY_NAME_BLANK)

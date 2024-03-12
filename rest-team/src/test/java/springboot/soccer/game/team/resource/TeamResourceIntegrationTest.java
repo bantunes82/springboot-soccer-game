@@ -51,7 +51,7 @@ class TeamResourceIntegrationTest {
     private final String authServerUrl;
     private final String clientId;
     private TeamDTO bayernMunchen;
-    private TeamDTO borussiaDortmund;
+    private TeamDTO bayerLeverkusen;
     private TeamDTO corinthians;
     private TeamDTO invalidTeamDTO;
     private TeamDTO invalidTeamDTONullValues;
@@ -72,7 +72,7 @@ class TeamResourceIntegrationTest {
     void setUp() {
         createCorinthiansTeam();
         createBayerMunchenTeam();
-        createBorussiaDortmundTeam();
+        createBayerLeverkusen();
         createInvalidTeamDTO();
         createInvalidTeamDTONullValues();
         createInvalidTeamDTONullCountryDTO();
@@ -117,7 +117,7 @@ class TeamResourceIntegrationTest {
     void findTeamByCountryCode_GivenNoExistentTeamWithTheCountryCode_ReturnsEmptyTeamList() {
         ParameterizedTypeReference<List<TeamDTO>> paramType = new ParameterizedTypeReference<>() {
         };
-        ResponseEntity<List<TeamDTO>> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/country/IT", HttpMethod.GET, new HttpEntity<>(headers), paramType);
+        ResponseEntity<List<TeamDTO>> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/country/CL", HttpMethod.GET, new HttpEntity<>(headers), paramType);
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
@@ -147,13 +147,13 @@ class TeamResourceIntegrationTest {
     void findTeamByCountryCode_GivenExistentTeamWithTheCountryCode_ReturnsTeamListWithOneElement() {
         ParameterizedTypeReference<List<TeamDTO>> paramType = new ParameterizedTypeReference<>() {
         };
-        ResponseEntity<List<TeamDTO>> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/country/BR", HttpMethod.GET, new HttpEntity<>(headers), paramType);
+        ResponseEntity<List<TeamDTO>> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/country/CO", HttpMethod.GET, new HttpEntity<>(headers), paramType);
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
         Assertions.assertEquals(1, response.getBody().size());
-        Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).name());
-        Assertions.assertEquals("BR", response.getBody().get(0).countryDTO().code());
+        Assertions.assertEquals("América de Cali S.A", response.getBody().get(0).name());
+        Assertions.assertEquals("CO", response.getBody().get(0).countryDTO().code());
     }
 
     @Test
@@ -279,7 +279,7 @@ class TeamResourceIntegrationTest {
     void updateTeam_GivenExistentTeam_ReturnsBadRequest() {
         headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
         headers.setContentType(APPLICATION_JSON);
-        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-2", HttpMethod.PUT, new HttpEntity<>(corinthians, headers), ErrorDTO.class);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/19", HttpMethod.PUT, new HttpEntity<>(corinthians, headers), ErrorDTO.class);
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
@@ -291,7 +291,7 @@ class TeamResourceIntegrationTest {
         headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
         headers.setContentType(APPLICATION_JSON);
         headers.add(ACCEPT_LANGUAGE, ES);
-        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-2", HttpMethod.PUT, new HttpEntity<>(corinthians, headers), ErrorDTO.class);
+        ResponseEntity<ErrorDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/19", HttpMethod.PUT, new HttpEntity<>(corinthians, headers), ErrorDTO.class);
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
@@ -322,7 +322,7 @@ class TeamResourceIntegrationTest {
     void updateTeam_GivenValidDTOAndAllowedRoleUser_ReturnsOK() {
         headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
         headers.setContentType(APPLICATION_JSON);
-        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-2", HttpMethod.PUT, new HttpEntity<>(bayernMunchen, headers), TeamDTO.class);
+        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/19", HttpMethod.PUT, new HttpEntity<>(bayernMunchen, headers), TeamDTO.class);
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
@@ -413,11 +413,11 @@ class TeamResourceIntegrationTest {
     @Test
     void updateTeamLevel_GivenValidRangeLevelAndAllowedRoleUser_ReturnsOK() {
         headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
-        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-3/level/8.8", HttpMethod.PATCH, new HttpEntity<>(headers), TeamDTO.class);
+        ResponseEntity<TeamDTO> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/20/level/8.8", HttpMethod.PATCH, new HttpEntity<>(headers), TeamDTO.class);
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertEquals(APPLICATION_JSON, response.getHeaders().getContentType());
-        Assertions.assertEquals(8.350000000000001, response.getBody().level());
+        Assertions.assertEquals(8.350000047683716, response.getBody().level());
     }
 
     @Test
@@ -460,7 +460,7 @@ class TeamResourceIntegrationTest {
     @Test
     void deleteTeam_GivenValidTeamIdAndAllowedRoleUser_ReturnsNoContent() {
         headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
-        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/-4", HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
+        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH + "/18", HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
 
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
@@ -589,7 +589,7 @@ class TeamResourceIntegrationTest {
     void createTeam_GivenValidDTOAndNotAllowedRoleUser_ReturnsForbidden() {
         headers.setBearerAuth(getAccessTokenForNotAllowedRoleUser());
         headers.setContentType(APPLICATION_JSON);
-        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(borussiaDortmund, headers), Void.class);
+        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(bayerLeverkusen, headers), Void.class);
 
         Assertions.assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
@@ -598,7 +598,7 @@ class TeamResourceIntegrationTest {
     void createTeam_GivenValidDTOAndInvalidAccessToken_ReturnsUnauthorized() {
         headers.setBearerAuth("XX");
         headers.setContentType(APPLICATION_JSON);
-        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(borussiaDortmund, headers), Void.class);
+        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(bayerLeverkusen, headers), Void.class);
 
         Assertions.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
@@ -607,7 +607,7 @@ class TeamResourceIntegrationTest {
     void createTeam_GivenValidDTOAndAllowedRoleUser_ReturnsCreated() {
         headers.setBearerAuth(getAccessTokenForAllowedRoleUser());
         headers.setContentType(APPLICATION_JSON);
-        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(borussiaDortmund, headers), Void.class);
+        ResponseEntity<Void> response = testRestTemplate.exchange(TEAM_RESOURCE_PATH, HttpMethod.POST, new HttpEntity<>(bayerLeverkusen, headers), Void.class);
 
         Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
         Assertions.assertTrue(response.getHeaders().getLocation().toString().contains("/v1/teams/3"));
@@ -647,14 +647,14 @@ class TeamResourceIntegrationTest {
     }
 
 
-    private void createBorussiaDortmundTeam() {
+    private void createBayerLeverkusen() {
         CountryDTO germany = new CountryDTO("Germany", "DE");
-        borussiaDortmund = TeamDTO.builder()
+        bayerLeverkusen = TeamDTO.builder()
                 .countryDTO(germany)
-                .founded(LocalDate.of(1909, 12, 19))
-                .level(8.8d)
-                .name("Borussia Dortmund")
-                .picture("https://conteudo.imguol.com.br/p/pp/2020/eiplus/champions/times/borussia.png")
+                .founded(LocalDate.of(1904, 6, 1))
+                .level(8.1d)
+                .name("Bayer 04 Leverkusen Fußball GmbH")
+                .picture("https://upload.wikimedia.org/wikipedia/en/thumb/5/59/Bayer_04_Leverkusen_logo.svg/345px-Bayer_04_Leverkusen_logo.svg.png")
                 .build();
     }
 

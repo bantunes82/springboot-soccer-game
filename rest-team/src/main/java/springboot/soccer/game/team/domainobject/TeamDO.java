@@ -9,15 +9,7 @@ import lombok.Setter;
 import springboot.soccer.game.team.validation.ConstraintMessage;
 import springboot.soccer.game.team.validation.Range;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,8 +19,10 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 
+import static jakarta.persistence.ConstraintMode.CONSTRAINT;
+
 @Entity
-@Table(name = "team", uniqueConstraints = @UniqueConstraint(name = "uc_team", columnNames = {"name", "country"}))
+@Table(name = "team", uniqueConstraints = @UniqueConstraint(name = "uc_team", columnNames = {"name", "country_id"}))
 @Getter
 @Setter
 @Builder
@@ -37,7 +31,7 @@ import java.util.Optional;
 public final class TeamDO extends BaseDO {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = ConstraintMessage.TEAM_NAME_BLANK)
@@ -63,7 +57,7 @@ public final class TeamDO extends BaseDO {
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @NotNull(message = ConstraintMessage.TEAM_COUNTRY_NULL)
-    @JoinColumn(name = "country", nullable = false)
+    @JoinColumn(name = "country_id", nullable = false, foreignKey = @ForeignKey(CONSTRAINT))
     @Valid
     private CountryDO countryDO;
 
