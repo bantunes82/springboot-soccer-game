@@ -1,7 +1,9 @@
-version: "3"
+version: "2.2"
+
 services:
   database:
     image: "postgres:13.2"
+    network_mode: 'host'
     container_name: "soccer-database"
     ports:
       - "5432:5432"
@@ -12,20 +14,38 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:12.0.4
+    network_mode: 'host'
     container_name: keycloak
     environment:
       - DB_VENDOR=h2
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
-    command: -b 0.0.0.0 -Djboss.http.port=8080 -Dkeycloak.profile.feature.upload_scripts=enabled -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/tmp/keycloak/realms -Dkeycloak.migration.strategy=OVERWRITE_EXISTING
+    command: -b 0.0.0.0 -Djgroups.bind_addr=127.0.0.1 -Djboss.http.port=8080 -Dkeycloak.profile.feature.upload_scripts=enabled -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/tmp/keycloak/realms -Dkeycloak.migration.strategy=OVERWRITE_EXISTING
     ports:
-      - "8082:8080"
+      - "8080:8080"
     volumes:
       - ./keycloak/realms:/tmp/keycloak/realms/
 
+  rest-team:
+    image: rest-team:1.0
+    network_mode: 'host'
+    container_name: rest-team
+    depends_on:
+      - database
+      - keycloak
+    environment:
+      DS_HOST: 127.0.0.1
+      DS_PORT: 5432
+      KC_HOST: 127.0.0.1
+      KC_PORT: 8080
+    ports:
+      - "8081:8081"
+    profiles:
+      - rest-team
+
   prometheus:
     image: "prom/prometheus"
-    network_mode: 'host' # On Linux, this is required to let Prometheus access the other containers.
+    network_mode: 'host'
     container_name: "prometheus"
     ports:
       - "9090:9090"
@@ -36,8 +56,8 @@ services:
 
   grafana:
     build: grafana
-    network_mode: 'host' # On Linux, this is required to let Grafana access the other containers.
     container_name: "grafana"
+    network_mode: 'host'
     user: "root"
     restart: unless-stopped
     ports:

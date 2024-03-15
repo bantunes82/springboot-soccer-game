@@ -7,8 +7,7 @@ This API allows CRUD operations on a soccer team.
 ## Running the application
 ### Approach 1 - Using Docker Compose at Development Time
 
-With this approach you need to have docker and
-docker-compose installed in your local computer. This is the command
+With this approach you need to have docker and docker-compose installed in your local computer. This is the command
 that you have to run:
 
 ```shell script
@@ -33,12 +32,38 @@ This command will start the containers below and the rest-team application will 
 -  Postgres
 -  Keycloak
 
+### Approach 3 - Building a Container and using Docker Compose
+
+With this approach you need to have docker and docker-compose installed in your local computer.
+
+There is no `Dockerfile` in this project (it is using buildpacks to build the container image).
+
+You can build a container image for the rest-team project (if you have a docker daemon) using the Spring Boot build plugin:
+
+```bash
+mvn spring-boot:build-image
+```
+
+After that you will run the application and the others containers using docker-compose.
+
+This is the command that you have to run:
+```bash
+docker-compose -f ../infrastructure/docker-compose-linux.yaml --profile rest-team up
+```
+
+This command will start the containers below:
+-  Rest-team 
+-  Postgres
+-  Keycloak
+-  Prometheus
+-  Grafana
+
 ## Overall Comments
 
 **Final Solution**
 
 Once executing the final solution and accessing the swagger
-[page](http://localhost:8081/rest-team/swagger-ui/index.html?configUrl=/rest-team/v3/api-docs/swagger-config#/), you can see the
+[page](http://127.0.0.1:8081/rest-team/swagger-ui/index.html?configUrl=/rest-team/v3/api-docs/swagger-config#/), you can see the
 concern in respecting Restful endpoints (as well as the Http Status
 codes).
 
@@ -54,13 +79,13 @@ codes).
  ![Swagger](https://i.ibb.co/p0s5Kpb/swagger.png "Swagger Endpoints")
 
 
-**Prometheus (available only for the Approach 1 - Using Docker Compose at Development Time)**
+**Prometheus (available only for the Approach 1 and 3 - Using Docker Compose at Development Time)**
 
-This is the url to access the metrics from [prometheus](http://localhost:9090/graph).
+This is the url to access the metrics from [prometheus](http://127.0.0.1:9090/graph).
 
-**Grafana (available only for the Approach 1 - Using Docker Compose at Development Time)**
+**Grafana (available only for the Approach 1 and 3 - Using Docker Compose at Development Time)**
 
-This is the url to access the [Grafana DashBoard](http://localhost:3000) from Soccer Team application.
+This is the url to access the [Grafana DashBoard](http://127.0.0.1:3000) from Soccer Team application.
 
 The Grafana DashBoard should looks like this:
 
@@ -69,7 +94,7 @@ The Grafana DashBoard should looks like this:
 
 **Keycloak**
 
-This is the url to access the [Keycloak console](http://localhost:8082/auth/) configuration.
+This is the url to access the [Keycloak console](http://127.0.0.1:8080/auth/) configuration.
 The username and password are "admin"
 
 **Testing**
@@ -101,10 +126,10 @@ ulimit -n 131072
 ulimit -u 8192
 docker-compose -f ../infrastructure/sonarqube-docker-compose.yaml up
 ```
-This is the url to access the [SonarQube](http://localhost:9000/projects?sort=-analysis_date).
+This is the url to access the [SonarQube](http://127.0.0.1:9000/projects?sort=-analysis_date).
 The username and password are "admin"
 
-In the first access of the [SonarQube](http://localhost:9000/projects?sort=-analysis_date), you have to change the password, so please 
+In the first access of the [SonarQube](http://127.0.0.1:9000/projects?sort=-analysis_date), you have to change the password, so please 
 change the password to "adminadmin".
 
 In case you have a Sonar instance running locally (or a Docker

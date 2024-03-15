@@ -99,7 +99,7 @@
             "lineColor": "rgb(31, 120, 193)",
             "show": false
           },
-          "tableColumn": "process_uptime_seconds{instance=\"localhost:8081\", job=\"team\"}",
+          "tableColumn": "process_uptime_seconds{instance=\"127.0.0.1:8081\", job=\"team\"}",
           "targets": [
             {
               "expr": "process_uptime_seconds{application=\"$application\", instance=\"$instance\"}",
@@ -489,7 +489,7 @@
             "lineColor": "rgb(31, 120, 193)",
             "show": false
           },
-          "tableColumn": "{instance=\"localhost:8081\", job=\"team\"}",
+          "tableColumn": "{instance=\"127.0.0.1:8081\", job=\"team\"}",
           "targets": [
             {
               "expr": "process_start_time_seconds{application=\"$application\", instance=\"$instance\"}*1000",
@@ -2523,7 +2523,7 @@
             "lineColor": "rgb(31, 120, 193)",
             "show": false
           },
-          "tableColumn": "hikaricp_connections{instance=\"localhost:8081\", job=\"team\", pool=\"HikariPool-1\"}",
+          "tableColumn": "hikaricp_connections{instance=\"127.0.0.1:8081\", job=\"team\", pool=\"HikariPool-1\"}",
           "targets": [
             {
               "expr": "hikaricp_connections{instance=\"$instance\", application=\"$application\", pool=\"$hikaricp\"}",
@@ -2725,7 +2725,7 @@
             "lineColor": "rgb(31, 120, 193)",
             "show": false
           },
-          "tableColumn": "hikaricp_connections_timeout_total{instance=\"localhost:8081\", job=\"team\", pool=\"HikariPool-1\"}",
+          "tableColumn": "hikaricp_connections_timeout_total{instance=\"127.0.0.1:8081\", job=\"team\", pool=\"HikariPool-1\"}",
           "targets": [
             {
               "expr": "hikaricp_connections_timeout_total{instance=\"$instance\", application=\"$application\", pool=\"$hikaricp\"}",
@@ -4860,8 +4860,8 @@
         "allValue": null,
         "current": {
           "selected": false,
-          "text": "localhost:8081",
-          "value": "localhost:8081"
+          "text": "127.0.0.1:8081",
+          "value": "127.0.0.1:8081"
         },
         "datasource": "PROMETHEUS_DS",
         "definition": "label_values(jvm_classes_loaded_classes, instance)",

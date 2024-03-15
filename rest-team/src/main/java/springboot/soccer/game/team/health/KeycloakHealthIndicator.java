@@ -1,5 +1,6 @@
 package springboot.soccer.game.team.health;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 @Component
+@Slf4j
 public class KeycloakHealthIndicator implements HealthIndicator {
 
     private final String oidcAuthServerUrl;
@@ -38,6 +40,7 @@ public class KeycloakHealthIndicator implements HealthIndicator {
                     .toBodilessEntity()
                     .getStatusCode() == HttpStatus.OK;
         } catch (RuntimeException ex) {
+            log.error("Error to check the connection with Keycloak", ex);
             return false;
         }
     }

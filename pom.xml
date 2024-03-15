@@ -18,7 +18,7 @@
     </modules>
     <properties>
         <sonar.projectName>SpringBoot Soccer Game</sonar.projectName>
-        <sonar.host.url>http://localhost:9000</sonar.host.url>
+        <sonar.host.url>http://127.0.0.1:9000</sonar.host.url>
         <sonar.login>admin</sonar.login>
         <sonar.password>adminadmin</sonar.password>
         <language.compiler.level>21</language.compiler.level>

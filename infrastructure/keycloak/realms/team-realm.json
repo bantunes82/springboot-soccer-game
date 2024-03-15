@@ -613,7 +613,7 @@
     "clientAuthenticatorType" : "client-secret",
     "secret" : "6fe5572d-d0f7-4121-8fc4-d2768bf82836",
     "redirectUris": [
-      "http://localhost:8081/*"
+      "http://127.0.0.1:8081/*"
     ],
     "webOrigins": [
       "*"
