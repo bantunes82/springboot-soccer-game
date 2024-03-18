@@ -3,6 +3,7 @@ package springboot.soccer.game.team.resource.mapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledInNativeImage;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
+@DisabledInNativeImage  // <!-- Mockito issue with Native Image https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-with-GraalVM#testing-->
 class TeamMapperTest {
 
     private CountryDO countryDO;

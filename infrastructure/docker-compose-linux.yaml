@@ -1,10 +1,15 @@
-version: "2.2"
+version: "3"
 
 services:
   database:
     image: "postgres:13.2"
     network_mode: 'host'
     container_name: "soccer-database"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 5s
+      retries: 5
     ports:
       - "5432:5432"
     environment:
@@ -16,6 +21,11 @@ services:
     image: quay.io/keycloak/keycloak:12.0.4
     network_mode: 'host'
     container_name: keycloak
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:8080/auth || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 6
     environment:
       - DB_VENDOR=h2
       - KEYCLOAK_USER=admin
@@ -31,8 +41,10 @@ services:
     network_mode: 'host'
     container_name: rest-team
     depends_on:
-      - database
-      - keycloak
+      database:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
     environment:
       DS_HOST: 127.0.0.1
       DS_PORT: 5432

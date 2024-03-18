@@ -32,7 +32,7 @@ This command will start the containers below and the rest-team application will 
 -  Postgres
 -  Keycloak
 
-### Approach 3 - Building a Container and using Docker Compose
+### Approach 3 - Building a Container Image with Buildpacks and using Docker Compose
 
 With this approach you need to have docker and docker-compose installed in your local computer.
 
@@ -57,6 +57,35 @@ This command will start the containers below:
 -  Keycloak
 -  Prometheus
 -  Grafana
+
+### Approach 4 - Building a Lightweight Container with Cloud Native Buildpacks and using Docker Compose
+
+With this approach you need to have docker and docker-compose installed in your local computer and to build the Native Image 
+you will need to have installed the OpenJDK from GraalVM 21 (for instance: GraalVM CE 21.0.2+13.1). 
+To install the openJDK the easiest way is through SDKMan.
+
+There is no `Dockerfile` in this project (it is using buildpacks to build the Native image).
+
+You can build a Native image for the rest-team project (if you have a docker daemon) using the Spring Boot build plugin:
+
+```bash
+mvn -Pnative spring-boot:build-image
+```
+
+After that you will run the application and the others containers using docker-compose.
+
+This is the command that you have to run:
+```bash
+docker-compose -f ../infrastructure/docker-compose-linux.yaml --profile rest-team up
+```
+
+This command will start the containers below:
+-  Rest-team
+-  Postgres
+-  Keycloak
+-  Prometheus
+-  Grafana
+
 
 ## Overall Comments
 
@@ -135,7 +164,6 @@ change the password to "adminadmin".
 In case you have a Sonar instance running locally (or a Docker
 Container), you can execute the command:
 ```shell script
-..
 mvn clean install -Psonar
 ```
 In order to observe the potential Bugs, Code smells,
@@ -146,6 +174,16 @@ Technical Debt, etc. The results will be similar to this one:
 
 ---
 
+**Testing With Native Build Tools**
 
+GraalVM Native Build Tools includes the ability to run tests inside a native image. 
+This can be helpful when you want to deeply test that the internals of your application work in a GraalVM native image.
 
+To test the Native Image you will need to have installed the OpenJDK from GraalVM 21 (for instance: GraalVM CE 21.0.2+13.1).
+To install the openJDK the easiest way is through SDKMan.
 
+To build the image and run the tests, use the test goal with the nativeTest profile active:
+
+```shell script
+mvn -PnativeTest clean test
+```
