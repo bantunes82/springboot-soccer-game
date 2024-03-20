@@ -32,7 +32,7 @@ This command will start the containers below and the rest-team application will 
 -  Postgres
 -  Keycloak
 
-### Approach 3 - Building a Container Image with Buildpacks and using Docker Compose
+### Approach 3 - Building a Container Image with Buildpacks and use Docker Compose to run the application and dependents containers
 
 With this approach you need to have docker and docker-compose installed in your local computer.
 
@@ -58,7 +58,7 @@ This command will start the containers below:
 -  Prometheus
 -  Grafana
 
-### Approach 4 - Building a Lightweight Container with Cloud Native Buildpacks and using Docker Compose
+### Approach 4 - Building a Lightweight Container with Cloud Native Buildpacks and use Docker Compose to run the application and dependents containers
 
 With this approach you need to have docker and docker-compose installed in your local computer and to build the Native Image 
 you will need to have installed the OpenJDK from GraalVM 21 (for instance: GraalVM CE 21.0.2+13.1). 
