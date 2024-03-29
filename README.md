@@ -17,7 +17,6 @@
 - Spring-boot DevTools
 - Spring-boot Docker Compose
 - Buildpacks
-- Micrometer Registry Prometheus
 - Postgresql
 - Flyway
 - Lombok

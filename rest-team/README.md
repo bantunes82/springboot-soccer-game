@@ -17,8 +17,7 @@ mvn spring-boot:run
 This command will start the containers below and the rest-team application will connect with the first two containers:
 -  Postgres
 -  Keycloak
--  Prometheus
--  Grafana
+
 
 ### Approach 2 - Using Test Containers at Development Time
 
@@ -55,8 +54,7 @@ This command will start the containers below:
 -  Rest-team 
 -  Postgres
 -  Keycloak
--  Prometheus
--  Grafana
+
 
 ### Approach 4 - Building a Lightweight Container with Cloud Native Buildpacks and use Docker Compose to run the application and dependents containers
 
