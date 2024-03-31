@@ -17,11 +17,18 @@
 - Spring-boot DevTools
 - Spring-boot Docker Compose
 - Buildpacks
-- Postgresql
 - Flyway
 - Lombok
 - MapStruct
 - Httpclient5
+- OpenTelemetry agent
+- Postgres
+- Keycloak
+- Opentelemetry Collector
+- Prometheus
+- Grafana Loki
+- Grafana Tempo
+- Grafana
 
 **The following Test Libraries:**
 - Spring-boot Starter Test
