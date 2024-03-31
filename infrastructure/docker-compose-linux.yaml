@@ -3,7 +3,6 @@ version: "3"
 services:
   database:
     image: postgres:13.2
-    network_mode: host
     container_name: soccer-database
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -83,7 +82,7 @@ services:
     ports:
       - "8081:8081"
     profiles:
-      - observability
+      - rest-team-observability
 
   collector:
     image: otel/opentelemetry-collector-contrib:latest
@@ -107,6 +106,7 @@ services:
       - prometheus
     profiles:
       - observability
+      - rest-team-observability
     labels:
       # disabled healtcheck, pending https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/30798
       #org.springframework.boot.readiness-check.tcp.disable: true
@@ -126,6 +126,7 @@ services:
     restart: unless-stopped
     profiles:
       - observability
+      - rest-team-observability
     labels:
       org.springframework.boot.ignore: true
 
@@ -138,6 +139,7 @@ services:
       - "3100"
     profiles:
       - observability
+      - rest-team-observability
     labels:
       org.springframework.boot.ignore: true
 
@@ -153,6 +155,7 @@ services:
       - "3200"  # tempo as grafana datasource
     profiles:
       - observability
+      - rest-team-observability
     labels:
       org.springframework.boot.ignore: true
 
@@ -172,5 +175,6 @@ services:
       - tempo
     profiles:
       - observability
+      - rest-team-observability
     labels:
       org.springframework.boot.ignore: true
