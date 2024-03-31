@@ -52,11 +52,6 @@ https://www.jetbrains.com/help/idea/spring-boot.html#spring-boot-endpoints-->
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
@@ -142,4 +137,91 @@ https://www.jetbrains.com/help/idea/spring-boot.html#spring-boot-endpoints-->
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>observability</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-dependency</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/agent</outputDirectory>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>io.opentelemetry.javaagent</groupId>
+                                            <artifactId>opentelemetry-javaagent</artifactId>
+                                            <version>${opentelemetry-agent.version}</version>
+                                            <type>jar</type>
+                                            <destFileName>optel-agent.jar</destFileName>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>build-info</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <profiles>
+                                <profile>observability</profile>
+                            </profiles>
+
+                            <!-- configuration to run the application locally-->
+                            <environmentVariables>
+                                <OTEL_SERVICE_NAME>${name}</OTEL_SERVICE_NAME>
+                                <OTEL_RESOURCE_ATTRIBUTES>service=${name},env=dev</OTEL_RESOURCE_ATTRIBUTES>
+                                <OTEL_METRICS_EXPORTER>otlp</OTEL_METRICS_EXPORTER>
+                                <OTEL_EXPORTER_OTLP_METRICS_ENDPOINT>http://localhost:4317</OTEL_EXPORTER_OTLP_METRICS_ENDPOINT>
+                                <OTEL_EXPORTER_OTLP_METRICS_PROTOCOL>grpc</OTEL_EXPORTER_OTLP_METRICS_PROTOCOL>
+                                <OTEL_TRACES_EXPORTER>otlp</OTEL_TRACES_EXPORTER>
+                                <OTEL_EXPORTER_OTLP_TRACES_ENDPOINT>http://localhost:4317</OTEL_EXPORTER_OTLP_TRACES_ENDPOINT>
+                                <OTEL_EXPORTER_OTLP_TRACES_PROTOCOL>grpc</OTEL_EXPORTER_OTLP_TRACES_PROTOCOL>
+                                <OTEL_LOGS_EXPORTER>otlp</OTEL_LOGS_EXPORTER>
+                                <OTEL_EXPORTER_OTLP_LOGS_ENDPOINT>http://localhost:4317</OTEL_EXPORTER_OTLP_LOGS_ENDPOINT>
+                                <OTEL_EXPORTER_OTLP_LOGS_PROTOCOL>grpc</OTEL_EXPORTER_OTLP_LOGS_PROTOCOL>
+                            </environmentVariables>
+                            <jvmArguments>
+                                -javaagent:${project.build.directory}/agent/optel-agent.jar
+                            </jvmArguments>
+
+                            <!-- configuration to run the application via container image-->
+                            <image>
+                                <buildpacks>
+                                    <buildpack>urn:cnb:builder:paketo-buildpacks/java</buildpack>
+                                    <buildpack>gcr.io/paketo-buildpacks/opentelemetry</buildpack>
+                                </buildpacks>
+                                <env>
+                                    <BP_OPENTELEMETRY_ENABLED>true</BP_OPENTELEMETRY_ENABLED>
+                                </env>
+                            </image>
+                            <excludes>
+                                <exclude>
+                                    <groupId>org.projectlombok</groupId>
+                                    <artifactId>lombok</artifactId>
+                                </exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

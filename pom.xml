@@ -36,6 +36,7 @@
         <jakarta.validation-api.version>[3.0.2]</jakarta.validation-api.version>
         <httpclient5.version>[5.3]</httpclient5.version>
         <loom-unit.version>0.3.0</loom-unit.version>
+        <opentelemetry-agent.version>2.2.0</opentelemetry-agent.version>
 
         <!-- Issue with Native Image https://github.com/spring-projects/spring-boot/releases/tag/v3.2.3-->
         <hibernate.version>6.4.2.Final</hibernate.version>

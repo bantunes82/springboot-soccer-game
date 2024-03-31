@@ -2,9 +2,8 @@ version: "3"
 
 services:
   database:
-    image: "postgres:13.2"
-    network_mode: 'host'
-    container_name: "soccer-database"
+    image: postgres:13.2
+    container_name: soccer-database
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 3s
@@ -19,7 +18,7 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:12.0.4
-    network_mode: 'host'
+    network_mode: host
     container_name: keycloak
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://127.0.0.1:8080/auth || exit 1"]
@@ -38,7 +37,7 @@ services:
 
   rest-team:
     image: rest-team:1.0
-    network_mode: 'host'
+    network_mode: host
     container_name: rest-team
     depends_on:
       database:
@@ -55,28 +54,127 @@ services:
     profiles:
       - rest-team
 
+  rest-team-observability:
+    image: rest-team:1.0
+    network_mode: host
+    container_name: rest-team-observability
+    depends_on:
+      database:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    environment:
+      DS_HOST: 127.0.0.1
+      DS_PORT: 5432
+      KC_HOST: 127.0.0.1
+      KC_PORT: 8080
+      OTEL_JAVAAGENT_ENABLED: true
+      OTEL_SERVICE_NAME: rest-team
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://localhost:4317
+      OTEL_EXPORTER_OTLP_METRICS_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://localhost:4317
+      OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: grpc
+      OTEL_LOGS_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://localhost:4317
+      OTEL_EXPORTER_OTLP_LOGS_PROTOCOL: grpc
+    ports:
+      - "8081:8081"
+    profiles:
+      - rest-team-observability
+
+  collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: collector
+    command:
+      - --config=/etc/otelcol-contrib/otel-collector.yml
+    volumes:
+      - ./collector/otel-collector.yml:/etc/otelcol-contrib/otel-collector.yml
+    restart: unless-stopped
+    ports:
+      - "1888" # pprof extension
+      - "8888" # Prometheus metrics exposed by the Collector
+      - "8889" # Prometheus exporter metrics
+      - "13133:13133" # health_check extension
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP http receiver
+      - "55679" # zpages extension
+    depends_on:
+      - loki
+      - tempo
+      - prometheus
+    profiles:
+      - observability
+      - rest-team-observability
+    labels:
+      # disabled healtcheck, pending https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/30798
+      #org.springframework.boot.readiness-check.tcp.disable: true
+      org.springframework.boot.ignore: true
+
   prometheus:
-    image: "prom/prometheus"
-    network_mode: 'host'
-    container_name: "prometheus"
+    image: prom/prometheus
+    container_name: prometheus
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus/configuration/prometheus-linux.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --enable-feature=exemplar-storage
+      - --web.enable-remote-write-receiver
+    restart: unless-stopped
+    profiles:
+      - observability
+      - rest-team-observability
+    labels:
+      org.springframework.boot.ignore: true
+
+  loki:
+    container_name: loki
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: unless-stopped
+    ports:
+      - "3100"
+    profiles:
+      - observability
+      - rest-team-observability
+    labels:
+      org.springframework.boot.ignore: true
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yml" ]
+    volumes:
+      - ./tempo/tempo.yml:/etc/tempo.yml
+    restart: unless-stopped
+    ports:
+      - "4317"  # otlp grpc
+      - "3200"  # tempo as grafana datasource
+    profiles:
+      - observability
+      - rest-team-observability
     labels:
       org.springframework.boot.ignore: true
 
   grafana:
-    build: grafana
-    container_name: "grafana"
-    network_mode: 'host'
-    user: "root"
+    image: grafana/grafana
+    container_name: grafana
+    volumes:
+      - ./grafana/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/main.yaml
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
     restart: unless-stopped
     ports:
       - "3000:3000"
-    volumes:
-      - ./grafana/dashboards:/etc/grafana/dashboards
     depends_on:
       - prometheus
+      - loki
+      - tempo
+    profiles:
+      - observability
+      - rest-team-observability
     labels:
       org.springframework.boot.ignore: true
