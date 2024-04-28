@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 
 
 @TestConfiguration(proxyBeanMethods = false)
-    public class TestContainersConfiguration {
+public class TestContainersConfiguration {
 
     private final static String POSTGRES_IMAGE = "postgres:13.2";
     private final static String KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:12.0.4";
@@ -41,7 +41,7 @@ import java.util.function.Supplier;
                 .withClasspathResourceMapping("./keycloak/realms/", "/tmp/keycloak/realms/", BindMode.READ_ONLY)
                 .withStartupTimeout(Duration.ofSeconds(120))
                 .withExposedPorts(8080)
-                .waitingFor(Wait.forHttp("/auth").forStatusCode(200));
+                .waitingFor(Wait.forHttp("/auth"));
 
         Supplier<Object> authServerUrl = () -> "http://%s:%d/auth".formatted(keycloakContainer.getHost(), keycloakContainer.getFirstMappedPort());
         registry.add("keycloak.auth-server-url", authServerUrl);
