@@ -41,7 +41,7 @@ public class TestContainersConfiguration {
                 .withClasspathResourceMapping("./keycloak/realms/", "/tmp/keycloak/realms/", BindMode.READ_ONLY)
                 .withStartupTimeout(Duration.ofSeconds(120))
                 .withExposedPorts(8080)
-                .waitingFor(Wait.forHttp("/auth"));
+                .waitingFor(Wait.forHttp("/auth").forStatusCode(200));
 
         Supplier<Object> authServerUrl = () -> "http://%s:%d/auth".formatted(keycloakContainer.getHost(), keycloakContainer.getFirstMappedPort());
         registry.add("keycloak.auth-server-url", authServerUrl);
