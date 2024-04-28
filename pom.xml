@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.3</version>
+        <version>3.2.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>springboot.soccer.game</groupId>
@@ -38,8 +38,6 @@
         <loom-unit.version>0.3.0</loom-unit.version>
         <opentelemetry-agent.version>2.2.0</opentelemetry-agent.version>
 
-        <!-- Issue with Native Image https://github.com/spring-projects/spring-boot/releases/tag/v3.2.3-->
-        <hibernate.version>6.4.2.Final</hibernate.version>
     </properties>
 
     <dependencyManagement>
