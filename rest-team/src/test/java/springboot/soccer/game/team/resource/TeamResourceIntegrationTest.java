@@ -4,10 +4,10 @@ import me.escoffier.loom.loomunit.LoomUnitExtension;
 import me.escoffier.loom.loomunit.ShouldNotPin;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
@@ -35,6 +35,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static springboot.soccer.game.team.validation.ConstraintMessage.*;
 import static springboot.soccer.game.team.exception.BusinessException.ErrorCode.*;
 
+@AutoConfigureTestRestTemplate
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestContainersConfiguration.class)
 @Tag("integration")
@@ -58,7 +59,6 @@ class TeamResourceIntegrationTest {
     private TeamDTO invalidTeamDTONullCountryDTO;
     private HttpHeaders headers;
 
-    @Autowired
     public TeamResourceIntegrationTest(TestRestTemplate testRestTemplate, MessageSource messageSource,
                                        @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String authServerUrl,
                                        @Value("${keycloak.resource}") String clientId) {
