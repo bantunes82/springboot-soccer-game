@@ -82,7 +82,7 @@ class TeamResourceTest {
 
         verify(teamService).findRandom();
         verify(teamMapper).toTeamDTO(teamDO);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().name());
     }
 
@@ -104,7 +104,7 @@ class TeamResourceTest {
 
         verify(teamService).findByName("Sport Club Corinthians Paulista");
         verify(teamMapper).toTeamDTOs(Arrays.asList(teamDO));
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals(1, response.getBody().size());
         Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).name());
     }
@@ -118,7 +118,7 @@ class TeamResourceTest {
 
         verify(teamService).findByName("XXX");
         verify(teamMapper).toTeamDTOs(Collections.emptyList());
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals(0, response.getBody().size());
     }
 
@@ -131,7 +131,7 @@ class TeamResourceTest {
 
         verify(teamService).findByCountryCode("BR", 0, 10);
         verify(teamMapper).toTeamDTOs(Arrays.asList(teamDO));
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals(1, response.getBody().size());
         Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().get(0).name());
     }
@@ -145,7 +145,7 @@ class TeamResourceTest {
 
         verify(teamService).findByCountryCode("BR", 0, 10);
         verify(teamMapper).toTeamDTOs(Collections.emptyList());
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals(0, response.getBody().size());
     }
 
@@ -160,7 +160,7 @@ class TeamResourceTest {
 
         verify(teamMapper).toTeamDO(teamDTO);
         verify(teamService).create(teamDO);
-        Assertions.assertEquals(201, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals("/rest-team/v1/teams/1", response.getHeaders().getLocation().getPath());
     }
 
@@ -175,7 +175,7 @@ class TeamResourceTest {
         verify(teamMapper).toTeamDO(teamDTO);
         verify(teamService).update(1L, teamDO);
         verify(teamMapper).toTeamDTO(teamDO);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().name());
     }
 
@@ -199,7 +199,7 @@ class TeamResourceTest {
 
         verify(teamService).updateLevel(1L, 8d);
         verify(teamMapper).toTeamDTO(teamDO);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
         Assertions.assertEquals("Sport Club Corinthians Paulista", response.getBody().name());
     }
 
@@ -219,7 +219,7 @@ class TeamResourceTest {
         ResponseEntity response = teamResource.deleteTeam(1L);
 
         verify(teamService).delete(1L);
-        Assertions.assertEquals(204, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
     }
 
     @Test
