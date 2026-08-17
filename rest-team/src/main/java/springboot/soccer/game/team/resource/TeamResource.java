@@ -30,7 +30,7 @@ import springboot.soccer.game.team.domainobject.TeamDO;
 import springboot.soccer.game.team.resource.mapper.TeamMapper;
 import springboot.soccer.game.team.service.TeamService;
 import springboot.soccer.game.team.validation.CountryCode;
-import springboot.soccer.game.team.validation.Range;
+import springboot.soccer.game.team.validation.DoubleRange;
 
 import jakarta.validation.Valid;
 
@@ -147,7 +147,7 @@ public class TeamResource {
     //@Timed(value = "timeUpdateTeamLevel", description = "Times how long it takes to invoke the updateTeamLevel method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @PatchMapping(path = "/{id}/level/{value}")
     public ResponseEntity<TeamDTO> updateTeamLevel(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId,
-                                                   @Parameter(required = true, description = "soccer team level") @Range(min = 1.0, max = 10.0) @PathVariable("value") Double level) {
+                                                   @Parameter(required = true, description = "soccer team level") @DoubleRange(min = 1.0, max = 10.0) @PathVariable("value") Double level) {
         TeamDO teamUpdated = teamService.updateLevel(teamId, level);
 
         return ResponseEntity.ok(teamMapper.toTeamDTO(teamUpdated));

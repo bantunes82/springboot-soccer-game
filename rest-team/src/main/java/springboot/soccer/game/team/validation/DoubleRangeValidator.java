@@ -6,14 +6,14 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 @Slf4j
-public class DoubleRangeValidator implements ConstraintValidator<Range, Object> {
+public class DoubleRangeValidator implements ConstraintValidator<DoubleRange, Object> {
 
     private Double maxPrecision;
     private Double minPrecision;
     private String message;
 
     @Override
-    public void initialize(Range doubleRange) {
+    public void initialize(DoubleRange doubleRange) {
         maxPrecision = doubleRange.max();
         minPrecision = doubleRange.min();
         message = doubleRange.message();
@@ -27,7 +27,7 @@ public class DoubleRangeValidator implements ConstraintValidator<Range, Object> 
             isValid = value.compareTo(maxPrecision) <= 0 && value.compareTo(minPrecision) >= 0;
 
             if (!isValid) {
-                log.debug("Range is invalid: {}", value);
+                log.debug("DoubleRange is invalid: {}", value);
                 context.disableDefaultConstraintViolation();
                 context.buildConstraintViolationWithTemplate(message)
                         .addConstraintViolation();

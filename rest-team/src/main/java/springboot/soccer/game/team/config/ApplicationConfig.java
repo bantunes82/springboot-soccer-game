@@ -66,7 +66,7 @@ public class ApplicationConfig {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(http -> {
-                    http.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/actuator/**").permitAll();
+                    http.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html/**","/actuator/**").permitAll();
                     http.requestMatchers(HttpMethod.GET, PATH_ENDPOINT).permitAll();
                     http.requestMatchers(HttpMethod.PUT, PATH_ENDPOINT).hasRole(role);
                     http.requestMatchers(HttpMethod.DELETE, PATH_ENDPOINT).hasRole(role);

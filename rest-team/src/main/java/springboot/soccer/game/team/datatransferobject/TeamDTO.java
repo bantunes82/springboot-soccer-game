@@ -3,7 +3,7 @@ package springboot.soccer.game.team.datatransferobject;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import springboot.soccer.game.team.validation.ConstraintMessage;
-import springboot.soccer.game.team.validation.Range;
+import springboot.soccer.game.team.validation.DoubleRange;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -27,7 +27,7 @@ public record TeamDTO(
         @NotNull(message = ConstraintMessage.TEAM_FOUNDED_BLANK)
         LocalDate founded,
 
-        @Range(min = 1.0, max = 10.0)
+        @DoubleRange(min = 1.0, max = 10.0)
         Double level,
 
         @NotBlank(message = ConstraintMessage.TEAM_PICTURE_BLANK)
