@@ -133,8 +133,10 @@ services:
   loki:
     container_name: loki
     image: grafana/loki:latest
-    command: -config.file=/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/loki-config.yaml
     restart: unless-stopped
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml
     ports:
       - "3100"
     profiles:
