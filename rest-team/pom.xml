@@ -231,6 +231,8 @@ https://www.jetbrains.com/help/idea/spring-boot.html#spring-boot-endpoints-->
                                 <OTEL_LOGS_EXPORTER>otlp</OTEL_LOGS_EXPORTER>
                                 <OTEL_EXPORTER_OTLP_LOGS_ENDPOINT>http://localhost:4317</OTEL_EXPORTER_OTLP_LOGS_ENDPOINT>
                                 <OTEL_EXPORTER_OTLP_LOGS_PROTOCOL>grpc</OTEL_EXPORTER_OTLP_LOGS_PROTOCOL>
+                                <!-- Enable experimental log instrumentation -->
+                                <OTEL_INSTRUMENTATION_LOGBACK_APPENDER_EXPERIMENTAL_ENABLED>true</OTEL_INSTRUMENTATION_LOGBACK_APPENDER_EXPERIMENTAL_ENABLED>
                             </environmentVariables>
                             <jvmArguments>
                                 -javaagent:${project.build.directory}/agent/optel-agent.jar

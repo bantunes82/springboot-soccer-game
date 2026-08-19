@@ -23,8 +23,8 @@ exporters:
   prometheusremotewrite:
     endpoint: "http://prometheus:9090/api/v1/write"
 
-  otlp/tempo:
-    endpoint: "http://tempo:4317"
+  otlphttp/tempo:
+    endpoint: "http://tempo:4318"
     tls:
       insecure: true
 
@@ -47,7 +47,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tempo]
+      exporters: [otlphttp/tempo]
 
 extensions:
   health_check:
