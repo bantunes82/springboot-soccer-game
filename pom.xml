@@ -17,7 +17,7 @@
         <module>rest-team</module>
     </modules>
     <properties>
-        <java.version>22</java.version>
+        <java.version>25</java.version>
         <sonar.projectName>SpringBoot Soccer Game</sonar.projectName>
         <sonar.host.url>http://127.0.0.1:9000</sonar.host.url>
         <sonar.login>admin</sonar.login>
@@ -29,7 +29,7 @@
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
         <springdoc-openapi-starter-webmvc-ui.vesion>3.0.3</springdoc-openapi-starter-webmvc-ui.vesion>
         <loom-unit.version>0.3.0</loom-unit.version>
-        <opentelemetry-agent.version>2.2.0</opentelemetry-agent.version>
+        <opentelemetry-agent.version>2.30.0</opentelemetry-agent.version>
     </properties>
 
     <dependencyManagement>
