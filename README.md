@@ -36,4 +36,7 @@
 - Test Containers Dependencies
 - Jacoco and Surefire plugin(test coverage)
 
+## Setup used to migrate this application from Spring Boot 3.2.5 to 4.0.7
+See the [SpringBootUpgrade.md](SpringBootUpgrade.md)
+
 
