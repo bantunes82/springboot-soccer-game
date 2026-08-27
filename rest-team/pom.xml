@@ -16,7 +16,11 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-restclient</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -57,8 +61,12 @@ https://www.jetbrains.com/help/idea/spring-boot.html#spring-boot-endpoints-->
             <scope>runtime</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
+            <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -70,15 +78,41 @@ https://www.jetbrains.com/help/idea/spring-boot.html#spring-boot-endpoints-->
             <artifactId>mapstruct</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents.client5</groupId>
-            <artifactId>httpclient5</artifactId>
-        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-restclient-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-oauth2-resource-server-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -88,12 +122,12 @@ https://www.jetbrains.com/help/idea/spring-boot.html#spring-boot-endpoints-->
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
+            <artifactId>testcontainers-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -197,6 +231,8 @@ https://www.jetbrains.com/help/idea/spring-boot.html#spring-boot-endpoints-->
                                 <OTEL_LOGS_EXPORTER>otlp</OTEL_LOGS_EXPORTER>
                                 <OTEL_EXPORTER_OTLP_LOGS_ENDPOINT>http://localhost:4317</OTEL_EXPORTER_OTLP_LOGS_ENDPOINT>
                                 <OTEL_EXPORTER_OTLP_LOGS_PROTOCOL>grpc</OTEL_EXPORTER_OTLP_LOGS_PROTOCOL>
+                                <!-- Enable experimental log instrumentation -->
+                                <OTEL_INSTRUMENTATION_LOGBACK_APPENDER_EXPERIMENTAL_ENABLED>true</OTEL_INSTRUMENTATION_LOGBACK_APPENDER_EXPERIMENTAL_ENABLED>
                             </environmentVariables>
                             <jvmArguments>
                                 -javaagent:${project.build.directory}/agent/optel-agent.jar
@@ -205,8 +241,8 @@ https://www.jetbrains.com/help/idea/spring-boot.html#spring-boot-endpoints-->
                             <!-- configuration to run the application via container image-->
                             <image>
                                 <buildpacks>
-                                    <buildpack>urn:cnb:builder:paketo-buildpacks/java</buildpack>
-                                    <buildpack>gcr.io/paketo-buildpacks/opentelemetry</buildpack>
+                                    <buildpack>docker.io/paketobuildpacks/java</buildpack>
+                                    <buildpack>docker.io/paketobuildpacks/opentelemetry</buildpack>
                                 </buildpacks>
                                 <env>
                                     <BP_OPENTELEMETRY_ENABLED>true</BP_OPENTELEMETRY_ENABLED>
