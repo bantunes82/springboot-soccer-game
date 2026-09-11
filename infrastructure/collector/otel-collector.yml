@@ -2,6 +2,7 @@ receivers:
   otlp:
     protocols:
       grpc:
+        endpoint: "0.0.0.0:4317"
 
 # Read more about processors here: https://opentelemetry.io/docs/collector/configuration/#processors
 #
@@ -22,13 +23,15 @@ exporters:
   prometheusremotewrite:
     endpoint: "http://prometheus:9090/api/v1/write"
 
-  otlp/tempo:
-    endpoint: "http://tempo:4317"
+  otlphttp/tempo:
+    endpoint: "http://tempo:4318"
     tls:
       insecure: true
 
-  loki:
-    endpoint: "http://loki:3100/loki/api/v1/push"
+  otlphttp/loki:
+    endpoint: "http://loki:3100/otlp"
+    tls:
+      insecure: true
 
 service:
   extensions: [health_check]
@@ -40,11 +43,11 @@ service:
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [loki]
+      exporters: [otlphttp/loki]
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tempo]
+      exporters: [otlphttp/tempo]
 
 extensions:
   health_check:

@@ -85,7 +85,7 @@ services:
       - rest-team-observability
 
   collector:
-    image: otel/opentelemetry-collector-contrib:latest
+    image: otel/opentelemetry-collector-contrib:0.160.0
     container_name: collector
     command:
       - --config=/etc/otelcol-contrib/otel-collector.yml
@@ -113,7 +113,7 @@ services:
       org.springframework.boot.ignore: true
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v3.14.0
     container_name: prometheus
     ports:
       - "9090:9090"
@@ -132,9 +132,12 @@ services:
 
   loki:
     container_name: loki
-    image: grafana/loki:latest
-    command: -config.file=/etc/loki/local-config.yaml
+    image: grafana/loki:3.7.7
+    command: -config.file=/etc/loki/loki-config.yaml
     restart: unless-stopped
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml
+      - loki-data:/loki
     ports:
       - "3100"
     profiles:
@@ -144,7 +147,7 @@ services:
       org.springframework.boot.ignore: true
 
   tempo:
-    image: grafana/tempo:latest
+    image: grafana/tempo:3.0.3
     container_name: tempo
     command: [ "-config.file=/etc/tempo.yml" ]
     volumes:
@@ -160,7 +163,7 @@ services:
       org.springframework.boot.ignore: true
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:13.2.1
     container_name: grafana
     volumes:
       - ./grafana/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
@@ -178,3 +181,6 @@ services:
       - rest-team-observability
     labels:
       org.springframework.boot.ignore: true
+volumes:
+  loki-data:
+    driver: local
