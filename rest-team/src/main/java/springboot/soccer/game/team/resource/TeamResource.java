@@ -63,6 +63,7 @@ public class TeamResource {
     // @Timed(value = "timeFindRandomTeam", description = "Times how long it takes to invoke the findRandomTeam method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @GetMapping(path = "/random")
     public ResponseEntity<TeamDTO> findRandomTeam() {
+        log.info("Finding a random soccer team");
         TeamDO teamRandom = teamService.findRandom();
 
         return ResponseEntity.ok(teamMapper.toTeamDTO(teamRandom));
@@ -73,6 +74,7 @@ public class TeamResource {
     //@Timed(value = "timeFindTeamByName", description = "Times how long it takes to invoke the findTeamByName method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @GetMapping(path = "/name/{name}")
     public ResponseEntity<List<TeamDTO>> findTeamByName(@Parameter(description = "soccer team name", required = true) @PathVariable String name) {
+        log.info("Finding soccer teams by name: {}", name);
         List<TeamDO> teams = teamService.findByName(name);
 
         return ResponseEntity.ok(teamMapper.toTeamDTOs(teams));
@@ -88,6 +90,7 @@ public class TeamResource {
     public ResponseEntity<List<TeamDTO>> findTeamByCountryCode(@Parameter(description = "country code", required = true) @PathVariable @CountryCode String countryCode,
                                                                @Parameter(description = "page index") @RequestParam(defaultValue = "0") int pageIndex,
                                                                @Parameter(description = "page size") @RequestParam(defaultValue = "10") int pageSize) {
+        log.info("Finding soccer teams by country code: {}, pageIndex: {}, pageSize: {}", countryCode, pageIndex, pageSize);
         List<TeamDO> teams = teamService.findByCountryCode(countryCode, pageIndex, pageSize);
 
         return ResponseEntity.ok(teamMapper.toTeamDTOs(teams));
@@ -104,6 +107,7 @@ public class TeamResource {
     //@Timed(value = "timeCreateTeam", description = "Times how long it takes to invoke the createTeam method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> createTeam(@io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class)), description = "soccer team to be created") @Valid @RequestBody TeamDTO teamDTO) {
+        log.info("Creating team: {}", teamDTO);
         TeamDO teamDO = teamMapper.toTeamDO(teamDTO);
         TeamDO teamSaved = teamService.create(teamDO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -129,6 +133,7 @@ public class TeamResource {
     @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<TeamDTO> updateTeam(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId,
                                               @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamDTO.class)), description = "soccer team to be updated") @Valid @RequestBody TeamDTO teamDTO) {
+        log.info("Updating team: {} for teamId: {}", teamDTO, teamId);
         TeamDO teamDO = teamMapper.toTeamDO(teamDTO);
         TeamDO teamUpdated = teamService.update(teamId, teamDO);
 
@@ -148,6 +153,7 @@ public class TeamResource {
     @PatchMapping(path = "/{id}/level/{value}")
     public ResponseEntity<TeamDTO> updateTeamLevel(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId,
                                                    @Parameter(required = true, description = "soccer team level") @Range(min = 1.0, max = 10.0) @PathVariable("value") Double level) {
+        log.info("Updating team level for teamId: {} to level: {}", teamId, level);
         TeamDO teamUpdated = teamService.updateLevel(teamId, level);
 
         return ResponseEntity.ok(teamMapper.toTeamDTO(teamUpdated));
@@ -164,6 +170,7 @@ public class TeamResource {
     //@Timed(value = "timeDeleteTeam", description = "Times how long it takes to invoke the deleteTeam method", histogram = true, percentiles = {0.5,0.75,0.95,0.98,0.99,0.999})
     @DeleteMapping(path = "{id}")
     public ResponseEntity<Void> deleteTeam(@Parameter(required = true, description = "soccer team id") @PathVariable("id") Long teamId) {
+        log.info("Deleting team with teamId: {}", teamId);
         teamService.delete(teamId);
 
         return ResponseEntity.noContent().build();
