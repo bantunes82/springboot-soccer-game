@@ -35,7 +35,7 @@
         <jakarta.validation-api.version>[3.0.2]</jakarta.validation-api.version>
         <httpclient5.version>[5.3]</httpclient5.version>
         <loom-unit.version>0.3.0</loom-unit.version>
-        <opentelemetry-agent.version>2.2.0</opentelemetry-agent.version>
+        <opentelemetry-agent.version>2.30.0</opentelemetry-agent.version>
 
     </properties>
 
