@@ -240,11 +240,16 @@ https://www.jetbrains.com/help/idea/spring-boot.html#spring-boot-endpoints-->
 
                             <!-- configuration to run the application via container image-->
                             <image>
+                                <builder>docker.io/paketobuildpacks/builder-jammy-base:0.4.641</builder>
+
+                                <pullPolicy>IF_NOT_PRESENT</pullPolicy>
+
                                 <buildpacks>
-                                    <buildpack>docker.io/paketobuildpacks/java:22.5.0</buildpack>
+                                    <buildpack>docker.io/paketobuildpacks/java</buildpack>
                                     <buildpack>docker.io/paketobuildpacks/opentelemetry:2.30.0</buildpack>
                                 </buildpacks>
                                 <env>
+                                    <BP_JVM_VERSION>25</BP_JVM_VERSION>
                                     <BP_OPENTELEMETRY_ENABLED>true</BP_OPENTELEMETRY_ENABLED>
                                 </env>
                             </image>
