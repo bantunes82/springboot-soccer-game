@@ -215,7 +215,6 @@ class TeamResourceTest {
 
     @Test
     void deleteTeam_GivenValidTeamId_DeleteTeam() {
-        doNothing().when(teamService).delete(1L);
 
         ResponseEntity response = teamResource.deleteTeam(1L);
 
