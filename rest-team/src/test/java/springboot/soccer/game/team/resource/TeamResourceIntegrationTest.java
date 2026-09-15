@@ -4,6 +4,7 @@ import me.escoffier.loom.loomunit.LoomUnitExtension;
 import me.escoffier.loom.loomunit.ShouldNotPin;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,6 +60,7 @@ class TeamResourceIntegrationTest {
     private TeamDTO invalidTeamDTONullCountryDTO;
     private HttpHeaders headers;
 
+    @Autowired
     public TeamResourceIntegrationTest(TestRestTemplate testRestTemplate, MessageSource messageSource,
                                        @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}") String authServerUrl,
                                        @Value("${keycloak.resource}") String clientId) {
