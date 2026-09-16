@@ -12,7 +12,7 @@ import springboot.soccer.game.team.dataaccessobject.TeamRepository;
 import springboot.soccer.game.team.domainobject.CountryDO;
 import springboot.soccer.game.team.domainobject.TeamDO;
 import springboot.soccer.game.team.exception.BusinessException;
-import springboot.soccer.game.team.validation.Range;
+import springboot.soccer.game.team.validation.DoubleRange;
 
 import jakarta.validation.Valid;
 import java.util.List;
@@ -75,7 +75,7 @@ public class TeamService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public TeamDO updateLevel(Long teamId, @Range(min = 1.0, max = 10.0) Double level) {
+    public TeamDO updateLevel(Long teamId, @DoubleRange(min = 1.0, max = 10.0) Double level) {
         TeamDO teamSaved = findTeamChecked(teamId);
         teamSaved.setLevel(generateNewLevel(level, teamSaved.getLevel()));
 

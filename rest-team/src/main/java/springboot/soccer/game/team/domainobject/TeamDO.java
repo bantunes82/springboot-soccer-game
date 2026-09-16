@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import springboot.soccer.game.team.validation.ConstraintMessage;
-import springboot.soccer.game.team.validation.Range;
+import springboot.soccer.game.team.validation.DoubleRange;
 
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -45,7 +45,7 @@ public final class TeamDO extends BaseDO {
     @NotNull(message = ConstraintMessage.TEAM_FOUNDED_BLANK)
     private LocalDate founded;
 
-    @Range(min = 1.0, max = 10.0)
+    @DoubleRange(min = 1.0, max = 10.0)
     private Double level;
 
     @NotBlank(message = ConstraintMessage.TEAM_PICTURE_BLANK)
