@@ -240,7 +240,7 @@ reports available in the IDE/command line.
 GraalVM Native Build Tools includes the ability to run tests inside a native image.
 This can be helpful when you want to deeply test that the internals of your application work in a GraalVM native image.
 
-To test the Native Image you will need to have installed the OpenJDK from GraalVM 21 (for instance: GraalVM CE 21.0.2+13.1).
+To test the Native Image you will need to have installed the OpenJDK from GraalVM 25 (for instance: GraalVM CE 25.2.4-graalce).
 To install the openJDK the easiest way is through SDKMan.
 
 To build the image and run the tests, use the test goal with the nativeTest profile active:
