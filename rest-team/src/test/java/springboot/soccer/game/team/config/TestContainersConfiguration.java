@@ -46,7 +46,7 @@ public class TestContainersConfiguration {
                         "/tmp/keycloak/realms/team-realm.json")
                 .withExposedPorts(8080)
                 .waitingFor(Wait.forHttp("/auth").forStatusCode(200))
-                .withStartupTimeout(Duration.ofSeconds(120));
+                .withStartupTimeout(Duration.ofSeconds(180));
     }
 
     @Bean
