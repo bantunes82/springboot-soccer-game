@@ -119,6 +119,7 @@ https://www.jetbrains.com/help/idea/spring-boot.html#spring-boot-endpoints-->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${springboot-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -172,6 +173,7 @@ https://www.jetbrains.com/help/idea/spring-boot.html#spring-boot-endpoints-->
                     <plugin>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
+                        <version>${springboot-maven-plugin.version}</version>
                         <executions>
                             <execution>
                                 <goals>
