@@ -1,0 +1,13 @@
+{
+  "eval_id": 3,
+  "eval_name": "boot4-confirmed-transition",
+  "prompt": "The current 3.x stage has passed validation. Yes, proceed with the migration to Spring Boot 4.x using springboot-upgrade-workflow.md. Using the isolated evidence in scenario.md, produce an ordered decision trace including the exact command, version inspection, validation, and final message. Also explain what you would do if the pinned recipe artifact failed to resolve instead. Work only from the provided simulated evidence; do not execute Maven or change application files. Distinguish simulated observations from real execution. Save your answer as response.md.",
+  "assertions": [
+    "Selects the exact pinned Arconia Boot 4.1 command, using rewrite-spring 1.2.3 and rewrite-maven-plugin 6.46.1.",
+    "Recognizes the confirmed 3.x to 4.x transition and verifies the parent and effective service version become fixture-stable 4.1.2.",
+    "Orders clean install with unit and integration tests before documented jar startup, health and teams endpoint checks, and process cleanup.",
+    "The successful branch reports simulated readiness and asks whether additional validation is wanted.",
+    "The unresolved-artifact branch stops without silently substituting a recipe, claiming a changed version, or claiming readiness, and asks how to proceed.",
+    "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution."
+  ]
+}

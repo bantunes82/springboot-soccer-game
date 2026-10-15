@@ -1,0 +1,50 @@
+{
+  "skill_name": "springboot-upgrade",
+  "evals": [
+    {
+      "id": 1,
+      "name": "boot2-stabilize-before-major",
+      "prompt": "We want to take this old Spring Boot service to 4.x using springboot-upgrade-workflow.md. Using the isolated evidence in scenario.md, produce an ordered decision trace for the immediate stage, including exact commands, repair and validation steps, and the final message you would send me. Work only from the provided simulated evidence; do not execute Maven or change application files. Distinguish simulated observations from real execution. Save your answer as response.md.",
+      "expected_output": "Select the pinned Boot 2.7 recipe, stabilize 2.x, repair and revalidate the failure, perform the README smoke check, then ask about additional validation and confirmation for 3.x without running later stages.",
+      "files": ["evals/fixtures/boot2-stabilize-before-major/scenario.md"],
+      "assertions": [
+        "Selects the exact pinned Boot 2.7 OpenRewrite command, including datatable export, as the immediate upgrade command.",
+        "Identifies the parent change from 2.3.12.RELEASE to fixture-stable 2.7.18 and verifies inherited module versions after the recipe.",
+        "Orders clean install, WebMvcConfigurerAdapter repair, and a successful repeat build before runtime validation.",
+        "Includes the README jar startup and health check after the successful build, with cleanup of the started process.",
+        "Asks about additional validation and waits for confirmation of 3.x rather than executing 3.x or 4.x.",
+        "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "boot3-integration-blocker",
+      "prompt": "Upgrade this Spring Boot 3.2 service using springboot-upgrade-workflow.md; eventually we want 4.x. Using the isolated evidence in scenario.md, produce an ordered decision trace for the immediate stage, including exact commands, validation steps, and your final status message. Work only from the provided simulated evidence; do not execute Maven or change application files. Distinguish simulated observations from real execution. Save your answer as response.md.",
+      "expected_output": "Select the pinned Boot 3.5 recipe, check the inherited BOM version, run clean install and the separate integration-test profile, report the unavailable database as a blocker without claiming readiness or moving to 4.x.",
+      "files": ["evals/fixtures/boot3-integration-blocker/scenario.md"],
+      "assertions": [
+        "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, as the immediate upgrade command.",
+        "Uses the BOM property and effective module versions to verify 3.2.0 to fixture-stable 3.5.12 rather than relying on the plugin version.",
+        "Runs clean install before the separately required mvn -Pintegration verify and distinguishes unit-test success from integration-test failure.",
+        "Reports unavailable PostgreSQL as blocking integration and runtime validation, with no invented successful provisioning or readiness.",
+        "Pauses the incomplete 3.x stage without executing the 4.x migration or treating it as ready to proceed.",
+        "Clearly labels the trace and observed outcomes as simulated, without claiming an actual upgrade or actual command execution."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "boot4-confirmed-transition",
+      "prompt": "The current 3.x stage has passed validation. Yes, proceed with the migration to Spring Boot 4.x using springboot-upgrade-workflow.md. Using the isolated evidence in scenario.md, produce an ordered decision trace including the exact command, version inspection, validation, and final message. Also explain what you would do if the pinned recipe artifact failed to resolve instead. Work only from the provided simulated evidence; do not execute Maven or change application files. Distinguish simulated observations from real execution. Save your answer as response.md.",
+      "expected_output": "Use the exact Arconia Boot 4.1 recipe after confirmed transition, check the actual POM, run clean install and module startup/smoke validation, ask about additional checks, and explain that artifact-resolution failure blocks the stage rather than silently substituting a recipe.",
+      "files": ["evals/fixtures/boot4-confirmed-transition/scenario.md"],
+      "assertions": [
+        "Selects the exact pinned Arconia Boot 4.1 command, using rewrite-spring 1.2.3 and rewrite-maven-plugin 6.46.1.",
+        "Recognizes the confirmed 3.x to 4.x transition and verifies the parent and effective service version become fixture-stable 4.1.2.",
+        "Orders clean install with unit and integration tests before documented jar startup, health and teams endpoint checks, and process cleanup.",
+        "The successful branch reports simulated readiness and asks whether additional validation is wanted.",
+        "The unresolved-artifact branch stops without silently substituting a recipe, claiming a changed version, or claiming readiness, and asks how to proceed.",
+        "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "total_tokens": null,
+  "duration_ms": null,
+  "total_duration_seconds": null,
+  "note": "The completion notification did not expose token usage or duration. Metrics are unavailable, not zero."
+}

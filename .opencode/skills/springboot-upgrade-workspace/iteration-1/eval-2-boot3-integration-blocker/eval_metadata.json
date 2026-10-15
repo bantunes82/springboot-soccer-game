@@ -1,0 +1,13 @@
+{
+  "eval_id": 2,
+  "eval_name": "boot3-integration-blocker",
+  "prompt": "Upgrade this Spring Boot 3.2 service using springboot-upgrade-workflow.md; eventually we want 4.x. Using the isolated evidence in scenario.md, produce an ordered decision trace for the immediate stage, including exact commands, validation steps, and your final status message. Work only from the provided simulated evidence; do not execute Maven or change application files. Distinguish simulated observations from real execution. Save your answer as response.md.",
+  "assertions": [
+    "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, as the immediate upgrade command.",
+    "Uses the BOM property and effective module versions to verify 3.2.0 to fixture-stable 3.5.12 rather than relying on the plugin version.",
+    "Runs clean install before the separately required mvn -Pintegration verify and distinguishes unit-test success from integration-test failure.",
+    "Reports unavailable PostgreSQL as blocking integration and runtime validation, with no invented successful provisioning or readiness.",
+    "Pauses the incomplete 3.x stage without executing the 4.x migration or treating it as ready to proceed.",
+    "Clearly labels the trace and observed outcomes as simulated, without claiming an actual upgrade or actual command execution."
+  ]
+}

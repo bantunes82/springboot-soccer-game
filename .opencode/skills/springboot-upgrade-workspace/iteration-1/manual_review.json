@@ -1,0 +1,47 @@
+{
+  "method": "Inline semantic review of all six complete response.md files against the fixture evidence and assertions. Each entry covers assertions 2 through 6 in order; assertion 1 is checked by exact command comparison. Line ranges cite the reviewed outputs, not execution logs.",
+  "reviews": {
+    "eval-1-boot2-stabilize-before-major/with_skill": [
+      {"passed": true, "lines": [7, 22]},
+      {"passed": true, "lines": [24, 42]},
+      {"passed": true, "lines": [44, 58]},
+      {"passed": true, "lines": [60, 74]},
+      {"passed": true, "lines": [1, 3]}
+    ],
+    "eval-1-boot2-stabilize-before-major/without_skill": [
+      {"passed": true, "lines": [7, 15]},
+      {"passed": true, "lines": [17, 35]},
+      {"passed": true, "lines": [37, 51]},
+      {"passed": true, "lines": [53, 61]},
+      {"passed": true, "lines": [1, 3]}
+    ],
+    "eval-2-boot3-integration-blocker/with_skill": [
+      {"passed": true, "lines": [7, 21]},
+      {"passed": true, "lines": [23, 39]},
+      {"passed": true, "lines": [39, 60]},
+      {"passed": true, "lines": [60, 62]},
+      {"passed": true, "lines": [1, 3]}
+    ],
+    "eval-2-boot3-integration-blocker/without_skill": [
+      {"passed": true, "lines": [7, 29]},
+      {"passed": true, "lines": [31, 47]},
+      {"passed": true, "lines": [47, 71]},
+      {"passed": true, "lines": [73, 79]},
+      {"passed": true, "lines": [1, 3]}
+    ],
+    "eval-3-boot4-confirmed-transition/with_skill": [
+      {"passed": true, "lines": [7, 17]},
+      {"passed": true, "lines": [19, 40]},
+      {"passed": true, "lines": [42, 50]},
+      {"passed": true, "lines": [52, 65]},
+      {"passed": true, "lines": [1, 3]}
+    ],
+    "eval-3-boot4-confirmed-transition/without_skill": [
+      {"passed": true, "lines": [7, 23]},
+      {"passed": true, "lines": [25, 46]},
+      {"passed": true, "lines": [48, 52]},
+      {"passed": true, "lines": [54, 65], "note": "The decision trace says to discuss an explicit workflow change if pinned-artifact resolution cannot be restored; the final message preserves that decision rather than making a unilateral substitution."},
+      {"passed": true, "lines": [1, 3]}
+    ]
+  }
+}
