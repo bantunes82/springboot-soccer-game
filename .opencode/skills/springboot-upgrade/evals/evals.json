@@ -4,7 +4,7 @@
     {
       "id": 1,
       "name": "boot2-stabilize-before-major",
-      "prompt": "We want to take this old Spring Boot service to 4.x using springboot-upgrade-workflow.md. Using the isolated evidence in scenario.md, produce an ordered decision trace for the immediate stage, including exact commands, repair and validation steps, and the final message you would send me. Work only from the provided simulated evidence; do not execute Maven or change application files. Distinguish simulated observations from real execution. Save your answer as response.md.",
+      "prompt": "We want to take this old Spring Boot service to 4.x. Using the isolated evidence in scenario.md, produce an ordered decision trace for the immediate stage, including exact commands, repair and validation steps, and the final message you would send me. Work only from the provided simulated evidence; do not execute Maven or change application files. Distinguish simulated observations from real execution. Save your answer as response.md.",
       "expected_output": "Select the pinned Boot 2.7 recipe, stabilize 2.x, repair and revalidate the failure, perform the README smoke check, then ask about additional validation and confirmation for 3.x without running later stages.",
       "files": ["evals/fixtures/boot2-stabilize-before-major/scenario.md"],
       "assertions": [
@@ -19,7 +19,7 @@
     {
       "id": 2,
       "name": "boot3-integration-blocker",
-      "prompt": "Upgrade this Spring Boot 3.2 service using springboot-upgrade-workflow.md; eventually we want 4.x. Using the isolated evidence in scenario.md, produce an ordered decision trace for the immediate stage, including exact commands, validation steps, and your final status message. Work only from the provided simulated evidence; do not execute Maven or change application files. Distinguish simulated observations from real execution. Save your answer as response.md.",
+      "prompt": "Upgrade this Spring Boot 3.2 service; eventually we want 4.x. Using the isolated evidence in scenario.md, produce an ordered decision trace for the immediate stage, including exact commands, validation steps, and your final status message. Work only from the provided simulated evidence; do not execute Maven or change application files. Distinguish simulated observations from real execution. Save your answer as response.md.",
       "expected_output": "Select the pinned Boot 3.5 recipe, check the inherited BOM version, run clean install and the separate integration-test profile, report the unavailable database as a blocker without claiming readiness or moving to 4.x.",
       "files": ["evals/fixtures/boot3-integration-blocker/scenario.md"],
       "assertions": [
@@ -34,7 +34,7 @@
     {
       "id": 3,
       "name": "boot4-confirmed-transition",
-      "prompt": "The current 3.x stage has passed validation. Yes, proceed with the migration to Spring Boot 4.x using springboot-upgrade-workflow.md. Using the isolated evidence in scenario.md, produce an ordered decision trace including the exact command, version inspection, validation, and final message. Also explain what you would do if the pinned recipe artifact failed to resolve instead. Work only from the provided simulated evidence; do not execute Maven or change application files. Distinguish simulated observations from real execution. Save your answer as response.md.",
+      "prompt": "The current 3.x stage has passed validation. Yes, proceed with the migration to Spring Boot 4.x. Using the isolated evidence in scenario.md, produce an ordered decision trace including the exact command, version inspection, validation, and final message. Also explain what you would do if the pinned recipe artifact failed to resolve instead. Work only from the provided simulated evidence; do not execute Maven or change application files. Distinguish simulated observations from real execution. Save your answer as response.md.",
       "expected_output": "Use the exact Arconia Boot 4.1 recipe after confirmed transition, check the actual POM, run clean install and module startup/smoke validation, ask about additional checks, and explain that artifact-resolution failure blocks the stage rather than silently substituting a recipe.",
       "files": ["evals/fixtures/boot4-confirmed-transition/scenario.md"],
       "assertions": [

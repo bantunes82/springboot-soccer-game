@@ -1,6 +1,6 @@
 ---
 name: springboot-upgrade
-description: Upgrade a Maven Spring Boot application incrementally using this repository's springboot-upgrade-workflow.md and its pinned OpenRewrite recipes. Use when asked to upgrade or migrate Spring Boot, update an older Boot release, or move between Boot 2.x, 3.x, and 4.x. Includes compilation, test failure repair, documented runtime validation, and confirmation between major-version stages.
+description: Upgrade a Maven Spring Boot application incrementally using the self-contained workflow and pinned OpenRewrite recipes in this skill. Use when asked to upgrade or migrate Spring Boot, update an older Boot release, or move between Boot 2.x, 3.x, and 4.x. Includes compilation, test failure repair, documented runtime validation, and confirmation between major-version stages.
 compatibility: Requires Maven, a compatible JDK, access to the configured Maven repositories, and the application's documented validation dependencies.
 ---
 
@@ -10,12 +10,10 @@ Carry out one validated upgrade stage at a time. A successful recipe run is only
 the start: compilation, unit/integration tests, and documented application checks
 establish whether the application is ready.
 
-## 1. Inspect the project and workflow
+## 1. Inspect the project
 
-- Locate the repository root and read its `springboot-upgrade-workflow.md`
-  (`../../../springboot-upgrade-workflow.md` relative to this skill). This is the
-  user-maintained workflow; read it on each invocation so subsequent edits apply.
-  If it is missing, ask for it rather than silently inventing a replacement.
+- Locate the repository root. Use the workflow and commands defined in this skill
+  as the upgrade procedure; no separate workflow document is required.
 - Read applicable `AGENTS.md` instructions and the root/module README files.
   Inspect the working tree so unrelated user changes are preserved.
 - Inspect the root and module `pom.xml` files. Resolve Spring Boot's effective
@@ -39,7 +37,7 @@ milestones, and release candidates when selecting a stable target.
 
 | Starting state | Immediate stage |
 | --- | --- |
-| Older 1.x | Stabilize on the latest stable 1.x first. The workflow supplies no 1.x recipe: establish the required migration steps from official guidance rather than guessing a command. |
+| Older 1.x | Stabilize on the latest stable 1.x first. This skill supplies no 1.x recipe: establish the required migration steps from official guidance rather than guessing a command. |
 | Latest stable 1.x, moving toward newer majors | Upgrade to latest stable 2.x with the 2.7 recipe. |
 | Older 2.x | Upgrade to latest stable 2.x with the 2.7 recipe, then validate and pause. |
 | Latest stable 2.x, with the next migration confirmed | Upgrade to latest stable 3.x with the 3.5 recipe. |
@@ -49,13 +47,12 @@ milestones, and release candidates when selecting a stable target.
 | Already at the requested stable destination | Verify the current state and report that no version change is needed. |
 
 Do not skip a major version. A request for a distant destination does not remove
-the workflow's confirmation between completed stages. If starting on a latest
+the confirmation between completed stages. If starting on a latest
 stable major and the user explicitly requests the immediate next major, that
 request authorizes the first transition; subsequent transitions still require
-the step-7 confirmation.
+the confirmation described in section 4.
 
-The commands below reproduce the workflow at skill creation. If the workflow is
-edited, follow its current commands. Keep the pinned coordinates and recipe IDs;
+Use the commands below for each stage. Keep the pinned coordinates and recipe IDs;
 do not silently replace an unavailable recipe or upgrade the recipe artifacts.
 If a command cannot resolve, or its target line conflicts with the verified
 stable destination, explain the evidence and ask how to proceed. Do not force

@@ -2,7 +2,7 @@
 
 This is a workflow simulation, not a live Maven project. All versions, release
 metadata, and command outcomes below are test inputs, not claims about releases
-available today. Use the supplied repository workflow as the upgrade policy.
+available today. No separate upgrade workflow document is supplied or required.
 
 ## Initial inspection
 - Root `pom.xml` has parent `org.springframework.boot:spring-boot-starter-parent:2.3.12.RELEASE`.
