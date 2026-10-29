@@ -14,7 +14,14 @@ establish whether the application is ready.
 
 - Locate the repository root. Use the workflow and commands defined in this skill
   as the upgrade procedure; no separate workflow document is required.
-- Read applicable `AGENTS.md` instructions and the root/module README files.
+- MANDATORY: locate and read every `README.md`, `AGENTS.md`, and `CLAUDE.md` file
+  that applies to the repository root and to each module touched by the upgrade.
+  Specifically extract and note any section describing **Validation**,
+  **Startup**, or **How to Run the application** (these sections may appear
+  under different headings, e.g. "Running the application", "Getting started",
+  "Verification", "Testing"). Treat these sections as the authoritative,
+  non-optional runtime/validation procedure for this project — do not substitute
+  a generic `mvn clean install` or a guessed `java -jar` invocation for them.
   Inspect the working tree so unrelated user changes are preserved.
 - Inspect the root and module `pom.xml` files. Resolve Spring Boot's effective
   version, including inherited parents, properties, or an imported
@@ -94,11 +101,16 @@ After each recipe, complete all these steps before considering another stage:
    `clean install`; inspect the build configuration and documented instructions.
    Report skipped or unavailable tests accurately. If required dependencies or
    services are unavailable, report the blocker and pause this stage.
-5. Revisit README and applicable AGENTS validation/startup instructions. Follow
-   the documented application launch and functional/smoke checks, fixing failures
-   and rerunning checks. Build success alone does not prove runtime readiness.
-   If no validation process is documented, use an appropriate local startup or
-   smoke check where feasible and explain what was verified or remains blocked.
+5. MANDATORY after every recipe run: re-read the `README.md`, `AGENTS.md`, and
+   `CLAUDE.md` Validation/Startup/How-to-Run sections identified in step 1, and
+   execute every step they document (environment setup, services to start,
+   launch commands, functional/smoke checks, shutdown/cleanup) in the order
+   given. This applies regardless of how minor the migration seemed. Fix any
+   failure these steps surface and rerun them until they pass. Build success
+   alone does not prove runtime readiness, and skipping this step is not an
+   option for a completed stage. If no such section exists anywhere in the
+   repository, say so explicitly, then use an appropriate local startup or smoke
+   check where feasible and explain what was verified or remains blocked.
 6. Clean up only processes/resources started for this validation. Inspect the
    final diff and retain relevant command results and test outcomes for reporting.
 
@@ -108,7 +120,9 @@ Summarize:
 
 - **Version:** initial → actual resulting version, stage, stable-release evidence.
 - **Changes:** recipe used and material manual fixes.
-- **Validation:** commands, build/test results, runtime checks, and any blockers.
+- **Validation:** which README.md/AGENTS.md/CLAUDE.md Validation/Startup/How-to-Run
+  sections were followed (file and section name), the commands run from them,
+  build/test results, runtime checks, and any blockers.
 - **Status:** ready only when the required checks actually passed; otherwise
   describe the incomplete stage without implying success.
 - **Next:** after successful validation, ask whether the user wants additional
