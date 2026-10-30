@@ -1,13 +1,14 @@
 ---
 name: springboot-upgrade
-description: Upgrade a Maven Spring Boot application incrementally using the self-contained workflow and pinned OpenRewrite recipes in this skill. Use when asked to upgrade or migrate Spring Boot, update an older Boot release, or move between Boot 2.x, 3.x, and 4.x. Includes compilation, test failure repair, mandatory execution of EVERY run/validation approach documented in README.md, AGENTS.md, and CLAUDE.md after each upgrade stage, and confirmation between major-version stages.
+description: Upgrade a Maven Spring Boot application incrementally using the self-contained workflow and pinned OpenRewrite recipes in this skill. Use when asked to upgrade or migrate Spring Boot, update an older Boot release, or move between Boot 2.x, 3.x, and 4.x. Includes compilation, test failure repair, mandatory execution of EVERY run/validation approach documented in README.md, AGENTS.md, and CLAUDE.md after each upgrade stage, a mandatory smoke test of every interface the running application exposes (REST API, Swagger UI/OpenAPI, web UI, actuator, auth flows, etc.) after every step and approach, and confirmation between major-version stages.
 compatibility: Requires Maven, a compatible JDK, access to the configured Maven repositories, and the application's documented validation dependencies.
 ---
 
 # Spring Boot upgrade
 
 Carry out one validated upgrade stage at a time. A successful recipe run is only
-the start: compilation, unit/integration tests, and documented application checks
+the start: compilation, unit/integration tests, documented application checks,
+and a smoke test of the running application's real interfaces after every step
 establish whether the application is ready.
 
 ## 1. Inspect the project
@@ -32,6 +33,23 @@ establish whether the application is ready.
   distinct command. Alternatives are *not* "pick one": if a README lists
   Approach 1, 1.1, 2, 3, 3.1, and 4, the checklist has all six, plus every
   documented test, integration-test, native-test, coverage, and analysis command.
+- Build the **smoke-test plan** now as well (see section 3a). Documentation
+  rarely lists every interface, so derive it from the code and configuration
+  too: base URL (`server.port`, `server.servlet.context-path`,
+  `spring.webflux.base-path`, profile overrides), controllers and their mappings
+  (`@RestController`, `@Controller`, router functions), springdoc/springfox
+  (`/v3/api-docs`, `/swagger-ui/index.html`), actuator exposure and health
+  groups, server-rendered or static web pages (Thymeleaf/Freemarker templates,
+  `static/index.html`), GraphQL, WebSocket, or other exposed protocols, and the
+  security model (public vs. protected routes, documented token helpers or test
+  credentials). Record which interfaces exist; "no web UI" is a finding, not an
+  assumption.
+- Before running the recipe, if the application can be started with the
+  documented default approach, capture a **baseline smoke run** (in particular
+  save the OpenAPI document and representative responses). Comparing against it
+  after the upgrade exposes silently dropped endpoints, changed JSON shapes, or
+  altered status codes that a bare "200 OK" would hide. If a baseline cannot be
+  captured, say so and continue.
 - Inspect the working tree so unrelated user changes are preserved.
 - Inspect the root and module `pom.xml` files. Resolve Spring Boot's effective
   version, including inherited parents, properties, or an imported
@@ -125,11 +143,12 @@ After each recipe, complete all these steps before considering another stage:
      plugins. One passing approach says nothing about the others.
    - For each run approach: perform its documented setup, start it (background
      long-running processes and capture logs), wait for the documented readiness
-     signal, run the documented functional/smoke checks (health/readiness,
-     Swagger/API docs, public endpoints, authenticated calls when a token helper
-     is documented), then stop it and run its documented cleanup (e.g. Compose
-     `down`) before starting the next one, so ports and containers do not
-     collide. Run items sequentially.
+     signal, run the **full smoke test from section 3a** against it, then stop it
+     and run its documented cleanup (e.g. Compose `down`) before starting the
+     next one, so ports and containers do not collide. Run items sequentially.
+   - Every other item is also followed by a smoke test (section 3a explains how
+     for build-only and test-only items). An item is PASSED only when its own
+     command succeeded **and** its smoke test passed.
    - Fix every failure these items surface, then rerun the failing item **and**
      any earlier items the fix could affect, until all pass.
    - A missing prerequisite (e.g. GraalVM for native, a SonarQube server, Docker
@@ -142,11 +161,64 @@ After each recipe, complete all these steps before considering another stage:
      propose the next major stage until the user resolves it or explicitly
      waives that specific item.
    - Only if none of these files document any run/validation step, say so
-     explicitly, then use an appropriate local startup and smoke check and explain
-     what was verified.
+     explicitly, then start the application with an appropriate local command
+     and still run the full smoke test from section 3a.
 6. Clean up only processes/resources started for this validation. Inspect the
    final diff and retain each checklist item's command, result, and evidence
-   (exit code, key log lines, HTTP status) for reporting.
+   (exit code, key log lines, HTTP status, smoke-test results) for reporting.
+
+## 3a. Smoke test after every step and approach
+
+Builds and test suites pass while the running application is broken more often
+than one would expect after a Boot upgrade: a renamed property silently changes
+the context path, Spring Security 6 defaults lock down routes, springdoc stops
+serving Swagger UI, Jackson changes a JSON shape, a native image lacks a
+reflection hint. Only exercising the real interfaces of the running application
+catches these. That is why every checklist item ends with a smoke test — no
+exceptions, including after a fix and its rerun.
+
+**When, per item type:**
+
+| Item type | Smoke test |
+| --- | --- |
+| Run approach (`spring-boot:run`, `test-run`, Compose, `java -jar`, profile variants) | Run it against that instance while it is up, before stopping it. |
+| Build-only (`build-image`, native image, `package`/jar) | Start the produced artifact (via the documented follow-up, e.g. Compose profile, or `docker run`/`java -jar`) and smoke test it. An image that was built but never started is not validated. |
+| Test-only or analysis (`test`, `verify`, `install`, native tests, coverage, Sonar) | Afterwards, start the application with the primary documented run approach and smoke test it. Consecutive test-only items may share one smoke run only if no code, configuration, or dependency changed between them. |
+
+**What to exercise** — every interface the smoke-test plan (section 1) found,
+not only what the documentation mentions:
+
+1. **Health:** liveness/readiness (or `/actuator/health`) returns UP, including
+   each component in the documented health group.
+2. **API docs and Swagger UI:** `/v3/api-docs` (or the configured path) returns
+   valid JSON; diff its paths and operations against the baseline when you have
+   one. `/swagger-ui/index.html` (or the configured path) returns 200 HTML that
+   references the Swagger UI bundle, and the configuration it loads points at a
+   reachable API document.
+3. **REST API:** at least one representative request per controller /
+   resource. Assert status **and** content (expected fields, non-empty seed
+   data, content type), not only that the call returned 2xx.
+4. **Security:** a protected route without credentials returns 401/403; when a
+   token helper or test credentials are documented, perform an authenticated
+   write (e.g. create → read back → delete/clean up) so you leave no test data
+   behind.
+5. **Web UI:** if server-rendered or static pages exist, request them and assert
+   expected markup/text; load key assets (JS/CSS). If a headless browser is
+   readily available, use it for the main page; otherwise HTTP checks suffice.
+6. **Other interfaces** the application exposes (GraphQL, WebSocket, messaging,
+   gRPC, actuator info/metrics): one minimal round trip each.
+7. **Logs:** scan the startup and request logs for errors, stack traces, and
+   deprecation warnings introduced by the upgrade.
+
+Use plain commands (`curl --fail -sS -w '%{http_code}'`, `jq`) so results are
+reproducible, and keep a short evidence line per check (URL, status, the
+asserted value). Prefer writing the checks once as a small script in a temp
+directory and reusing it for every item and every stage — it keeps runs
+consistent and makes comparing approaches meaningful.
+
+A failed smoke check fails the item: fix the cause, rerun the item and its smoke
+test. If a check cannot run (e.g. no credentials for an authenticated call), mark
+that check BLOCKED with the reason and ask the user — do not quietly drop it.
 
 ## 4. Report and pause
 
@@ -156,10 +228,14 @@ Summarize:
 - **Changes:** recipe used and material manual fixes.
 - **Validation:** the full documented validation checklist as a table, one row
   per item: source (file → heading), command(s), result (PASSED / FAILED /
-  BLOCKED / WAIVED by user), and evidence. Every item found in section 1 must
-  appear; do not drop rows that were not run.
-- **Status:** ready only when every checklist item PASSED (or the user explicitly
-  waived it); otherwise describe the incomplete stage without implying success.
+  BLOCKED / WAIVED by user), smoke-test result, and evidence. Every item found in
+  section 1 must appear; do not drop rows that were not run.
+- **Smoke tests:** the interfaces exercised (health, API docs, Swagger UI, REST
+  endpoints, auth, web UI, others) with URL and result, which items each smoke
+  run covered, and any differences from the pre-upgrade baseline.
+- **Status:** ready only when every checklist item and its smoke test PASSED (or
+  the user explicitly waived it); otherwise describe the incomplete stage
+  without implying success.
 - **Next:** only after every checklist item passed or was waived, ask whether
   the user wants additional validation. If a major-version migration is still
   pending, ask whether to proceed to that specific next stage. Wait for the

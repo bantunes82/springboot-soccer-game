@@ -1,0 +1,56 @@
+{
+  "expectations": [
+    {
+      "text": "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, and verifies 2.7.18 to fixture-stable 3.5.12.",
+      "passed": true,
+      "evidence": "Command `mvn -U org.openrewrite.maven:rewrite-maven-plugin:6.46.1:run ... UpgradeSpringBoot_3_5 --define rewrite.exportDatatables=true`; 'the `api` effective POM confirms it. This matches the verified stable target' (3.5.12 from 2.7.18)."
+    },
+    {
+      "text": "Builds an explicit checklist that includes all four README run approaches, mvn clean verify, mvn -PnativeTest clean test, the Sonar analysis, and the CLAUDE.md /v1/items check.",
+      "passed": true,
+      "evidence": "Checklist V1 clean verify, V2/V4/V5/V6 Approaches 1-4, V3 CLAUDE.md /v1/items, V7 nativeTest, V8 Sonar."
+    },
+    {
+      "text": "Executes every run approach (1, 2, 3 and 4) with readiness and /v1/items checks, rather than stopping after the first successful approach.",
+      "passed": true,
+      "evidence": "Section 3.3 runs Approaches 1-4, each with 'Readiness passed and /v1/items returned 200'."
+    },
+    {
+      "text": "Fixes the Testcontainers dependency and the native reflection hint failures and reruns the affected approaches until they pass.",
+      "passed": true,
+      "evidence": "Adds spring-boot-testcontainers, 'Rerun of Approach 2, simulated: started'; ItemDto hint, 'Rerun, simulated: the native image builds ... readiness passed'; flags V0/V1/V5 reruns NOT EVIDENCED."
+    },
+    {
+      "text": "Installs or asks about GraalVM via the documented SDKMAN route instead of skipping the native approach and native tests.",
+      "passed": true,
+      "evidence": "'Prerequisite set up through the documented SDKMAN step: `sdk install java 21.0.2-graalce`'."
+    },
+    {
+      "text": "Does not silently skip the Sonar item: asks the user about starting SonarQube/submitting analysis or marks it BLOCKED, and does not report the stage as fully ready while it is outstanding.",
+      "passed": true,
+      "evidence": "'It is BLOCKED pending your confirmation'; 'The stage is incomplete'; asks 'May I start the local SonarQube'."
+    },
+    {
+      "text": "Final report contains a per-item validation table with source file, command, and PASSED/FAILED/BLOCKED status for every checklist item.",
+      "passed": true,
+      "evidence": "Final table ID/Source/Command/Result/Evidence for V0-V8 with PASSED / FAILED→fixed→PASSED / BLOCKED (V0 'NOT EVIDENCED', judged acceptable as an explicit non-pass status; same standard applied to the other run)."
+    },
+    {
+      "text": "Every checklist item, including mvn clean verify, native tests and each built image, is followed by a smoke test against a running instance covering readiness, /v1/items content and any API docs/Swagger UI, rather than only the documented curl.",
+      "passed": false,
+      "evidence": "Smoke checks are limited to the documented curls: readiness and '/v1/items returned 200', on run approaches only. No smoke run tied to `mvn clean verify` (V1) or `mvn -PnativeTest clean test` (V7); no /v1/items content assertion; API docs/Swagger, security and log checks are never considered."
+    },
+    {
+      "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+      "passed": true,
+      "evidence": "'I ran nothing ... Every outcome below is a simulated observation from scenario.md'; table header 'all results are simulated, nothing was really executed'."
+    }
+  ],
+  "summary": {"passed": 8, "failed": 1, "total": 9, "pass_rate": 0.89},
+  "eval_feedback": {
+    "suggestions": [
+      {"assertion": "Every checklist item, including mvn clean verify, native tests and each built image, is followed by a smoke test ...", "reason": "Bundles several sub-requirements; the fixture gives no Swagger/content evidence, so a response can pass only on plan wording."}
+    ],
+    "overall": "Assertion 8 is the only one that discriminates between runs."
+  }
+}

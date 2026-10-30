@@ -1,0 +1,16 @@
+{
+  "eval_id": 5,
+  "eval_name": "boot3-smoke-interfaces",
+  "prompt": "Get this service onto the latest Spring Boot 3.x. Using the isolated evidence in scenario.md, produce an ordered decision trace for this stage, including exact commands, every validation and check you run, fixes, and your final report to me. Work only from the provided simulated evidence; do not execute Maven or change application files. Distinguish simulated observations from real execution. Save your answer as response.md.",
+  "assertions": [
+    "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, and verifies 3.2.5 to fixture-stable 3.5.12.",
+    "Derives smoke checks beyond the documented readiness URL from code/config: /shop context path, /v3/api-docs, Swagger UI, product endpoints, and the static index page.",
+    "Smoke tests include a security check: unauthenticated write rejected and an authenticated write using scripts/get-token.sh, with cleanup of created data.",
+    "REST checks assert response content (e.g. 3 seeded products / expected fields), not only HTTP status.",
+    "Detects the api-docs 500 / Swagger UI failure as a stage failure despite passing build and readiness, fixes springdoc, and reruns the build plus the smoke test.",
+    "Runs a smoke test after the test-only mvn clean verify item (by starting the app) and after the Approach B image is started via Compose, not only after Approach A.",
+    "Captures or compares against a pre-upgrade baseline (e.g. OpenAPI document) or explicitly states why it could not.",
+    "Final report includes per-interface smoke-test results with URL and status alongside the per-item checklist table.",
+    "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution."
+  ]
+}

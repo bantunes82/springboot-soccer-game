@@ -1,0 +1,56 @@
+{
+  "expectations": [
+    {
+      "text": "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, and verifies 3.2.5 to fixture-stable 3.5.12.",
+      "passed": true,
+      "evidence": "Command `mvn -U org.openrewrite.maven:rewrite-maven-plugin:6.46.1:run ... UpgradeSpringBoot_3_5 --define rewrite.exportDatatables=true`; '[SIM] The parent is now 3.5.12 in the effective POM, which matches the verified stable target' (from 3.2.5)."
+    },
+    {
+      "text": "Derives smoke checks beyond the documented readiness URL from code/config: /shop context path, /v3/api-docs, Swagger UI, product endpoints, and the static index page.",
+      "passed": true,
+      "evidence": "Step 1.5 code/config inspection; S1-S8 'derived ... from the code inspection': /shop context, S2 /shop/v1/products, S3 /shop/ and app.js, S6 /shop/v3/api-docs, S7 /shop/swagger-ui/index.html."
+    },
+    {
+      "text": "Smoke tests include a security check: unauthenticated write rejected and an authenticated write using scripts/get-token.sh, with cleanup of created data.",
+      "passed": true,
+      "evidence": "S4 unauthenticated POST → 401; S5 'TOKEN=$(scripts/get-token.sh admin admin), then POST, GET, and DELETE' (the DELETE cleans up the created product)."
+    },
+    {
+      "text": "REST checks assert response content (e.g. 3 seeded products / expected fields), not only HTTP status.",
+      "passed": true,
+      "evidence": "S2 '200; 3 seeded products'; S3 '\"Shop Catalog\" page'; S6 'paths match the pre-upgrade baseline'."
+    },
+    {
+      "text": "Detects the api-docs 500 / Swagger UI failure as a stage failure despite passing build and readiness, fixes springdoc, and reruns the build plus the smoke test.",
+      "passed": true,
+      "evidence": "'S6 fails: GET /shop/v3/api-docs returns 500 ... S7 fails'; 'only the smoke test revealed it'; springdoc 2.3.0 → 2.8.9; 3.7 `mvn clean verify` passes, 3.8 'mvn spring-boot:run, then S1–S8 ... All pass'."
+    },
+    {
+      "text": "Runs a smoke test after the test-only mvn clean verify item (by starting the app) and after the Approach B image is started via Compose, not only after Approach A.",
+      "passed": false,
+      "evidence": "Approach B smoke is present (3.9 'Compose ... up -d, then S1–S8'), but no smoke test is associated with the test-only `mvn clean verify` item: the V1 row only says 'All unit and integration tests pass', and S1-S8 are defined only 'for each run approach'. Approach A happens to follow verify in the scenario order, so this is coincidental rather than a deliberate post-verify smoke run."
+    },
+    {
+      "text": "Captures or compares against a pre-upgrade baseline (e.g. OpenAPI document) or explicitly states why it could not.",
+      "passed": true,
+      "evidence": "Pre-upgrade baseline: `curl -s .../shop/v3/api-docs | jq -S '.paths | keys' > .../api-docs-baseline.json`; later 'diff ... shows no differences'."
+    },
+    {
+      "text": "Final report includes per-interface smoke-test results with URL and status alongside the per-item checklist table.",
+      "passed": false,
+      "evidence": "The final report has only the per-item checklist table. Smoke results are compressed into a prose Evidence cell for V2 ('Readiness UP. Products 200 (3)...') and 'all smoke checks pass' for V3, with no per-interface URL/status rows."
+    },
+    {
+      "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+      "passed": true,
+      "evidence": "'I didn't run anything ... Every outcome below comes from the isolated fixture scenario.md and is labelled [SIM]'; 'All results below are simulated'."
+    }
+  ],
+  "summary": {"passed": 7, "failed": 2, "total": 9, "pass_rate": 0.78},
+  "eval_feedback": {
+    "suggestions": [
+      {"assertion": "Runs a smoke test after the test-only mvn clean verify item ...", "reason": "The scenario order puts Approach A directly after clean verify, so the behavior is hard to tell apart from coincidence."}
+    ],
+    "overall": "Assertions 6 and 8 discriminate between runs; the others pass for both."
+  }
+}
