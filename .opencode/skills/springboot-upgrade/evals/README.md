@@ -1,8 +1,9 @@
 # Workflow evaluations
 
-`evals.json` defines three isolated, evidence-driven simulations: 2.x stabilization
-before crossing majors, 3.x with blocked integration tests, and a confirmed 4.x
-transition with an alternate artifact-resolution failure.
+`evals.json` defines four isolated, evidence-driven simulations: 2.x stabilization
+before crossing majors, 3.x with blocked integration tests, a confirmed 4.x
+transition with an alternate artifact-resolution failure, and a 2.x→3.x major
+upgrade that must run every approach documented in README/AGENTS/CLAUDE files.
 
 These evaluate the agent's decisions, command selection, validation order, and
 reporting. They do not run OpenRewrite, compile a real service, verify current
