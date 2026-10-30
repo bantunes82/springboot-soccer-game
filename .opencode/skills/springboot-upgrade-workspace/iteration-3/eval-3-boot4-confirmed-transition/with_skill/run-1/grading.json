@@ -1,0 +1,43 @@
+{
+  "expectations": [
+    {
+      "text": "Selects the exact pinned Arconia Boot 4.1 command, using rewrite-spring 1.2.3 and rewrite-maven-plugin 6.46.1.",
+      "passed": true,
+      "evidence": "L26: `mvn -U org.openrewrite.maven:rewrite-maven-plugin:6.46.1:run -Drewrite.recipeArtifactCoordinates=io.arconia.migrations:rewrite-spring:1.2.3 -Drewrite.activeRecipes=io.arconia.rewrite.spring.boot4.UpgradeSpringBoot_4_1`. It is identical to SKILL.md L111."
+    },
+    {
+      "text": "Recognizes the confirmed 3.x to 4.x transition and verifies the parent and effective service version become fixture-stable 4.1.2.",
+      "passed": true,
+      "evidence": "L20 user confirmed the transition, matched to the stage table row; L35-37 'root parent is now 4.1.2 ... service module's effective POM also resolves Boot 4.1.2 ... matches the verified latest stable 4.x'."
+    },
+    {
+      "text": "Orders clean install with unit and integration tests before documented jar startup, health and teams endpoint checks, and process cleanup.",
+      "passed": true,
+      "evidence": "L44 item 1 mvn clean install (unit and integration) PASSED, then L45 item 2 java -jar smoke profile, curl health and /teams, 'Process stopped afterward'."
+    },
+    {
+      "text": "The successful branch reports simulated readiness and asks whether additional validation is wanted.",
+      "passed": true,
+      "evidence": "L73 'all checklist items passed in the simulation, so the 4.x stage is ready'; L75 'would you like any more validation...?'"
+    },
+    {
+      "text": "The unresolved-artifact branch stops without silently substituting a recipe, claiming a changed version, or claiming readiness, and asks how to proceed.",
+      "passed": true,
+      "evidence": "L85-90 will not switch recipes, bump versions, hand-edit the parent, or claim an upgrade; L92-93 BLOCKED, version stays 3.5.12; L96-100 asks the user and waits."
+    },
+    {
+      "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+      "passed": true,
+      "evidence": "L3-8 'Nothing below was actually run ... [SIMULATED] ... [PLANNED]'; L58 'Simulated evidence only'."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "eval_feedback": {
+    "overall": "Both skill versions pass everything; nothing here discriminates. No assertion covers the Changes split, even though with_skill (L62-67) separates recipe and agent changes and says 'none' for the agent, while old_skill (L56) uses a single combined line. The cleanup assertion is satisfied by a planned 'stop' statement, so it can't tell planned cleanup from performed cleanup."
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "expectations": [
+    {
+      "text": "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, as the immediate upgrade command.",
+      "passed": true,
+      "evidence": "L31: exact `mvn -U ...rewrite-maven-plugin:6.46.1:run --define rewrite.recipeArtifactCoordinates=org.openrewrite.recipe:rewrite-spring:6.37.1 --define rewrite.activeRecipes=org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_5 --define rewrite.exportDatatables=true`. It matches SKILL.md L105."
+    },
+    {
+      "text": "Uses the BOM property and effective module versions to verify 3.2.0 to fixture-stable 3.5.12 rather than relying on the plugin version.",
+      "passed": true,
+      "evidence": "L10 'spring-boot.version=3.2.0 ... The Boot Maven plugin version is separate and does not set the dependency version'; L34 property 3.2.0\u21923.5.12; L47 'mvn help:effective-pom ... Effective POMs confirm 3.5.12 for every module'."
+    },
+    {
+      "text": "Runs clean install before the separately required mvn -Pintegration verify and distinguishes unit-test success from integration-test failure.",
+      "passed": true,
+      "evidence": "L48 3.2 clean install PASSED 'No integration tests ran'; L50 3.4 `mvn -Pintegration verify` FAILED: PostgreSQL connection refused."
+    },
+    {
+      "text": "Reports unavailable PostgreSQL as blocking integration and runtime validation, with no invented successful provisioning or readiness.",
+      "passed": true,
+      "evidence": "L52 'Database provisioning is unavailable ... V2 is BLOCKED'; L53 runtime BLOCKED 'I did not start the app or claim any health result'; L76-78 table shows BLOCKED."
+    },
+    {
+      "text": "Pauses the incomplete 3.x stage without executing the 4.x migration or treating it as ready to proceed.",
+      "passed": true,
+      "evidence": "L84 'NOT READY ... I am not proposing the 4.x migration'; L93 'I won't start that stage without your confirmation'."
+    },
+    {
+      "text": "Clearly labels the trace and observed outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+      "passed": true,
+      "evidence": "L3 'I did not run any of these commands ... Every result below is a simulated observation ([SIM])'."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "eval_feedback": {
+    "overall": "Both skill versions pass every assertion, so this eval doesn't discriminate. Because the scenario has no agent changes, it never tests the Changes-section split; one could check that the report explicitly says 'no AI-agent changes' under a separate recipe/agent heading (with_skill L64-70 does this, old_skill L55 doesn't)."
+  }
+}

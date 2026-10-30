@@ -1,0 +1,18 @@
+{
+  "eval_id": 4,
+  "eval_name": "boot3-all-documented-approaches",
+  "prompt": "Yes, go ahead and move this service from Boot 2.7 to 3.x. Using the isolated evidence in scenario.md, produce an ordered decision trace for this stage, including exact commands, every validation you run after the upgrade, fixes, and your final report to me. Work only from the provided simulated evidence; do not execute Maven or change application files. Distinguish simulated observations from real execution. Save your answer as response.md.",
+  "assertions": [
+    "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, and verifies 2.7.18 to fixture-stable 3.5.12.",
+    "Builds an explicit checklist that includes all four README run approaches, mvn clean verify, mvn -PnativeTest clean test, the Sonar analysis, and the CLAUDE.md /v1/items check.",
+    "Executes every run approach (1, 2, 3 and 4) with readiness and /v1/items checks, rather than stopping after the first successful approach.",
+    "Fixes the Testcontainers dependency and the native reflection hint failures and reruns the affected approaches until they pass.",
+    "Installs or asks about GraalVM via the documented SDKMAN route instead of skipping the native approach and native tests.",
+    "Does not silently skip the Sonar item: asks the user about starting SonarQube/submitting analysis or marks it BLOCKED, and does not report the stage as fully ready while it is outstanding.",
+    "Final report contains a per-item validation table with source file, command, and PASSED/FAILED/BLOCKED status for every checklist item.",
+    "Final report's Changes section separates recipe changes (Boot version and migrations, with the recipe ID) from agent changes (Testcontainers dependency and native reflection hint fixes), each agent change listing the file and the failing approach that required it.",
+    "Captures the recipe-only diff/status before applying any manual fix, so recipe and agent changes can be attributed.",
+    "Every checklist item, including mvn clean verify, native tests and each built image, is followed by a smoke test against a running instance covering readiness, /v1/items content and any API docs/Swagger UI, rather than only the documented curl.",
+    "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution."
+  ]
+}

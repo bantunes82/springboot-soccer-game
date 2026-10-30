@@ -1,0 +1,48 @@
+{
+  "expectations": [
+    {
+      "text": "Selects the exact pinned Boot 2.7 OpenRewrite command, including datatable export, as the immediate upgrade command.",
+      "passed": true,
+      "evidence": "L23: exact command `mvn -U org.openrewrite.maven:rewrite-maven-plugin:6.46.1:run --define rewrite.recipeArtifactCoordinates=org.openrewrite.recipe:rewrite-spring:6.37.1 --define rewrite.activeRecipes=org.openrewrite.java.spring.boot2.UpgradeSpringBoot_2_7 --define rewrite.exportDatatables=true`. It matches SKILL.md L99 argument for argument."
+    },
+    {
+      "text": "Identifies the parent change from 2.3.12.RELEASE to fixture-stable 2.7.18 and verifies inherited module versions after the recipe.",
+      "passed": true,
+      "evidence": "L14 initial parent 2.3.12.RELEASE; L28 'root parent becomes 2.7.18, and both domain and api resolve 2.7.18'; L36 'confirm the effective version with mvn help:effective-pom ... consistent across the reactor'."
+    },
+    {
+      "text": "Orders clean install, WebMvcConfigurerAdapter repair, and a successful repeat build before runtime validation.",
+      "passed": true,
+      "evidence": "L37 V1 attempt 1 FAILED (WebMvcConfigurerAdapter) -> L38 repair -> L39 attempt 2 PASSED -> L40-48 runtime startup/health only after that."
+    },
+    {
+      "text": "Includes the README jar startup and health check after the successful build, with cleanup of the started process.",
+      "passed": true,
+      "evidence": "L41-45 `java -jar api/target/api.jar --spring.profiles.active=smoke` and `curl --fail ... /health` after the successful build; L48 `kill $APP_PID` and confirm the port is free; only that process is stopped."
+    },
+    {
+      "text": "Asks about additional validation and waits for confirmation of 3.x rather than executing 3.x or 4.x.",
+      "passed": true,
+      "evidence": "L51 'Stop. Do not run the 3.5 recipe'; L82 'Do you want any additional validation on 2.7.18? Should I proceed to ... 3.x ... I'll wait for your answer'. 4.x needs a separate confirmation."
+    },
+    {
+      "text": "Final report's Changes section has separate 'OpenRewrite recipe' and 'AI agent' subsections: the parent version bump is attributed to the recipe, and the WebMvcConfigurerAdapter repair is attributed to the agent with the build failure as its reason.",
+      "passed": true,
+      "evidence": "L59 '### Changes made by the OpenRewrite recipe' with recipe ID and coordinates, L61 'pom.xml: Boot parent 2.3.12.RELEASE \u2192 2.7.18'; L64 '### Changes made by the AI agent' table with L67 WebMvcConfigurerAdapter\u2192WebMvcConfigurer, reason 'First mvn clean install failed to compile api'."
+    },
+    {
+      "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+      "passed": true,
+      "evidence": "L3 'Nothing here was actually run ... Results are marked [SIMULATED]'; L80 'no Maven command, application run, or file change was actually performed'."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  },
+  "eval_feedback": {
+    "overall": "Only the Changes-section assertion discriminates (old skill uses a flat 'Changes' list); the other six are met by both skill versions. Neither assertion catches the factual slip about when WebMvcConfigurerAdapter was removed (it was deprecated in Spring 5 and removed in Spring 6, not 'removed in Spring 5 / Boot 2.x')."
+  }
+}

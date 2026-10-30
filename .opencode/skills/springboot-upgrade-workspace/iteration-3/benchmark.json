@@ -1,0 +1,598 @@
+{
+  "metadata": {
+    "skill_name": "springboot-upgrade",
+    "skill_path": ".opencode/skills/springboot-upgrade",
+    "executor_model": "github-copilot/claude-opus-5.5",
+    "analyzer_model": "github-copilot/claude-opus-5.5",
+    "timestamp": "2026-10-30T07:19:18Z",
+    "evals_run": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Selects the exact pinned Boot 2.7 OpenRewrite command, including datatable export, as the immediate upgrade command.",
+          "passed": true,
+          "evidence": "L23: exact command `mvn -U org.openrewrite.maven:rewrite-maven-plugin:6.46.1:run --define rewrite.recipeArtifactCoordinates=org.openrewrite.recipe:rewrite-spring:6.37.1 --define rewrite.activeRecipes=org.openrewrite.java.spring.boot2.UpgradeSpringBoot_2_7 --define rewrite.exportDatatables=true`. It matches SKILL.md L99 argument for argument."
+        },
+        {
+          "text": "Identifies the parent change from 2.3.12.RELEASE to fixture-stable 2.7.18 and verifies inherited module versions after the recipe.",
+          "passed": true,
+          "evidence": "L14 initial parent 2.3.12.RELEASE; L28 'root parent becomes 2.7.18, and both domain and api resolve 2.7.18'; L36 'confirm the effective version with mvn help:effective-pom ... consistent across the reactor'."
+        },
+        {
+          "text": "Orders clean install, WebMvcConfigurerAdapter repair, and a successful repeat build before runtime validation.",
+          "passed": true,
+          "evidence": "L37 V1 attempt 1 FAILED (WebMvcConfigurerAdapter) -> L38 repair -> L39 attempt 2 PASSED -> L40-48 runtime startup/health only after that."
+        },
+        {
+          "text": "Includes the README jar startup and health check after the successful build, with cleanup of the started process.",
+          "passed": true,
+          "evidence": "L41-45 `java -jar api/target/api.jar --spring.profiles.active=smoke` and `curl --fail ... /health` after the successful build; L48 `kill $APP_PID` and confirm the port is free; only that process is stopped."
+        },
+        {
+          "text": "Asks about additional validation and waits for confirmation of 3.x rather than executing 3.x or 4.x.",
+          "passed": true,
+          "evidence": "L51 'Stop. Do not run the 3.5 recipe'; L82 'Do you want any additional validation on 2.7.18? Should I proceed to ... 3.x ... I'll wait for your answer'. 4.x needs a separate confirmation."
+        },
+        {
+          "text": "Final report's Changes section has separate 'OpenRewrite recipe' and 'AI agent' subsections: the parent version bump is attributed to the recipe, and the WebMvcConfigurerAdapter repair is attributed to the agent with the build failure as its reason.",
+          "passed": true,
+          "evidence": "L59 '### Changes made by the OpenRewrite recipe' with recipe ID and coordinates, L61 'pom.xml: Boot parent 2.3.12.RELEASE \u2192 2.7.18'; L64 '### Changes made by the AI agent' table with L67 WebMvcConfigurerAdapter\u2192WebMvcConfigurer, reason 'First mvn clean install failed to compile api'."
+        },
+        {
+          "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+          "passed": true,
+          "evidence": "L3 'Nothing here was actually run ... Results are marked [SIMULATED]'; L80 'no Maven command, application run, or file change was actually performed'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.857,
+        "passed": 6,
+        "failed": 1,
+        "total": 7,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Selects the exact pinned Boot 2.7 OpenRewrite command, including datatable export, as the immediate upgrade command.",
+          "passed": true,
+          "evidence": "L39: exact pinned 2.7 command with --define rewrite.exportDatatables=true. It matches SKILL.md L99."
+        },
+        {
+          "text": "Identifies the parent change from 2.3.12.RELEASE to fixture-stable 2.7.18 and verifies inherited module versions after the recipe.",
+          "passed": true,
+          "evidence": "L12 parent 2.3.12.RELEASE; L46-47 'resolve the effective Boot version per module, e.g. mvn help:effective-pom. Simulated: Both domain and api resolve 2.7.18'."
+        },
+        {
+          "text": "Orders clean install, WebMvcConfigurerAdapter repair, and a successful repeat build before runtime validation.",
+          "passed": true,
+          "evidence": "L49-56: attempt 1 FAILED -> Step 3.3 repair -> attempt 2 PASSED; runtime V2 only at Step 3.5 (L58-68)."
+        },
+        {
+          "text": "Includes the README jar startup and health check after the successful build, with cleanup of the started process.",
+          "passed": true,
+          "evidence": "L61-66 java -jar ... --spring.profiles.active=smoke, curl --fail /health, `kill \"$APP_PID\"`; L84 'stop only the java -jar process'."
+        },
+        {
+          "text": "Asks about additional validation and waits for confirmation of 3.x rather than executing 3.x or 4.x.",
+          "passed": true,
+          "evidence": "L107 'Would you like any additional validation on 2.7.18 first? And should I go ahead with the 2.x \u2192 3.x stage? I'll wait for your answer'."
+        },
+        {
+          "text": "Final report's Changes section has separate 'OpenRewrite recipe' and 'AI agent' subsections: the parent version bump is attributed to the recipe, and the WebMvcConfigurerAdapter repair is attributed to the agent with the build failure as its reason.",
+          "passed": false,
+          "evidence": "L92-94: one flat '**Changes:**' bullet list ('The OpenRewrite recipe ... moved the parent' / 'Manual fix: ...'). It has no separate 'OpenRewrite recipe' and 'AI agent' subsections, and the manual fix's reason is 'WebMvcConfigurerAdapter was removed', not the failing mvn clean install."
+        },
+        {
+          "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+          "passed": true,
+          "evidence": "L3-6 '**simulated** ... I did not run Maven ... When this trace says a step \"passed\", it means the scenario says it passed'; L88 'nothing was actually executed'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, as the immediate upgrade command.",
+          "passed": true,
+          "evidence": "L31: exact `mvn -U ...rewrite-maven-plugin:6.46.1:run --define rewrite.recipeArtifactCoordinates=org.openrewrite.recipe:rewrite-spring:6.37.1 --define rewrite.activeRecipes=org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_5 --define rewrite.exportDatatables=true`. It matches SKILL.md L105."
+        },
+        {
+          "text": "Uses the BOM property and effective module versions to verify 3.2.0 to fixture-stable 3.5.12 rather than relying on the plugin version.",
+          "passed": true,
+          "evidence": "L10 'spring-boot.version=3.2.0 ... The Boot Maven plugin version is separate and does not set the dependency version'; L34 property 3.2.0\u21923.5.12; L47 'mvn help:effective-pom ... Effective POMs confirm 3.5.12 for every module'."
+        },
+        {
+          "text": "Runs clean install before the separately required mvn -Pintegration verify and distinguishes unit-test success from integration-test failure.",
+          "passed": true,
+          "evidence": "L48 3.2 clean install PASSED 'No integration tests ran'; L50 3.4 `mvn -Pintegration verify` FAILED: PostgreSQL connection refused."
+        },
+        {
+          "text": "Reports unavailable PostgreSQL as blocking integration and runtime validation, with no invented successful provisioning or readiness.",
+          "passed": true,
+          "evidence": "L52 'Database provisioning is unavailable ... V2 is BLOCKED'; L53 runtime BLOCKED 'I did not start the app or claim any health result'; L76-78 table shows BLOCKED."
+        },
+        {
+          "text": "Pauses the incomplete 3.x stage without executing the 4.x migration or treating it as ready to proceed.",
+          "passed": true,
+          "evidence": "L84 'NOT READY ... I am not proposing the 4.x migration'; L93 'I won't start that stage without your confirmation'."
+        },
+        {
+          "text": "Clearly labels the trace and observed outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+          "passed": true,
+          "evidence": "L3 'I did not run any of these commands ... Every result below is a simulated observation ([SIM])'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, as the immediate upgrade command.",
+          "passed": true,
+          "evidence": "L36: exact pinned 3.5 command including --define rewrite.exportDatatables=true. It matches SKILL.md L105."
+        },
+        {
+          "text": "Uses the BOM property and effective module versions to verify 3.2.0 to fixture-stable 3.5.12 rather than relying on the plugin version.",
+          "passed": true,
+          "evidence": "L11 BOM property spring-boot.version=3.2.0; 'The Boot Maven plugin has its own version, which does not set the dependency version'; L43 'BOM property changed 3.2.0 \u2192 3.5.12, and the effective POMs show 3.5.12 for every module'."
+        },
+        {
+          "text": "Runs clean install before the separately required mvn -Pintegration verify and distinguishes unit-test success from integration-test failure.",
+          "passed": true,
+          "evidence": "L44 clean install 'succeeds with unit tests only. No integration tests ran ... does not cover the integration requirement'; L46 `mvn -Pintegration verify` fails, PostgreSQL connection refused."
+        },
+        {
+          "text": "Reports unavailable PostgreSQL as blocking integration and runtime validation, with no invented successful provisioning or readiness.",
+          "passed": true,
+          "evidence": "L47 'I would not invent a database setup ... Item 2 \u2192 BLOCKED'; L48 runtime items 3\u20134 BLOCKED; L62-64 table."
+        },
+        {
+          "text": "Pauses the incomplete 3.x stage without executing the 4.x migration or treating it as ready to proceed.",
+          "passed": true,
+          "evidence": "L68 'NOT READY ... I am not proposing the 3.x \u2192 4.x stage'; L75 'I won't start that stage before then'."
+        },
+        {
+          "text": "Clearly labels the trace and observed outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+          "passed": true,
+          "evidence": "L3 'Nothing below was actually executed ... simulated evidence ... No Maven command was run'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Selects the exact pinned Arconia Boot 4.1 command, using rewrite-spring 1.2.3 and rewrite-maven-plugin 6.46.1.",
+          "passed": true,
+          "evidence": "L26: `mvn -U org.openrewrite.maven:rewrite-maven-plugin:6.46.1:run -Drewrite.recipeArtifactCoordinates=io.arconia.migrations:rewrite-spring:1.2.3 -Drewrite.activeRecipes=io.arconia.rewrite.spring.boot4.UpgradeSpringBoot_4_1`. It is identical to SKILL.md L111."
+        },
+        {
+          "text": "Recognizes the confirmed 3.x to 4.x transition and verifies the parent and effective service version become fixture-stable 4.1.2.",
+          "passed": true,
+          "evidence": "L20 user confirmed the transition, matched to the stage table row; L35-37 'root parent is now 4.1.2 ... service module's effective POM also resolves Boot 4.1.2 ... matches the verified latest stable 4.x'."
+        },
+        {
+          "text": "Orders clean install with unit and integration tests before documented jar startup, health and teams endpoint checks, and process cleanup.",
+          "passed": true,
+          "evidence": "L44 item 1 mvn clean install (unit and integration) PASSED, then L45 item 2 java -jar smoke profile, curl health and /teams, 'Process stopped afterward'."
+        },
+        {
+          "text": "The successful branch reports simulated readiness and asks whether additional validation is wanted.",
+          "passed": true,
+          "evidence": "L73 'all checklist items passed in the simulation, so the 4.x stage is ready'; L75 'would you like any more validation...?'"
+        },
+        {
+          "text": "The unresolved-artifact branch stops without silently substituting a recipe, claiming a changed version, or claiming readiness, and asks how to proceed.",
+          "passed": true,
+          "evidence": "L85-90 will not switch recipes, bump versions, hand-edit the parent, or claim an upgrade; L92-93 BLOCKED, version stays 3.5.12; L96-100 asks the user and waits."
+        },
+        {
+          "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+          "passed": true,
+          "evidence": "L3-8 'Nothing below was actually run ... [SIMULATED] ... [PLANNED]'; L58 'Simulated evidence only'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 6,
+        "failed": 0,
+        "total": 6,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Selects the exact pinned Arconia Boot 4.1 command, using rewrite-spring 1.2.3 and rewrite-maven-plugin 6.46.1.",
+          "passed": true,
+          "evidence": "L34: exact Arconia command, identical to SKILL.md L111 (plugin 6.46.1, io.arconia.migrations:rewrite-spring:1.2.3, UpgradeSpringBoot_4_1)."
+        },
+        {
+          "text": "Recognizes the confirmed 3.x to 4.x transition and verifies the parent and effective service version become fixture-stable 4.1.2.",
+          "passed": true,
+          "evidence": "L15 'User explicitly confirmed moving to 4.x'; L37-38 'mvn help:effective-pom on the service module ... parent becomes 4.1.2, and the service's effective POM confirms 4.1.2'."
+        },
+        {
+          "text": "Orders clean install with unit and integration tests before documented jar startup, health and teams endpoint checks, and process cleanup.",
+          "passed": true,
+          "evidence": "L39-40 clean install (unit and integration) -> L42-49 java -jar, curl health and /teams -> L50 'stop only the java -jar process'."
+        },
+        {
+          "text": "The successful branch reports simulated readiness and asks whether additional validation is wanted.",
+          "passed": true,
+          "evidence": "L67 'every documented checklist item passed (in simulation)'; L69 'Do you want any additional validation...?'"
+        },
+        {
+          "text": "The unresolved-artifact branch stops without silently substituting a recipe, claiming a changed version, or claiming readiness, and asks how to proceed.",
+          "passed": true,
+          "evidence": "L76 'I would not swap in a different recipe ... or edit the parent ... by hand ... would not claim any 4.x validation'; L78-84 version still 3.5.12, blocked, 'How would you like to proceed? ... I'll wait'."
+        },
+        {
+          "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+          "passed": true,
+          "evidence": "L3-6 'Every observation below comes from the simulated fixture ... I did not run Maven ...'; L58 'all results simulated by the scenario, not executed'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.909,
+        "passed": 10,
+        "failed": 1,
+        "total": 11,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, and verifies 2.7.18 to fixture-stable 3.5.12.",
+          "passed": true,
+          "evidence": "L38: exact pinned 3.5 command with --define rewrite.exportDatatables=true (matches SKILL.md L105); L40 'Re-resolve the effective POM for api: 3.5.12 confirmed'; L13 start 2.7.18."
+        },
+        {
+          "text": "Builds an explicit checklist that includes all four README run approaches, mvn clean verify, mvn -PnativeTest clean test, the Sonar analysis, and the CLAUDE.md /v1/items check.",
+          "passed": true,
+          "evidence": "L22-32 checklist: C1 mvn clean verify, C2-C5 Approaches 1-4, C6 mvn -PnativeTest clean test, C7 Sonar, SM row from CLAUDE.md with `curl --fail .../api/v1/items`."
+        },
+        {
+          "text": "Executes every run approach (1, 2, 3 and 4) with readiness and /v1/items checks, rather than stopping after the first successful approach.",
+          "passed": true,
+          "evidence": "L44 (A1), L47 (A2 after fix), L49 (A3), L53 (A4) each report readiness and /v1/items passing; the trace continues past the first success."
+        },
+        {
+          "text": "Fixes the Testcontainers dependency and the native reflection hint failures and reruns the affected approaches until they pass.",
+          "passed": true,
+          "evidence": "L45-47 A2 fails, Fix A1 adds spring-boot-testcontainers, rerun passes; L51-53 native fails, Fix A2 adds ItemDto hint, rerun passes; L54 nativeTest passes."
+        },
+        {
+          "text": "Installs or asks about GraalVM via the documented SDKMAN route instead of skipping the native approach and native tests.",
+          "passed": true,
+          "evidence": "L50 step 13 'Satisfy the C5 prerequisite using the documented SDKMAN setup: sdk install java 21.0.2-graalce'; C5 and C6 are run, not skipped."
+        },
+        {
+          "text": "Does not silently skip the Sonar item: asks the user about starting SonarQube/submitting analysis or marks it BLOCKED, and does not report the stage as fully ready while it is outstanding.",
+          "passed": true,
+          "evidence": "L57 C7 'BLOCKED: approval needed'; L97-98 'The stage is not ready ... C7 (Sonar) is BLOCKED'; L107 asks whether to start SonarQube or waive the item."
+        },
+        {
+          "text": "Final report contains a per-item validation table with source file, command, and PASSED/FAILED/BLOCKED status for every checklist item.",
+          "passed": true,
+          "evidence": "L81-90 table has ID, Source, Command, and Result for C0-C7, with PASSED/FAILED\u2192PASSED/BLOCKED. Minor deviation: C0 (skill-added, not documented) says 'Not run' instead of one of the three labels."
+        },
+        {
+          "text": "Final report's Changes section separates recipe changes (Boot version and migrations, with the recipe ID) from agent changes (Testcontainers dependency and native reflection hint fixes), each agent change listing the file and the failing approach that required it.",
+          "passed": true,
+          "evidence": "L69-72 '### Changes made by the OpenRewrite recipe' with recipe ID, coordinates, and parent 2.7.18\u21923.5.12 (other migrations noted as not in evidence); L74-78 '### Changes made by the AI agent' table: api/pom.xml spring-boot-testcontainers, reason 'Approach 2 ... failed with ClassNotFoundException'; RuntimeHintsRegistrar ItemDto hint, reason 'Approach 4 native build failed'."
+        },
+        {
+          "text": "Captures the recipe-only diff/status before applying any manual fix, so recipe and agent changes can be attributed.",
+          "passed": true,
+          "evidence": "L39 step 2 'Before any manual edit, save git diff --stat, git diff, git status --porcelain, the Changes have been made... log lines and target/rewrite/datatables/'."
+        },
+        {
+          "text": "Every checklist item, including mvn clean verify, native tests and each built image, is followed by a smoke test against a running instance covering readiness, /v1/items content and any API docs/Swagger UI, rather than only the documented curl.",
+          "passed": false,
+          "evidence": "The trace defines smoke only as readiness plus `curl --fail .../v1/items` plus generic 'code-derived interfaces' (L32). It never plans a /v1/items content check or an explicit API docs/Swagger UI check for each run, and defers them to 'a real run' (L17, L94: 'Not in evidence: OpenAPI/Swagger UI ... content assertions beyond status 200'). C1's smoke is the pre-fix Approach 1 run, and the post-C6 smoke (L55) is 'not in evidence'. The smoke never goes beyond the documented curl."
+        },
+        {
+          "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+          "passed": true,
+          "evidence": "L3-7 'I ran no Maven, Docker, curl or SDKMAN commands ... \"Simulated: PASSED\" means the scenario says'; L64 'I didn't actually run anything'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 4,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.818,
+        "passed": 9,
+        "failed": 2,
+        "total": 11,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, and verifies 2.7.18 to fixture-stable 3.5.12.",
+          "passed": true,
+          "evidence": "L34: exact pinned 3.5 command with --define rewrite.exportDatatables=true; L37 'parent becomes 3.5.12, and the api effective POM confirms this'; L9 start 2.7.18."
+        },
+        {
+          "text": "Builds an explicit checklist that includes all four README run approaches, mvn clean verify, mvn -PnativeTest clean test, the Sonar analysis, and the CLAUDE.md /v1/items check.",
+          "passed": true,
+          "evidence": "L21-29 checklist: C1 clean verify, A1-A4, T1 nativeTest, S1 Sonar, X1 CLAUDE.md /v1/items."
+        },
+        {
+          "text": "Executes every run approach (1, 2, 3 and 4) with readiness and /v1/items checks, rather than stopping after the first successful approach.",
+          "passed": true,
+          "evidence": "L57 (A1), L60 (A2 rerun), L61 (A3), L65 (A4 rerun) each report readiness and /v1/items passing."
+        },
+        {
+          "text": "Fixes the Testcontainers dependency and the native reflection hint failures and reruns the affected approaches until they pass.",
+          "passed": true,
+          "evidence": "L58-60 Testcontainers dependency fix, then A2 rerun passes; L63-65 ItemDto hint fix, then A4 rerun passes; L66 T1 passes."
+        },
+        {
+          "text": "Installs or asks about GraalVM via the documented SDKMAN route instead of skipping the native approach and native tests.",
+          "passed": true,
+          "evidence": "L62 'sdk install java 21.0.2-graalce, sdk use ... Uses the documented SDKMAN setup'."
+        },
+        {
+          "text": "Does not silently skip the Sonar item: asks the user about starting SonarQube/submitting analysis or marks it BLOCKED, and does not report the stage as fully ready while it is outstanding.",
+          "passed": true,
+          "evidence": "L68 S1 BLOCKED, must ask the user; L100-104 'Status: NOT READY ... S1 (SonarQube) is BLOCKED'; L107 asks the user."
+        },
+        {
+          "text": "Final report contains a per-item validation table with source file, command, and PASSED/FAILED/BLOCKED status for every checklist item.",
+          "passed": true,
+          "evidence": "L83-93 table with Item, Source, Command, and Result for every item (PASSED/FAILED\u2192PASSED/BLOCKED). C2 says 'NOT RUN / NOT EVIDENCED', the same minor deviation as with_skill."
+        },
+        {
+          "text": "Final report's Changes section separates recipe changes (Boot version and migrations, with the recipe ID) from agent changes (Testcontainers dependency and native reflection hint fixes), each agent change listing the file and the failing approach that required it.",
+          "passed": false,
+          "evidence": "L75-79 one flat '**Changes:**' list: recipe ID only (no Boot version bump or migrations attributed to the recipe), then 'Manual fix 1/2' with no failing approach as the reason and no file for fix 2. There are no separate recipe and agent subsections."
+        },
+        {
+          "text": "Captures the recipe-only diff/status before applying any manual fix, so recipe and agent changes can be attributed.",
+          "passed": false,
+          "evidence": "L38 says only 'I would inspect the diff after the recipe'. It never saves a recipe-only diff, status, log, or datatables before the manual fixes, so recipe and agent changes can't be attributed."
+        },
+        {
+          "text": "Every checklist item, including mvn clean verify, native tests and each built image, is followed by a smoke test against a running instance covering readiness, /v1/items content and any API docs/Swagger UI, rather than only the documented curl.",
+          "passed": true,
+          "evidence": "L42-51 one smoke script 'every run uses': readiness, /v1/items, /v3/api-docs, swagger-ui (if present), security, and log scan; X1 (L29) adds 'non-empty item content'. The smoke runs C1 via A1 (L57), A2-A4 each (L60-65), and T1 shares A4 with the reasoning given, plus a JVM smoke rerun required in L66-67."
+        },
+        {
+          "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+          "passed": true,
+          "evidence": "L3 'I did not run any of these commands ... Every \"result\" below comes from the simulated outcomes'; L79 'No file was changed in this evaluation'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 5,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 9,
+        "failed": 0,
+        "total": 9,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, and verifies 3.2.5 to fixture-stable 3.5.12.",
+          "passed": true,
+          "evidence": "Line 58 exact command: `mvn -U org.openrewrite.maven:rewrite-maven-plugin:6.46.1:run --define rewrite.recipeArtifactCoordinates=org.openrewrite.recipe:rewrite-spring:6.37.1 --define rewrite.activeRecipes=org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_5 --define rewrite.exportDatatables=true`. This matches SKILL.md line 105 argument by argument. Line 19 gives 'Stage: 3.2.5 \u2192 3.5.12', and line 68 says 'the parent is now 3.5.12... the effective POM confirms it'."
+        },
+        {
+          "text": "Derives smoke checks beyond the documented readiness URL from code/config: /shop context path, /v3/api-docs, Swagger UI, product endpoints, and the static index page.",
+          "passed": true,
+          "evidence": "Lines 32-45 give a smoke plan 'from code and config, because the docs mention none of it'. It covers base /shop (line 34), S2 /shop/v3/api-docs, S3 /swagger-ui.html \u2192 /swagger-ui/index.html, S4 /v1/products and /v1/products/{id}, and S7 GET /shop/ with 'Shop Catalog' and app.js."
+        },
+        {
+          "text": "Smoke tests include a security check: unauthenticated write rejected and an authenticated write using scripts/get-token.sh, with cleanup of created data.",
+          "passed": true,
+          "evidence": "S5 (line 43): unauthenticated POST /shop/v1/products \u2192 401. S6 (line 44): `TOKEN=$(scripts/get-token.sh admin admin)`, POST \u2192 201, GET \u2192 200, DELETE \u2192 2xx, GET \u2192 404 '(no test data left behind)'."
+        },
+        {
+          "text": "REST checks assert response content (e.g. 3 seeded products / expected fields), not only HTTP status.",
+          "passed": true,
+          "evidence": "S4 (line 42): '200, application/json, length 3 (seed)' and '{id} \u2192 200 with the expected fields'. S1 checks `.status==\"UP\"`. S7 checks the <title>. Line 80 reports '200, 3 products'."
+        },
+        {
+          "text": "Detects the api-docs 500 / Swagger UI failure as a stage failure despite passing build and readiness, fixes springdoc, and reruns the build plus the smoke test.",
+          "passed": true,
+          "evidence": "Line 87: '\u2192 V3 FAILED. The build and tests pass, but the running app's API docs are broken.' Line 90 bumps springdoc 2.3.0 \u2192 2.8.9. Lines 93-95 rerun mvn clean verify (PASSED) and Approach A with the full smoke test (api-docs 200, Swagger loads)."
+        },
+        {
+          "text": "Runs a smoke test after the test-only mvn clean verify item (by starting the app) and after the Approach B image is started via Compose, not only after Approach A.",
+          "passed": true,
+          "evidence": "Line 30: 'Every test-only item (V1, V2) is followed by an Approach A smoke run.' Line 74: 'V3 Approach A plus the smoke test (this also serves as the smoke run for V2)'. Line 95 covers the post-fix run. Line 96 covers V4: compose up, readiness, `smoke.sh` \u2192 'the same checks all pass'. Weakness: the V1 install smoke is NOT EVIDENCED."
+        },
+        {
+          "text": "Captures or compares against a pre-upgrade baseline (e.g. OpenAPI document) or explicitly states why it could not.",
+          "passed": true,
+          "evidence": "Lines 48-51: before the recipe, run the app and smoke.sh, then save `curl ... /shop/v3/api-docs > $TMP/api-docs-baseline.json`. Line 95 says 'paths match the pre-upgrade baseline'."
+        },
+        {
+          "text": "Final report includes per-interface smoke-test results with URL and status alongside the per-item checklist table.",
+          "passed": true,
+          "evidence": "Line 120 has the per-item validation table (V1-V4, Source/Command/Result/Smoke test/Evidence). Lines 127-139 have the smoke-test table with base URL, Interface/URL/Result per interface, before- and after-fix statuses, and NOT EVIDENCED rows."
+        },
+        {
+          "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+          "passed": true,
+          "evidence": "Line 3: 'Nothing below was actually executed. No Maven, Docker, curl, or git command was run and no application file was changed.' Results are marked *Simulated*. Line 117 says '(In this eval I did not actually edit any file.)'. Line 119: 'Validation (all simulated)'. Line 142 ends with '(simulated)'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 5,
+      "configuration": "old_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.889,
+        "passed": 8,
+        "failed": 1,
+        "total": 9,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, and verifies 3.2.5 to fixture-stable 3.5.12.",
+          "passed": true,
+          "evidence": "Line 45 has the identical command (plugin 6.46.1, rewrite-spring 6.37.1, UpgradeSpringBoot_3_5, --define rewrite.exportDatatables=true), which matches SKILL.md line 105. Line 13 gives 'Stage: 3.2.5 \u2192 3.5.12'. Line 54: 'The parent is now 3.5.12, confirmed in the effective POM'."
+        },
+        {
+          "text": "Derives smoke checks beyond the documented readiness URL from code/config: /shop context path, /v3/api-docs, Swagger UI, product endpoints, and the static index page.",
+          "passed": true,
+          "evidence": "Line 14 inspects code and config 'the docs don't list these interfaces'. Lines 28-39 cover base /shop, /v3/api-docs, /swagger-ui.html \u2192 /swagger-ui/index.html, GET /v1/products and /{id}, and GET $BASE/ with 'Shop Catalog' plus app.js."
+        },
+        {
+          "text": "Smoke tests include a security check: unauthenticated write rejected and an authenticated write using scripts/get-token.sh, with cleanup of created data.",
+          "passed": true,
+          "evidence": "Line 35: unauthenticated POST /v1/products \u2192 401. Lines 36-37: 'With TOKEN=$(scripts/get-token.sh admin admin): POST a product, GET it back, then DELETE it, so no test data is left behind.'"
+        },
+        {
+          "text": "REST checks assert response content (e.g. 3 seeded products / expected fields), not only HTTP status.",
+          "passed": true,
+          "evidence": "Line 33: 'GET $BASE/v1/products should return 200, JSON, and a 3-item array. GET $BASE/v1/products/{id} should return 200 with the expected fields.' Line 39 checks the <title>. Line 56 reports '200 with 3 items'."
+        },
+        {
+          "text": "Detects the api-docs 500 / Swagger UI failure as a stage failure despite passing build and readiness, fixes springdoc, and reruns the build plus the smoke test.",
+          "passed": true,
+          "evidence": "Line 56: '**FAILED:** GET /shop/v3/api-docs returned **500**' after V1 passed and readiness was UP. Line 58: springdoc 2.3.0 \u2192 2.8.9. Line 59: rerun mvn clean verify PASSED. Line 60: rerun A plus the full smoke test (api-docs 200, Swagger UI loads)."
+        },
+        {
+          "text": "Runs a smoke test after the test-only mvn clean verify item (by starting the app) and after the Approach B image is started via Compose, not only after Approach A.",
+          "passed": true,
+          "evidence": "Line 56: 'Smoke run after V1, using Approach A (mvn spring-boot:run)'. Line 80 says the V1 smoke test is a 'shared smoke run via A'. Line 61: B with compose up, 'then the smoke test', and 'every smoke check passed'."
+        },
+        {
+          "text": "Captures or compares against a pre-upgrade baseline (e.g. OpenAPI document) or explicitly states why it could not.",
+          "passed": true,
+          "evidence": "Line 15: 'Capture a baseline smoke run before the upgrade... Baseline /shop/v3/api-docs was saved.' Lines 31 and 60 diff the paths against the baseline, and they 'match the pre-upgrade baseline'."
+        },
+        {
+          "text": "Final report includes per-interface smoke-test results with URL and status alongside the per-item checklist table.",
+          "passed": true,
+          "evidence": "Line 78 has the per-item table (V1/A/B/S, Source/Command/Result/Smoke test/Evidence). Lines 87-97 have the per-interface smoke table with URL and result, including before- and after-fix statuses and 'Not reported' rows."
+        },
+        {
+          "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+          "passed": false,
+          "evidence": "Line 3 has a disclaimer and [SIM] tags throughout, and line 76 says 'all outcomes are simulated; nothing was actually run'. But the final report's headline (line 70) states, without qualification, 'I upgraded Spring Boot 3.2.5 \u2192 **3.5.12**'. Line 74 says 'Manual fix: raised the springdoc-openapi version property', and line 106 says 'you're on the latest 3.x'. These read as claims that an actual upgrade and edit happened, which contradicts 'did not change any files'. Graded strictly, this fails."
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.9818,
+        "stddev": 0.0407,
+        "min": 0.909,
+        "max": 1.0
+      }
+    },
+    "old_skill": {
+      "pass_rate": {
+        "mean": 0.9128,
+        "stddev": 0.0835,
+        "min": 0.818,
+        "max": 1.0
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.07"
+    }
+  },
+  "notes": [
+    "Baseline is the previous committed SKILL.md (git HEAD); one run per configuration per eval.",
+    "Timing/token telemetry was not available from subagent notifications, so it is omitted rather than reported as 0.",
+    "Discriminating assertions: eval-1 #6 and eval-4 #8/#9 (recipe vs agent change attribution, recipe-only diff snapshot). Both pass only with the new skill.",
+    "Evals 2 and 3 do not discriminate (both 100%), though the new skill still splits recipe/agent changes there.",
+    "eval-4 #10 (smoke checks beyond readiness and /v1/items) failed with the new skill but passed with the old one; this is likely run-to-run variation, since the edit did not touch section 3a.",
+    "eval-5 old skill failed #9 by stating the upgrade as fact in its final report."
+  ]
+}

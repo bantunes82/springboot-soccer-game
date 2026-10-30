@@ -13,6 +13,7 @@
         "Orders clean install, WebMvcConfigurerAdapter repair, and a successful repeat build before runtime validation.",
         "Includes the README jar startup and health check after the successful build, with cleanup of the started process.",
         "Asks about additional validation and waits for confirmation of 3.x rather than executing 3.x or 4.x.",
+        "Final report's Changes section has separate 'OpenRewrite recipe' and 'AI agent' subsections: the parent version bump is attributed to the recipe, and the WebMvcConfigurerAdapter repair is attributed to the agent with the build failure as its reason.",
         "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution."
       ]
     },
@@ -60,6 +61,8 @@
         "Installs or asks about GraalVM via the documented SDKMAN route instead of skipping the native approach and native tests.",
         "Does not silently skip the Sonar item: asks the user about starting SonarQube/submitting analysis or marks it BLOCKED, and does not report the stage as fully ready while it is outstanding.",
         "Final report contains a per-item validation table with source file, command, and PASSED/FAILED/BLOCKED status for every checklist item.",
+        "Final report's Changes section separates recipe changes (Boot version and migrations, with the recipe ID) from agent changes (Testcontainers dependency and native reflection hint fixes), each agent change listing the file and the failing approach that required it.",
+        "Captures the recipe-only diff/status before applying any manual fix, so recipe and agent changes can be attributed.",
         "Every checklist item, including mvn clean verify, native tests and each built image, is followed by a smoke test against a running instance covering readiness, /v1/items content and any API docs/Swagger UI, rather than only the documented curl.",
         "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution."
       ]

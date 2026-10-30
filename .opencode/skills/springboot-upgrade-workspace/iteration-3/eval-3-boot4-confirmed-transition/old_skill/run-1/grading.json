@@ -1,0 +1,43 @@
+{
+  "expectations": [
+    {
+      "text": "Selects the exact pinned Arconia Boot 4.1 command, using rewrite-spring 1.2.3 and rewrite-maven-plugin 6.46.1.",
+      "passed": true,
+      "evidence": "L34: exact Arconia command, identical to SKILL.md L111 (plugin 6.46.1, io.arconia.migrations:rewrite-spring:1.2.3, UpgradeSpringBoot_4_1)."
+    },
+    {
+      "text": "Recognizes the confirmed 3.x to 4.x transition and verifies the parent and effective service version become fixture-stable 4.1.2.",
+      "passed": true,
+      "evidence": "L15 'User explicitly confirmed moving to 4.x'; L37-38 'mvn help:effective-pom on the service module ... parent becomes 4.1.2, and the service's effective POM confirms 4.1.2'."
+    },
+    {
+      "text": "Orders clean install with unit and integration tests before documented jar startup, health and teams endpoint checks, and process cleanup.",
+      "passed": true,
+      "evidence": "L39-40 clean install (unit and integration) -> L42-49 java -jar, curl health and /teams -> L50 'stop only the java -jar process'."
+    },
+    {
+      "text": "The successful branch reports simulated readiness and asks whether additional validation is wanted.",
+      "passed": true,
+      "evidence": "L67 'every documented checklist item passed (in simulation)'; L69 'Do you want any additional validation...?'"
+    },
+    {
+      "text": "The unresolved-artifact branch stops without silently substituting a recipe, claiming a changed version, or claiming readiness, and asks how to proceed.",
+      "passed": true,
+      "evidence": "L76 'I would not swap in a different recipe ... or edit the parent ... by hand ... would not claim any 4.x validation'; L78-84 version still 3.5.12, blocked, 'How would you like to proceed? ... I'll wait'."
+    },
+    {
+      "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+      "passed": true,
+      "evidence": "L3-6 'Every observation below comes from the simulated fixture ... I did not run Maven ...'; L58 'all results simulated by the scenario, not executed'."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "eval_feedback": {
+    "overall": "Both skill versions pass everything; nothing here discriminates. No assertion covers the Changes split, even though with_skill (L62-67) separates recipe and agent changes and says 'none' for the agent, while old_skill (L56) uses a single combined line. The cleanup assertion is satisfied by a planned 'stop' statement, so it can't tell planned cleanup from performed cleanup."
+  }
+}

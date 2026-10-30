@@ -1,0 +1,43 @@
+{
+  "expectations": [
+    {
+      "text": "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, as the immediate upgrade command.",
+      "passed": true,
+      "evidence": "L36: exact pinned 3.5 command including --define rewrite.exportDatatables=true. It matches SKILL.md L105."
+    },
+    {
+      "text": "Uses the BOM property and effective module versions to verify 3.2.0 to fixture-stable 3.5.12 rather than relying on the plugin version.",
+      "passed": true,
+      "evidence": "L11 BOM property spring-boot.version=3.2.0; 'The Boot Maven plugin has its own version, which does not set the dependency version'; L43 'BOM property changed 3.2.0 \u2192 3.5.12, and the effective POMs show 3.5.12 for every module'."
+    },
+    {
+      "text": "Runs clean install before the separately required mvn -Pintegration verify and distinguishes unit-test success from integration-test failure.",
+      "passed": true,
+      "evidence": "L44 clean install 'succeeds with unit tests only. No integration tests ran ... does not cover the integration requirement'; L46 `mvn -Pintegration verify` fails, PostgreSQL connection refused."
+    },
+    {
+      "text": "Reports unavailable PostgreSQL as blocking integration and runtime validation, with no invented successful provisioning or readiness.",
+      "passed": true,
+      "evidence": "L47 'I would not invent a database setup ... Item 2 \u2192 BLOCKED'; L48 runtime items 3\u20134 BLOCKED; L62-64 table."
+    },
+    {
+      "text": "Pauses the incomplete 3.x stage without executing the 4.x migration or treating it as ready to proceed.",
+      "passed": true,
+      "evidence": "L68 'NOT READY ... I am not proposing the 3.x \u2192 4.x stage'; L75 'I won't start that stage before then'."
+    },
+    {
+      "text": "Clearly labels the trace and observed outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+      "passed": true,
+      "evidence": "L3 'Nothing below was actually executed ... simulated evidence ... No Maven command was run'."
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  },
+  "eval_feedback": {
+    "overall": "Both skill versions pass every assertion, so this eval doesn't discriminate. Because the scenario has no agent changes, it never tests the Changes-section split; one could check that the report explicitly says 'no AI-agent changes' under a separate recipe/agent heading (with_skill L64-70 does this, old_skill L55 doesn't)."
+  }
+}

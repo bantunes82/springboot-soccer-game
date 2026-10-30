@@ -1,0 +1,58 @@
+{
+  "expectations": [
+    {
+      "text": "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, and verifies 3.2.5 to fixture-stable 3.5.12.",
+      "passed": true,
+      "evidence": "Line 45 has the identical command (plugin 6.46.1, rewrite-spring 6.37.1, UpgradeSpringBoot_3_5, --define rewrite.exportDatatables=true), which matches SKILL.md line 105. Line 13 gives 'Stage: 3.2.5 \u2192 3.5.12'. Line 54: 'The parent is now 3.5.12, confirmed in the effective POM'."
+    },
+    {
+      "text": "Derives smoke checks beyond the documented readiness URL from code/config: /shop context path, /v3/api-docs, Swagger UI, product endpoints, and the static index page.",
+      "passed": true,
+      "evidence": "Line 14 inspects code and config 'the docs don't list these interfaces'. Lines 28-39 cover base /shop, /v3/api-docs, /swagger-ui.html \u2192 /swagger-ui/index.html, GET /v1/products and /{id}, and GET $BASE/ with 'Shop Catalog' plus app.js."
+    },
+    {
+      "text": "Smoke tests include a security check: unauthenticated write rejected and an authenticated write using scripts/get-token.sh, with cleanup of created data.",
+      "passed": true,
+      "evidence": "Line 35: unauthenticated POST /v1/products \u2192 401. Lines 36-37: 'With TOKEN=$(scripts/get-token.sh admin admin): POST a product, GET it back, then DELETE it, so no test data is left behind.'"
+    },
+    {
+      "text": "REST checks assert response content (e.g. 3 seeded products / expected fields), not only HTTP status.",
+      "passed": true,
+      "evidence": "Line 33: 'GET $BASE/v1/products should return 200, JSON, and a 3-item array. GET $BASE/v1/products/{id} should return 200 with the expected fields.' Line 39 checks the <title>. Line 56 reports '200 with 3 items'."
+    },
+    {
+      "text": "Detects the api-docs 500 / Swagger UI failure as a stage failure despite passing build and readiness, fixes springdoc, and reruns the build plus the smoke test.",
+      "passed": true,
+      "evidence": "Line 56: '**FAILED:** GET /shop/v3/api-docs returned **500**' after V1 passed and readiness was UP. Line 58: springdoc 2.3.0 \u2192 2.8.9. Line 59: rerun mvn clean verify PASSED. Line 60: rerun A plus the full smoke test (api-docs 200, Swagger UI loads)."
+    },
+    {
+      "text": "Runs a smoke test after the test-only mvn clean verify item (by starting the app) and after the Approach B image is started via Compose, not only after Approach A.",
+      "passed": true,
+      "evidence": "Line 56: 'Smoke run after V1, using Approach A (mvn spring-boot:run)'. Line 80 says the V1 smoke test is a 'shared smoke run via A'. Line 61: B with compose up, 'then the smoke test', and 'every smoke check passed'."
+    },
+    {
+      "text": "Captures or compares against a pre-upgrade baseline (e.g. OpenAPI document) or explicitly states why it could not.",
+      "passed": true,
+      "evidence": "Line 15: 'Capture a baseline smoke run before the upgrade... Baseline /shop/v3/api-docs was saved.' Lines 31 and 60 diff the paths against the baseline, and they 'match the pre-upgrade baseline'."
+    },
+    {
+      "text": "Final report includes per-interface smoke-test results with URL and status alongside the per-item checklist table.",
+      "passed": true,
+      "evidence": "Line 78 has the per-item table (V1/A/B/S, Source/Command/Result/Smoke test/Evidence). Lines 87-97 have the per-interface smoke table with URL and result, including before- and after-fix statuses and 'Not reported' rows."
+    },
+    {
+      "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+      "passed": false,
+      "evidence": "Line 3 has a disclaimer and [SIM] tags throughout, and line 76 says 'all outcomes are simulated; nothing was actually run'. But the final report's headline (line 70) states, without qualification, 'I upgraded Spring Boot 3.2.5 \u2192 **3.5.12**'. Line 74 says 'Manual fix: raised the springdoc-openapi version property', and line 106 says 'you're on the latest 3.x'. These read as claims that an actual upgrade and edit happened, which contradicts 'did not change any files'. Graded strictly, this fails."
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 1,
+    "total": 9,
+    "pass_rate": 0.889
+  },
+  "eval_feedback": {
+    "overall": "Assertions discriminate smoke-test derivation and the api-docs failure well, but both runs satisfy nearly all of them, so they do not distinguish the skills. Consider adding an assertion for separate recipe-vs-agent change attribution in the final report and for not marking the stage ready while mvn clean install is unevidenced (both runs handled that)."
+  }
+}

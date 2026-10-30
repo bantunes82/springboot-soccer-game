@@ -119,6 +119,22 @@ After each recipe, complete all these steps before considering another stage:
    Confirm the actual resulting Boot version against the selected stable target
    across the reactor. If nothing changed unexpectedly, or versions are
    inconsistent, investigate before declaring success.
+   - **Record what the recipe changed before you change anything yourself.**
+     The final report must separate recipe changes from agent changes (section
+     4), and that becomes guesswork once both are mixed in the working tree.
+     Right after the recipe exits, save `git diff --stat`, `git diff`, and
+     `git status --porcelain` to the temp directory (new files are untracked and
+     do not appear in `git diff`). Also keep the recipe's evidence of which
+     sub-recipe touched which file: the `Changes have been made to <file> by:`
+     lines in the Maven log, and, when `rewrite.exportDatatables=true` was used,
+     the datatables under `target/rewrite/datatables/` (e.g. source-file
+     results). If the tree had user changes before the recipe, snapshot those
+     first too, so they are attributed to neither.
+   - From this point on, keep a short **agent change log**: for every edit you
+     make (code, POM, configuration, tests, docs, scripts), note the file, what
+     changed, and the failure or reason that required it (e.g. "compile error
+     in `X.java`", "smoke test: `/v3/api-docs` 500"). Also log when you revert
+     or adjust something the recipe did — that is an agent change too.
 2. Run `mvn clean install` from the appropriate reactor root (or its project
    wrapper equivalent). Do not skip tests to manufacture a successful build.
 3. Fix migration-related compilation, unit-test, and integration-test failures,
@@ -225,7 +241,41 @@ that check BLOCKED with the reason and ask the user — do not quietly drop it.
 Summarize:
 
 - **Version:** initial → actual resulting version, stage, stable-release evidence.
-- **Changes:** recipe used and material manual fixes.
+- **Changes:** split into two clearly labeled subsections so the user can tell
+  automated migration from hand-made fixes — they carry different risk and
+  review needs (recipe edits are mechanical and repeatable; agent edits are
+  judgment calls that deserve closer review). Base both on the snapshot and
+  change log from section 3, step 1, not on memory.
+  - **Changes made by the OpenRewrite recipe:** the exact command and recipe ID
+    (with artifact coordinates), then the files it modified/added/deleted,
+    grouped by kind of change (e.g. Boot parent/BOM version, dependency
+    coordinates and versions, `javax.*` → `jakarta.*` imports, renamed
+    properties, Spring Security API migrations, plugin updates), naming the
+    responsible sub-recipe where the log or datatables show it. If the recipe
+    changed nothing, say so.
+  - **Changes made by the AI agent:** one entry per change with file(s), what
+    was changed, and why — the failing build/test/approach/smoke check that
+    required it, or another reason (e.g. aligning a version the recipe missed,
+    updating docs/commands). Include any recipe change you reverted or adjusted,
+    and say explicitly if you made no manual changes.
+
+  If a single file was touched by both, list it in both subsections, each
+  describing only its own part. Pre-existing user changes belong to neither.
+  Example layout:
+
+  ```markdown
+  ### Changes made by the OpenRewrite recipe
+  Recipe: `org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_5`
+  (`org.openrewrite.recipe:rewrite-spring:6.37.1`) — 7 files
+  - `pom.xml`: Boot parent 3.2.5 → 3.5.x; springdoc 2.3.0 → 2.8.x (UpgradeSpringBoot_3_5 → UpgradeDependencyVersion)
+  - `src/main/resources/application.yml`: renamed `management.metrics.export.*` properties (ChangeSpringPropertyKey)
+
+  ### Changes made by the AI agent
+  | File | Change | Reason |
+  | --- | --- | --- |
+  | `TestContainersConfiguration.java` | Replaced removed `@ServiceConnection` attribute | `mvn clean verify` compile error |
+  | `RestTeamRuntimeHints.java` | Registered reflection hint for `TeamDto` | Native smoke test: `/v1/teams` 500 |
+  ```
 - **Validation:** the full documented validation checklist as a table, one row
   per item: source (file → heading), command(s), result (PASSED / FAILED /
   BLOCKED / WAIVED by user), smoke-test result, and evidence. Every item found in

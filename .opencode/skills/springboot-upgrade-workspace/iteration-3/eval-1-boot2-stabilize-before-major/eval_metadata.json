@@ -1,0 +1,14 @@
+{
+  "eval_id": 1,
+  "eval_name": "boot2-stabilize-before-major",
+  "prompt": "We want to take this old Spring Boot service to 4.x. Using the isolated evidence in scenario.md, produce an ordered decision trace for the immediate stage, including exact commands, repair and validation steps, and the final message you would send me. Work only from the provided simulated evidence; do not execute Maven or change application files. Distinguish simulated observations from real execution. Save your answer as response.md.",
+  "assertions": [
+    "Selects the exact pinned Boot 2.7 OpenRewrite command, including datatable export, as the immediate upgrade command.",
+    "Identifies the parent change from 2.3.12.RELEASE to fixture-stable 2.7.18 and verifies inherited module versions after the recipe.",
+    "Orders clean install, WebMvcConfigurerAdapter repair, and a successful repeat build before runtime validation.",
+    "Includes the README jar startup and health check after the successful build, with cleanup of the started process.",
+    "Asks about additional validation and waits for confirmation of 3.x rather than executing 3.x or 4.x.",
+    "Final report's Changes section has separate 'OpenRewrite recipe' and 'AI agent' subsections: the parent version bump is attributed to the recipe, and the WebMvcConfigurerAdapter repair is attributed to the agent with the build failure as its reason.",
+    "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution."
+  ]
+}

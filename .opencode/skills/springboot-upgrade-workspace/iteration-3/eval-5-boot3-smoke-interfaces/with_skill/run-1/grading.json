@@ -1,0 +1,58 @@
+{
+  "expectations": [
+    {
+      "text": "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, and verifies 3.2.5 to fixture-stable 3.5.12.",
+      "passed": true,
+      "evidence": "Line 58 exact command: `mvn -U org.openrewrite.maven:rewrite-maven-plugin:6.46.1:run --define rewrite.recipeArtifactCoordinates=org.openrewrite.recipe:rewrite-spring:6.37.1 --define rewrite.activeRecipes=org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_5 --define rewrite.exportDatatables=true`. This matches SKILL.md line 105 argument by argument. Line 19 gives 'Stage: 3.2.5 \u2192 3.5.12', and line 68 says 'the parent is now 3.5.12... the effective POM confirms it'."
+    },
+    {
+      "text": "Derives smoke checks beyond the documented readiness URL from code/config: /shop context path, /v3/api-docs, Swagger UI, product endpoints, and the static index page.",
+      "passed": true,
+      "evidence": "Lines 32-45 give a smoke plan 'from code and config, because the docs mention none of it'. It covers base /shop (line 34), S2 /shop/v3/api-docs, S3 /swagger-ui.html \u2192 /swagger-ui/index.html, S4 /v1/products and /v1/products/{id}, and S7 GET /shop/ with 'Shop Catalog' and app.js."
+    },
+    {
+      "text": "Smoke tests include a security check: unauthenticated write rejected and an authenticated write using scripts/get-token.sh, with cleanup of created data.",
+      "passed": true,
+      "evidence": "S5 (line 43): unauthenticated POST /shop/v1/products \u2192 401. S6 (line 44): `TOKEN=$(scripts/get-token.sh admin admin)`, POST \u2192 201, GET \u2192 200, DELETE \u2192 2xx, GET \u2192 404 '(no test data left behind)'."
+    },
+    {
+      "text": "REST checks assert response content (e.g. 3 seeded products / expected fields), not only HTTP status.",
+      "passed": true,
+      "evidence": "S4 (line 42): '200, application/json, length 3 (seed)' and '{id} \u2192 200 with the expected fields'. S1 checks `.status==\"UP\"`. S7 checks the <title>. Line 80 reports '200, 3 products'."
+    },
+    {
+      "text": "Detects the api-docs 500 / Swagger UI failure as a stage failure despite passing build and readiness, fixes springdoc, and reruns the build plus the smoke test.",
+      "passed": true,
+      "evidence": "Line 87: '\u2192 V3 FAILED. The build and tests pass, but the running app's API docs are broken.' Line 90 bumps springdoc 2.3.0 \u2192 2.8.9. Lines 93-95 rerun mvn clean verify (PASSED) and Approach A with the full smoke test (api-docs 200, Swagger loads)."
+    },
+    {
+      "text": "Runs a smoke test after the test-only mvn clean verify item (by starting the app) and after the Approach B image is started via Compose, not only after Approach A.",
+      "passed": true,
+      "evidence": "Line 30: 'Every test-only item (V1, V2) is followed by an Approach A smoke run.' Line 74: 'V3 Approach A plus the smoke test (this also serves as the smoke run for V2)'. Line 95 covers the post-fix run. Line 96 covers V4: compose up, readiness, `smoke.sh` \u2192 'the same checks all pass'. Weakness: the V1 install smoke is NOT EVIDENCED."
+    },
+    {
+      "text": "Captures or compares against a pre-upgrade baseline (e.g. OpenAPI document) or explicitly states why it could not.",
+      "passed": true,
+      "evidence": "Lines 48-51: before the recipe, run the app and smoke.sh, then save `curl ... /shop/v3/api-docs > $TMP/api-docs-baseline.json`. Line 95 says 'paths match the pre-upgrade baseline'."
+    },
+    {
+      "text": "Final report includes per-interface smoke-test results with URL and status alongside the per-item checklist table.",
+      "passed": true,
+      "evidence": "Line 120 has the per-item validation table (V1-V4, Source/Command/Result/Smoke test/Evidence). Lines 127-139 have the smoke-test table with base URL, Interface/URL/Result per interface, before- and after-fix statuses, and NOT EVIDENCED rows."
+    },
+    {
+      "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+      "passed": true,
+      "evidence": "Line 3: 'Nothing below was actually executed. No Maven, Docker, curl, or git command was run and no application file was changed.' Results are marked *Simulated*. Line 117 says '(In this eval I did not actually edit any file.)'. Line 119: 'Validation (all simulated)'. Line 142 ends with '(simulated)'."
+    }
+  ],
+  "summary": {
+    "passed": 9,
+    "failed": 0,
+    "total": 9,
+    "pass_rate": 1.0
+  },
+  "eval_feedback": {
+    "overall": "Assertions discriminate smoke-test derivation and the api-docs failure well, but both runs satisfy nearly all of them, so they do not distinguish the skills. Consider adding an assertion for separate recipe-vs-agent change attribution in the final report and for not marking the stage ready while mvn clean install is unevidenced (both runs handled that)."
+  }
+}

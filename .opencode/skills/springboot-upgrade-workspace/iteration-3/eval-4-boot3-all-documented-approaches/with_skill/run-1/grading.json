@@ -1,0 +1,68 @@
+{
+  "expectations": [
+    {
+      "text": "Selects the exact pinned Boot 3.5 OpenRewrite command, including datatable export, and verifies 2.7.18 to fixture-stable 3.5.12.",
+      "passed": true,
+      "evidence": "L38: exact pinned 3.5 command with --define rewrite.exportDatatables=true (matches SKILL.md L105); L40 'Re-resolve the effective POM for api: 3.5.12 confirmed'; L13 start 2.7.18."
+    },
+    {
+      "text": "Builds an explicit checklist that includes all four README run approaches, mvn clean verify, mvn -PnativeTest clean test, the Sonar analysis, and the CLAUDE.md /v1/items check.",
+      "passed": true,
+      "evidence": "L22-32 checklist: C1 mvn clean verify, C2-C5 Approaches 1-4, C6 mvn -PnativeTest clean test, C7 Sonar, SM row from CLAUDE.md with `curl --fail .../api/v1/items`."
+    },
+    {
+      "text": "Executes every run approach (1, 2, 3 and 4) with readiness and /v1/items checks, rather than stopping after the first successful approach.",
+      "passed": true,
+      "evidence": "L44 (A1), L47 (A2 after fix), L49 (A3), L53 (A4) each report readiness and /v1/items passing; the trace continues past the first success."
+    },
+    {
+      "text": "Fixes the Testcontainers dependency and the native reflection hint failures and reruns the affected approaches until they pass.",
+      "passed": true,
+      "evidence": "L45-47 A2 fails, Fix A1 adds spring-boot-testcontainers, rerun passes; L51-53 native fails, Fix A2 adds ItemDto hint, rerun passes; L54 nativeTest passes."
+    },
+    {
+      "text": "Installs or asks about GraalVM via the documented SDKMAN route instead of skipping the native approach and native tests.",
+      "passed": true,
+      "evidence": "L50 step 13 'Satisfy the C5 prerequisite using the documented SDKMAN setup: sdk install java 21.0.2-graalce'; C5 and C6 are run, not skipped."
+    },
+    {
+      "text": "Does not silently skip the Sonar item: asks the user about starting SonarQube/submitting analysis or marks it BLOCKED, and does not report the stage as fully ready while it is outstanding.",
+      "passed": true,
+      "evidence": "L57 C7 'BLOCKED: approval needed'; L97-98 'The stage is not ready ... C7 (Sonar) is BLOCKED'; L107 asks whether to start SonarQube or waive the item."
+    },
+    {
+      "text": "Final report contains a per-item validation table with source file, command, and PASSED/FAILED/BLOCKED status for every checklist item.",
+      "passed": true,
+      "evidence": "L81-90 table has ID, Source, Command, and Result for C0-C7, with PASSED/FAILED\u2192PASSED/BLOCKED. Minor deviation: C0 (skill-added, not documented) says 'Not run' instead of one of the three labels."
+    },
+    {
+      "text": "Final report's Changes section separates recipe changes (Boot version and migrations, with the recipe ID) from agent changes (Testcontainers dependency and native reflection hint fixes), each agent change listing the file and the failing approach that required it.",
+      "passed": true,
+      "evidence": "L69-72 '### Changes made by the OpenRewrite recipe' with recipe ID, coordinates, and parent 2.7.18\u21923.5.12 (other migrations noted as not in evidence); L74-78 '### Changes made by the AI agent' table: api/pom.xml spring-boot-testcontainers, reason 'Approach 2 ... failed with ClassNotFoundException'; RuntimeHintsRegistrar ItemDto hint, reason 'Approach 4 native build failed'."
+    },
+    {
+      "text": "Captures the recipe-only diff/status before applying any manual fix, so recipe and agent changes can be attributed.",
+      "passed": true,
+      "evidence": "L39 step 2 'Before any manual edit, save git diff --stat, git diff, git status --porcelain, the Changes have been made... log lines and target/rewrite/datatables/'."
+    },
+    {
+      "text": "Every checklist item, including mvn clean verify, native tests and each built image, is followed by a smoke test against a running instance covering readiness, /v1/items content and any API docs/Swagger UI, rather than only the documented curl.",
+      "passed": false,
+      "evidence": "The trace defines smoke only as readiness plus `curl --fail .../v1/items` plus generic 'code-derived interfaces' (L32). It never plans a /v1/items content check or an explicit API docs/Swagger UI check for each run, and defers them to 'a real run' (L17, L94: 'Not in evidence: OpenAPI/Swagger UI ... content assertions beyond status 200'). C1's smoke is the pre-fix Approach 1 run, and the post-C6 smoke (L55) is 'not in evidence'. The smoke never goes beyond the documented curl."
+    },
+    {
+      "text": "Clearly labels the trace and successful outcomes as simulated, without claiming an actual upgrade or actual command execution.",
+      "passed": true,
+      "evidence": "L3-7 'I ran no Maven, Docker, curl or SDKMAN commands ... \"Simulated: PASSED\" means the scenario says'; L64 'I didn't actually run anything'."
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 1,
+    "total": 11,
+    "pass_rate": 0.909
+  },
+  "eval_feedback": {
+    "overall": "The Changes-split and recipe-snapshot assertions discriminate well (old_skill fails both). The smoke-coverage assertion is hard to grade: the fixture only says 'both checks pass', so '/v1/items content' and 'any API docs/Swagger UI' can only be met through planned checks, not evidence. The PASSED/FAILED/BLOCKED table assertion doesn't say how to treat extra non-documented rows such as `mvn clean install` that both runs mark 'Not run'."
+  }
+}
