@@ -21,13 +21,13 @@ public class RestTeamRuntimeHints implements RuntimeHintsRegistrar {
         // Register AbstractWebMvcEndpointHandlerMapping$OperationHandler for reflection
         hints.reflection().registerType(
                 TypeReference.of("org.springframework.boot.webmvc.actuate.endpoint.web.AbstractWebMvcEndpointHandlerMapping$OperationHandler"),
-                typeHint -> typeHint.withMembers(MemberCategory.DECLARED_FIELDS)
+                typeHint -> typeHint.withMembers(MemberCategory.ACCESS_DECLARED_FIELDS)
         );
 
         // Register ServletWebOperation for reflection (related class that might be needed)
         hints.reflection().registerType(
                 TypeReference.of("org.springframework.boot.webmvc.actuate.endpoint.web.AbstractWebMvcEndpointHandlerMapping$ServletWebOperation"),
-                typeHint -> typeHint.withMembers(MemberCategory.DECLARED_FIELDS, MemberCategory.INVOKE_DECLARED_METHODS)
+                typeHint -> typeHint.withMembers(MemberCategory.ACCESS_DECLARED_FIELDS, MemberCategory.INVOKE_DECLARED_METHODS)
         );
     }
 }
