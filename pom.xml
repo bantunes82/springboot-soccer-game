@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.7</version>
+        <version>4.1.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>springboot.soccer.game</groupId>
@@ -24,8 +24,8 @@
         <sonar.password>adminadmin</sonar.password>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <sonar-plugin.version>3.10.0.2594</sonar-plugin.version>
-        <jacoco-plugin.version>0.8.15</jacoco-plugin.version>
-        <jacoco.version>0.8.15</jacoco.version>
+        <jacoco-plugin.version>0.8.16</jacoco-plugin.version>
+        <jacoco.version>0.8.16</jacoco.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
         <springdoc-openapi-starter-webmvc-ui.vesion>3.0.3</springdoc-openapi-starter-webmvc-ui.vesion>
         <loom-unit.version>0.3.0</loom-unit.version>
