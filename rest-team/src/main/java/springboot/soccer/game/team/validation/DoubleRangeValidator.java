@@ -6,14 +6,14 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 @Slf4j
-public class DoubleRangeValidator implements ConstraintValidator<Range, Object> {
+public class DoubleRangeValidator implements ConstraintValidator<LevelRange, Object> {
 
     private Double maxPrecision;
     private Double minPrecision;
     private String message;
 
     @Override
-    public void initialize(Range doubleRange) {
+    public void initialize(LevelRange doubleRange) {
         maxPrecision = doubleRange.max();
         minPrecision = doubleRange.min();
         message = doubleRange.message();

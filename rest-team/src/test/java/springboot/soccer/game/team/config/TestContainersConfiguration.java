@@ -4,7 +4,7 @@ import org.springframework.boot.devtools.restart.RestartScope;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertyRegistrar;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -29,7 +29,7 @@ public class TestContainersConfiguration {
 
     @Bean
     //@RestartScope - it is not possible to use RestartScope annotation for any container of type GenericContainer
-    GenericContainer<?> keycloak(DynamicPropertyRegistry registry) {
+    GenericContainer<?> keycloak() {
         GenericContainer<?> keycloakContainer = new GenericContainer<>(KEYCLOAK_IMAGE)
                 .withCommand("""
                         -c standalone.xml -b 0.0.0.0 -Djboss.http.port=8080 -Dkeycloak.profile.feature.upload_scripts=enabled -Dkeycloak.migration.action=import \
@@ -45,10 +45,13 @@ public class TestContainersConfiguration {
                 .waitingFor(Wait.forHttp("/auth").forStatusCode(200))
                 .withStartupTimeout(Duration.ofSeconds(120));
 
-        Supplier<Object> authServerUrl = () -> "http://%s:%d/auth".formatted(keycloakContainer.getHost(), keycloakContainer.getFirstMappedPort());
-        registry.add("keycloak.auth-server-url", authServerUrl);
-
         return keycloakContainer;
+    }
+
+    @Bean
+    DynamicPropertyRegistrar keycloakProperties(GenericContainer<?> keycloak) {
+        Supplier<Object> authServerUrl = () -> "http://%s:%d/auth".formatted(keycloak.getHost(), keycloak.getFirstMappedPort());
+        return registry -> registry.add("keycloak.auth-server-url", authServerUrl);
     }
 
 }

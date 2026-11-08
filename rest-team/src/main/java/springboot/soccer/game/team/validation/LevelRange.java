@@ -15,7 +15,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Constraint(validatedBy = DoubleRangeValidator.class)
 @Documented
-public @interface Range
+public @interface LevelRange
 {
     String message() default ConstraintMessage.TEAM_LEVEL_INVALID;
 
