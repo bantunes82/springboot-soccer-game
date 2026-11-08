@@ -18,7 +18,6 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:12.0.4
-    network_mode: host
     container_name: keycloak
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://127.0.0.1:8080/auth || exit 1"]
@@ -29,11 +28,11 @@ services:
       - DB_VENDOR=h2
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
-    command: -b 0.0.0.0 -Djgroups.bind_addr=127.0.0.1 -Djboss.http.port=8080 -Dkeycloak.profile.feature.upload_scripts=enabled -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/tmp/keycloak/realms -Dkeycloak.migration.strategy=OVERWRITE_EXISTING
+    command: -c standalone.xml -b 0.0.0.0 -Djboss.http.port=8080 -Dkeycloak.profile.feature.upload_scripts=enabled -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/tmp/keycloak/realms -Dkeycloak.migration.strategy=OVERWRITE_EXISTING
     ports:
       - "8080:8080"
     volumes:
-      - ./keycloak/realms:/tmp/keycloak/realms/
+      - ./keycloak/realms/team-realm.json:/tmp/keycloak/realms/team-realm.json:ro
 
   rest-team:
     image: rest-team:1.0
