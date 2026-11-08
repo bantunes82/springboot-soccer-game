@@ -6,8 +6,8 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.DynamicPropertyRegistrar;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.MountableFile;
 
 import java.time.Duration;
@@ -23,8 +23,8 @@ public class TestContainersConfiguration {
     @Bean
     @RestartScope
     @ServiceConnection
-    PostgreSQLContainer<?> postgres() {
-        return new PostgreSQLContainer<>(POSTGRES_IMAGE);
+    PostgreSQLContainer postgres() {
+        return new PostgreSQLContainer(POSTGRES_IMAGE);
     }
 
     @Bean
